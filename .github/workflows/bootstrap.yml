@@ -38,23 +38,14 @@ jobs:
           if len(chunks) != 10:
               raise SystemExit(f'Expected 10 chunks, found {len(chunks)}')
 
-          for chunk in chunks:
-              print(f'{chunk}: {chunk.stat().st_size} bytes')
-
           encoded = ''.join(chunk.read_text(encoding='utf-8').strip() for chunk in chunks)
           encoded_hash = hashlib.sha256(encoded.encode('ascii')).hexdigest()
-          print(f'encoded bytes: {len(encoded)}')
-          print(f'encoded sha256: {encoded_hash}')
-
           expected_encoded_hash = 'a1fb452858981da2fb241c0d472ab47717c3504742a33b6c41b62ef12e31a3f5'
           if len(encoded) != 45132 or encoded_hash != expected_encoded_hash:
               raise SystemExit('Bootstrap chunks do not match the source package')
 
           archive_bytes = base64.b64decode(encoded, validate=True)
           archive_hash = hashlib.sha256(archive_bytes).hexdigest()
-          print(f'archive bytes: {len(archive_bytes)}')
-          print(f'archive sha256: {archive_hash}')
-
           expected_archive_hash = 'd56ad7f731af5625957d78d119ab7d9cfc2e3315613f94c02998ba70a1e1a610'
           if len(archive_bytes) != 33847 or archive_hash != expected_archive_hash:
               raise SystemExit('Decoded archive does not match the source package')
@@ -71,9 +62,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: npm
 
-      - name: Install dependencies
+      - name: Install dependencies and create lockfile
         run: npm install --no-audit --no-fund
 
       - name: Validate content
