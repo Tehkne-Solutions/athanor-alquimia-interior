@@ -24,7 +24,7 @@ export function TemplePage() {
   const awaitingReview = lamp?.lifecycle === 'awaiting_review' || lamp?.lifecycle === 'adjusted';
   const integrated = lamp?.lifecycle === 'integrated';
   const psalmsChamber = temple.rooms.find((room) => room.roomId === 'psalms-chamber');
-  const waterAvailable = psalmsChamber && psalmsChamber.status !== 'dormant' && psalmsChamber.status !== 'hidden';
+  const waterAvailable = Boolean(integrated || (psalmsChamber && psalmsChamber.status !== 'dormant' && psalmsChamber.status !== 'hidden'));
   const roomSelect = (roomId: string) => {
     if (roomId === 'proverbs-library') navigate('/temple/proverbs-library');
     if (roomId === 'psalms-chamber') navigate('/temple/psalms-chamber');
@@ -96,7 +96,7 @@ export function TemplePage() {
           </Card>
         )}
 
-        <Card title="Mapa do Templo" eyebrow="Ambientes"><TempleMap temple={temple} onRoomSelect={roomSelect}/></Card>
+        <Card title="Mapa do Templo" eyebrow="Ambientes"><TempleMap temple={temple} onRoomSelect={roomSelect} unlockedRoomIds={integrated ? ['psalms-chamber'] : []}/></Card>
         <Card title="Item ativo" eyebrow={lamp ? integrated ? 'Instrumento integrado' : 'Instrumento em observação' : 'Nenhum item equipado'}>
           {lamp ? <div className="item-mini"><div className="lamp-icon"><LampDesk/></div><div><strong>{lamp.name}</strong><p>{lamp.action}</p></div></div> : <div className="empty-state"><LampDesk/><p>Sua primeira receita será desbloqueada na Biblioteca.</p></div>}
         </Card>
