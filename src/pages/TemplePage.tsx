@@ -54,7 +54,7 @@ export function TemplePage() {
   );
 
   const roomSelect = (roomId: string) => {
-    if (roomple/proverbs-library');
+    if (roomId === 'proverbs-library') navigate('/temple/proverbs-library');
     if (roomId === 'psalms-chamber') navigate('/temple/psalms-chamber');
     if (roomId === 'forge') navigate('/temple/forge');
   };
@@ -121,7 +121,6 @@ export function TemplePage() {
             <div className="mission-card__icon">{waterCompleted ? <CupSoda/> : <Droplets/>}</div>
             <p>{waterCompleted
               ? 'As quatro práticas foram revisadas, o Cálice foi posicionado e o primeiro ciclo da Água foi registrado.'
-              : chal foi registrado.'
               : chaliceProgress?.positioned
                 ? 'O Cálice ocupa a Câmara. Falta escolher o destino das quatro práticas para encerrar o capítulo.'
                 : 'Reconheça emoção, lamento, memória e apoio sem transformá-los em diagnóstico ou pontuação moral.'}</p>
