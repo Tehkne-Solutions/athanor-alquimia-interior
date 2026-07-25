@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
-import { waterTrustStatements } from '../content/water';
+import { waterTrustStatements } from '../content/waterTrust';
 import {
   classifyWaterTrustStatement,
   completeWaterTrust,
