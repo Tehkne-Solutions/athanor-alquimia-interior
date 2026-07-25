@@ -15,6 +15,7 @@ import './styles/water-chapter.css';
 import './styles/fire.css';
 import './styles/fire-mission.css';
 import './styles/fire-interval.css';
+import './styles/fire-boundary.css';
 
 validateContent();
 
