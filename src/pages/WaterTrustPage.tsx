@@ -57,7 +57,7 @@ export function WaterTrustPage() {
           description="Conclua primeiro O Espelho das Memórias. Apoio possível não será apresentado como garantia ou previsão."
         />
         <Card title="Dependência da jornada" eyebrow="Espelho das Águas">
-          <p>{memoryCompleted ? 'Espelho das Águas disponível.' : 'O Espelho das Águas ainda é necessário.'}</p>
+          <p>O Espelho das Águas ainda é necessário.</p>
           <Button onClick={() => navigate('/temple/psalms-chamber')}><ArrowLeft size={18}/> Voltar à Câmara</Button>
         </Card>
       </div>
@@ -97,8 +97,11 @@ export function WaterTrustPage() {
     ].map((id) => waterTrustNodes.find((node) => node.id === id)).filter(Boolean);
     const selectedResourceLabels = progress.selectedResources
       .map((id) => waterSupportResources.find((resource) => resource.id === id)?.label)
-      .filter(Boolean);
+      .filter((label): label is string => Boolean(label));
     const selectedAction = waterCareActions.find((action) => action.id === progress.careAction);
+    const resourceSummary = selectedResourceLabels.length === 1
+      ? '1 recurso marcado como disponível agora.'
+      : `${selectedResourceLabels.length} recursos marcados como disponíveis agora.`;
 
     return (
       <div className="page page--water page--trust">
@@ -114,7 +117,7 @@ export function WaterTrustPage() {
             <p className="eyebrow">Componente da Água</p>
             <h2>Ponte da Confiança</h2>
             <p>{selectedResourceLabels.length > 0
-              ? `${selectedResourceLabels.length} recurso${selectedResourceLabels.length === 1 ? '' : 's'} marcado${selectedResourceLabels.length === 1 ? '' : 's'} como disponível${selectedResourceLabels.length === 1 ? '' : 'is'} agora.`
+              ? resourceSummary
               : 'Nenhum recurso foi marcado. A ausência de apoio disponível não reduz recompensa ou progresso.'}</p>
             <p className="field-help">A Ponte representa a conclusão da prática, não a existência objetiva de segurança.</p>
           </Card>
