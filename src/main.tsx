@@ -9,6 +9,7 @@ import './styles/research.css';
 import './styles/water.css';
 import './styles/water-lament.css';
 import './styles/water-memory.css';
+import './styles/water-trust.css';
 
 validateContent();
 
