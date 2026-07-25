@@ -43,6 +43,8 @@ export const itemLifecycleSchema = z.enum([
 ]);
 export type ItemLifecycle = 'recipe' | 'discovered' | 'incomplete' | 'created' | 'active' | 'awaiting_review' | 'adjusted' | 'integrated' | 'memorial' | 'archived';
 
+export type ReviewOutcome = 'integrated' | 'adjusted' | 'resting';
+
 export interface ProvenanceEntry {
   id: string;
   label: string;
@@ -128,8 +130,21 @@ export interface MissionProgress {
   classifications: Record<string, ClassificationEntry['correctCategory']>;
   intention?: string;
   action?: string;
+  reviewDueAt?: string;
+  lastReviewId?: string;
   startedAt: string;
   updatedAt: string;
+}
+
+export interface ReviewEntry {
+  id: string;
+  missionId: string;
+  itemId: string;
+  outcome: ReviewOutcome;
+  reflection?: string;
+  previousAction?: string;
+  adjustedAction?: string;
+  createdAt: string;
 }
 
 export interface CraftedItem {
