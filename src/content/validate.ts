@@ -1,6 +1,7 @@
 import { z } from 'zod';
-import { biblicalUnits, chainNodes, classificationEntries } from './seed';
 import { provenanceClassSchema } from '../domain/types';
+import { biblicalUnits, chainNodes, classificationEntries } from './seed';
+import { waterBiblicalUnit, waterLamentBiblicalUnit } from './water';
 
 const provenanceSchema = z.object({
   id: z.string().min(1),
@@ -32,7 +33,7 @@ const nodeSchema = z.object({
 });
 
 export function validateContent(): void {
-  z.array(biblicalUnitSchema).parse(biblicalUnits);
+  z.array(biblicalUnitSchema).parse([...biblicalUnits, waterBiblicalUnit, waterLamentBiblicalUnit]);
   z.array(nodeSchema).parse(chainNodes);
   z.array(z.object({ id: z.string(), text: z.string(), correctCategory: z.enum(['fact', 'interpretation', 'prediction', 'intention']) })).parse(classificationEntries);
 
