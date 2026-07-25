@@ -1,0 +1,39 @@
+name: Athanor CI
+
+on:
+  push:
+    branches:
+      - main
+      - agent/fase-4.1-vertical-slice
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci --no-audit --no-fund
+
+      - name: Validate content
+        run: npm run validate:content
+
+      - name: Run tests
+        run: npm test
+
+      - name: Build production bundle
+        run: npm run build
