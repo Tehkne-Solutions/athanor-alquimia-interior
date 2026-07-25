@@ -1,0 +1,163 @@
+.page--fire-boundary {
+  --boundary-glow: rgba(233, 149, 70, 0.18);
+}
+
+.fire-boundary-intro-grid,
+.fire-boundary-result-grid,
+.fire-boundary-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.fire-boundary-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.fire-boundary-statement-list {
+  display: grid;
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.fire-boundary-statement {
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 1rem;
+  background: rgba(15, 18, 23, 0.38);
+}
+
+.fire-boundary-statement > p:first-child {
+  margin-top: 0;
+  font-weight: 650;
+}
+
+.fire-boundary-classification-actions {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.fire-boundary-classification-actions button,
+.fire-boundary-option-list button {
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.035);
+  color: inherit;
+  padding: 0.75rem;
+  cursor: pointer;
+  text-align: left;
+}
+
+.fire-boundary-classification-actions button[aria-pressed='true'],
+.fire-boundary-option-list button[aria-pressed='true'] {
+  border-color: var(--accent);
+  background: var(--boundary-glow);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 50%, transparent);
+}
+
+.fire-boundary-classification-actions button:focus-visible,
+.fire-boundary-option-list button:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.fire-boundary-option-list {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.fire-boundary-option-list button {
+  display: grid;
+  gap: 0.25rem;
+}
+
+.fire-boundary-option-list span,
+.fire-boundary-chain-node small {
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+
+.boundary-plate-card {
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  min-height: 17rem;
+  text-align: center;
+  background:
+    radial-gradient(circle at center, rgba(247, 170, 86, 0.2), transparent 48%),
+    linear-gradient(145deg, rgba(62, 37, 20, 0.76), rgba(18, 19, 23, 0.92));
+}
+
+.boundary-plate-visual {
+  display: grid;
+  place-items: center;
+  position: relative;
+  width: 7rem;
+  height: 5rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid rgba(255, 196, 120, 0.45);
+  background: rgba(255, 146, 54, 0.1);
+}
+
+.boundary-plate-visual svg:first-child {
+  width: 3.1rem;
+  height: 3.1rem;
+}
+
+.boundary-plate-visual svg:last-child {
+  position: absolute;
+  right: 0.65rem;
+  bottom: 0.55rem;
+  width: 1.35rem;
+  height: 1.35rem;
+  color: #ffd08a;
+}
+
+.boundary-formula {
+  font-size: 1.05rem;
+  line-height: 1.7;
+}
+
+.fire-boundary-chain-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.fire-boundary-chain-node {
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.fire-boundary-chain-node h3 {
+  margin: 0.7rem 0 0.45rem;
+}
+
+@media (max-width: 900px) {
+  .fire-boundary-intro-grid,
+  .fire-boundary-result-grid,
+  .fire-boundary-form-grid,
+  .fire-boundary-chain-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 560px) {
+  .fire-boundary-classification-actions {
+    grid-template-columns: 1fr;
+  }
+
+  .fire-boundary-actions {
+    align-items: stretch;
+  }
+
+  .fire-boundary-actions > * {
+    width: 100%;
+  }
+}

@@ -1,4 +1,4 @@
-import { ArrowRight, BookOpenText, CheckCircle2, Clock3, CupSoda, Database, Droplets, Flame, LampDesk, RefreshCw, ShieldCheck } from 'lucide-react';
+import { ArrowRight, BookOpenText, CheckCircle2, Clock3, CupSoda, Database, Droplets, Flame, LampDesk, RefreshCw, Shield, ShieldCheck } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/Button';
 import { Card } from '../components/Card';
@@ -7,6 +7,7 @@ import { PageHeader } from '../components/PageHeader';
 import { TempleMap } from '../components/TempleMap';
 import { biblicalUnits } from '../content/seed';
 import { useAthanorStore } from '../state/useAthanorStore';
+import { useFireBoundaryStore } from '../state/useFireBoundaryStore';
 import { useFireIntervalStore } from '../state/useFireIntervalStore';
 import { useFireMissionStore } from '../state/useFireMissionStore';
 import { useWaterChaliceStore } from '../state/useWaterChaliceStore';
@@ -33,6 +34,7 @@ export function TemplePage() {
   const chapterProgress = useWaterChapterStore((state) => state.progress);
   const rawFireProgress = useFireMissionStore((state) => state.progress);
   const rawIntervalProgress = useFireIntervalStore((state) => state.progress);
+  const rawBoundaryProgress = useFireBoundaryStore((state) => state.progress);
   const passage = biblicalUnits[0];
 
   if (!character || !temple) return null;
@@ -43,29 +45,18 @@ export function TemplePage() {
   const psalmsChamber = temple.rooms.find((room) => room.roomId === 'psalms-chamber');
   const forge = temple.rooms.find((room) => room.roomId === 'forge');
   const waterAvailable = Boolean(integrated || (psalmsChamber && psalmsChamber.status !== 'dormant' && psalmsChamber.status !== 'hidden'));
-  const waterCompleted = Boolean(
-    chapterProgress
-      && waterJourney
-      && chapterProgress.journeyStartedAt === waterJourney.startedAt
-      && chapterProgress.status === 'completed'
-  );
+  const waterCompleted = Boolean(chapterProgress && waterJourney && chapterProgress.journeyStartedAt === waterJourney.startedAt && chapterProgress.status === 'completed');
   const forgeAvailable = Boolean(waterCompleted || (forge && forge.status !== 'dormant' && forge.status !== 'hidden'));
-  const chaliceAvailable = Boolean(
-    chaliceProgress
-      && waterJourney
-      && chaliceProgress.journeyStartedAt === waterJourney.startedAt
-      && chaliceProgress.chaliceCreated
-  );
+  const chaliceAvailable = Boolean(chaliceProgress && waterJourney && chaliceProgress.journeyStartedAt === waterJourney.startedAt && chaliceProgress.chaliceCreated);
   const sourceWaterCycleId = chapterProgress?.cycleId ?? chapterProgress?.completedAt;
-  const fireProgress = sourceWaterCycleId && rawFireProgress?.sourceWaterCycleId === sourceWaterCycleId
-    ? rawFireProgress
-    : undefined;
+  const fireProgress = sourceWaterCycleId && rawFireProgress?.sourceWaterCycleId === sourceWaterCycleId ? rawFireProgress : undefined;
   const namedFlameCreated = fireProgress?.status === 'completed' && fireProgress.namedFlameCreated;
   const sourceNamedFlameId = namedFlameCreated ? fireProgress.completedAt ?? fireProgress.updatedAt : undefined;
-  const intervalProgress = sourceNamedFlameId && rawIntervalProgress?.sourceNamedFlameId === sourceNamedFlameId
-    ? rawIntervalProgress
-    : undefined;
+  const intervalProgress = sourceNamedFlameId && rawIntervalProgress?.sourceNamedFlameId === sourceNamedFlameId ? rawIntervalProgress : undefined;
   const intervalEmberCreated = intervalProgress?.status === 'completed' && intervalProgress.intervalEmberCreated;
+  const sourceIntervalEmberId = intervalEmberCreated ? intervalProgress.completedAt ?? `${intervalProgress.sourceNamedFlameId}:interval-ember` : undefined;
+  const boundaryProgress = sourceIntervalEmberId && rawBoundaryProgress?.sourceIntervalEmberId === sourceIntervalEmberId ? rawBoundaryProgress : undefined;
+  const boundaryPlateCreated = boundaryProgress?.status === 'completed' && boundaryProgress.boundaryPlateCreated;
 
   const roomSelect = (roomId: string) => {
     if (roomId === 'proverbs-library') navigate('/temple/proverbs-library');
@@ -86,22 +77,25 @@ export function TemplePage() {
       ? 'Concluir o capítulo da Água'
       : waterJourney?.status === 'named'
         ? 'Continuar a jornada da Água'
-        : waterJourney
-          ? 'Continuar missão da Água'
-          : 'Entrar na Câmara dos Salmos';
-  const fireAction = intervalEmberCreated
-    ? 'Revisar a Brasa do Intervalo'
-    : intervalProgress
-      ? 'Continuar O Instante Antes do Gesto'
-      : namedFlameCreated
-        ? 'Iniciar O Instante Antes do Gesto'
-        : fireProgress
-          ? 'Continuar O Nome da Chama'
-          : 'Iniciar O Nome da Chama';
-  const fireRoute = namedFlameCreated ? '/mission/before-the-gesture' : '/mission/name-the-flame';
+        : waterJourney ? 'Continuar missão da Água' : 'Entrar na Câmara dos Salmos';
+
+  const fireAction = boundaryPlateCreated
+    ? 'Revisar a Placa do Limite'
+    : boundaryProgress
+      ? 'Continuar O Limite que Protege'
+      : intervalEmberCreated
+        ? 'Iniciar O Limite que Protege'
+        : intervalProgress
+          ? 'Continuar O Instante Antes do Gesto'
+          : namedFlameCreated
+            ? 'Iniciar O Instante Antes do Gesto'
+            : fireProgress ? 'Continuar O Nome da Chama' : 'Iniciar O Nome da Chama';
+  const fireRoute = intervalEmberCreated
+    ? '/mission/limit-that-protects'
+    : namedFlameCreated ? '/mission/before-the-gesture' : '/mission/name-the-flame';
 
   const activeRoomCount = temple.rooms.filter((room) => room.status === 'active' || room.status === 'restored' || room.status === 'available').length;
-  const componentCount = inventory.length + Number(waterJourney?.namedDropCreated) + Number(chaliceAvailable) + Number(namedFlameCreated) + Number(intervalEmberCreated);
+  const componentCount = inventory.length + Number(waterJourney?.namedDropCreated) + Number(chaliceAvailable) + Number(namedFlameCreated) + Number(intervalEmberCreated) + Number(boundaryPlateCreated);
 
   return (
     <div className="page page--temple">
@@ -110,32 +104,23 @@ export function TemplePage() {
         <Card className="hero-card">
           <div className="hero-card__scene"><div className={`temple-backdrop temple-backdrop--${temple.theme}`} aria-hidden="true"/><CharacterAvatar character={character}/></div>
           <div className="hero-card__content">
-            <p className="eyebrow">Nível da Obra</p>
-            <h2>{workLevelLabels[character.workLevel]}</h2>
-            <p>{intervalEmberCreated
-              ? 'A segunda prática do Fogo registrou um intervalo seguro sem concluir automaticamente o capítulo.'
-              : namedFlameCreated
-                ? 'A primeira prática do Fogo foi concluída sem integrar automaticamente o capítulo.'
-                : waterCompleted
-                  ? 'O primeiro ciclo da Água foi registrado, a Câmara está restaurada e a Forja foi aberta.'
-                  : integrated
-                    ? 'A primeira Obra foi revisada e a Câmara dos Salmos está disponível.'
-                    : awaitingReview
-                      ? 'A Biblioteca foi restaurada e aguarda o retorno da sua ação.'
-                      : 'A Biblioteca dos Provérbios aguarda sua primeira restauração.'}</p>
-            <div className="status-row">
-              <span><strong>{activeRoomCount}</strong> salas acessíveis</span>
-              <span><strong>{componentCount}</strong> componentes e itens</span>
-              <span><strong>{reviews.length + Number(waterCompleted)}</strong> ciclos e revisões</span>
-              <span><strong>{temple.restorationLevel}</strong> nível do Templo</span>
-            </div>
+            <p className="eyebrow">Nível da Obra</p><h2>{workLevelLabels[character.workLevel]}</h2>
+            <p>{boundaryPlateCreated
+              ? 'A terceira prática do Fogo registrou um limite em primeira pessoa sem concluir automaticamente o capítulo.'
+              : intervalEmberCreated
+                ? 'A segunda prática do Fogo registrou um intervalo seguro sem concluir automaticamente o capítulo.'
+                : namedFlameCreated
+                  ? 'A primeira prática do Fogo foi concluída sem integrar automaticamente o capítulo.'
+                  : waterCompleted
+                    ? 'O primeiro ciclo da Água foi registrado, a Câmara está restaurada e a Forja foi aberta.'
+                    : integrated
+                      ? 'A primeira Obra foi revisada e a Câmara dos Salmos está disponível.'
+                      : awaitingReview ? 'A Biblioteca foi restaurada e aguarda o retorno da sua ação.' : 'A Biblioteca dos Provérbios aguarda sua primeira restauração.'}</p>
+            <div className="status-row"><span><strong>{activeRoomCount}</strong> salas acessíveis</span><span><strong>{componentCount}</strong> componentes e itens</span><span><strong>{reviews.length + Number(waterCompleted)}</strong> ciclos e revisões</span><span><strong>{temple.restorationLevel}</strong> nível do Templo</span></div>
           </div>
         </Card>
 
-        <Card eyebrow="Princípio do ciclo" title={passage.title} className="principle-card">
-          <blockquote>{passage.principle}</blockquote><p>{passage.application}</p>
-          <Button onClick={() => navigate('/temple/proverbs-library')}>Entrar na Biblioteca <ArrowRight size={18}/></Button>
-        </Card>
+        <Card eyebrow="Princípio do ciclo" title={passage.title} className="principle-card"><blockquote>{passage.principle}</blockquote><p>{passage.application}</p><Button onClick={() => navigate('/temple/proverbs-library')}>Entrar na Biblioteca <ArrowRight size={18}/></Button></Card>
 
         <Card eyebrow={integrated ? 'Ciclo integrado' : awaitingReview ? 'Retorno pendente' : 'Missão principal'} title="A Palavra Antes da Resposta" className="mission-card">
           <div className="mission-card__icon">{integrated ? <CheckCircle2/> : awaitingReview ? <Clock3/> : <BookOpenText/>}</div>
@@ -144,38 +129,33 @@ export function TemplePage() {
           <Button variant="secondary" onClick={() => navigate(missionAction.route)}>{missionAction.label} <MissionActionIcon size={18}/></Button>
         </Card>
 
-        {waterAvailable && (
-          <Card eyebrow={waterCompleted ? 'Capítulo concluído' : 'Capítulo disponível'} title="A Câmara dos Salmos" className="mission-card mission-card--water">
-            <div className="mission-card__icon">{waterCompleted ? <CupSoda/> : <Droplets/>}</div>
-            <p>{waterCompleted
-              ? 'As quatro práticas foram revisadas, o Cálice foi posicionado e o primeiro ciclo da Água foi registrado.'
-              : chaliceProgress?.positioned
-                ? 'O Cálice ocupa a Câmara. Falta escolher o destino das quatro práticas para encerrar o capítulo.'
-                : 'Reconheça emoção, lamento, memória e apoio sem transformá-los em diagnóstico ou pontuação moral.'}</p>
-            <div className="mission-meta"><span>Capítulo da Água</span><span>{waterCompleted ? 'Ciclo registrado' : 'Práticas opcionais'}</span></div>
-            <Button variant="secondary" onClick={() => navigate(waterCompleted ? '/temple/psalms-chamber' : chaliceProgress?.positioned ? '/review/water-chapter' : '/temple/psalms-chamber')}>{waterAction} <ArrowRight size={18}/></Button>
-          </Card>
-        )}
+        {waterAvailable && <Card eyebrow={waterCompleted ? 'Capítulo concluído' : 'Capítulo disponível'} title="A Câmara dos Salmos" className="mission-card mission-card--water">
+          <div className="mission-card__icon">{waterCompleted ? <CupSoda/> : <Droplets/>}</div>
+          <p>{waterCompleted ? 'As quatro práticas foram revisadas, o Cálice foi posicionado e o primeiro ciclo da Água foi registrado.' : chaliceProgress?.positioned ? 'O Cálice ocupa a Câmara. Falta escolher o destino das quatro práticas para encerrar o capítulo.' : 'Reconheça emoção, lamento, memória e apoio sem transformá-los em diagnóstico ou pontuação moral.'}</p>
+          <div className="mission-meta"><span>Capítulo da Água</span><span>{waterCompleted ? 'Ciclo registrado' : 'Práticas opcionais'}</span></div>
+          <Button variant="secondary" onClick={() => navigate(waterCompleted ? '/temple/psalms-chamber' : chaliceProgress?.positioned ? '/review/water-chapter' : '/temple/psalms-chamber')}>{waterAction} <ArrowRight size={18}/></Button>
+        </Card>}
 
-        {forgeAvailable && (
-          <Card eyebrow={intervalEmberCreated ? 'Segundo componente criado' : namedFlameCreated ? 'Primeiro componente criado' : 'Novo capítulo disponível'} title="A Forja dos Elementos" className="mission-card mission-card--fire">
-            <div className="mission-card__icon">{intervalEmberCreated ? <Clock3/> : <Flame/>}</div>
-            <p>{intervalEmberCreated
-              ? 'A Brasa do Intervalo registra linha temporal, contexto de urgência e saída segura sem concluir automaticamente o Fogo.'
+        {forgeAvailable && <Card eyebrow={boundaryPlateCreated ? 'Terceiro componente criado' : intervalEmberCreated ? 'Segundo componente criado' : namedFlameCreated ? 'Primeiro componente criado' : 'Novo capítulo disponível'} title="A Forja dos Elementos" className="mission-card mission-card--fire">
+          <div className="mission-card__icon">{boundaryPlateCreated ? <Shield/> : intervalEmberCreated ? <Clock3/> : <Flame/>}</div>
+          <p>{boundaryPlateCreated
+            ? 'A Placa do Limite registra escopo, ação própria, duração e revisão sem controlar terceiros.'
+            : intervalEmberCreated
+              ? 'A Brasa do Intervalo está pronta para receber uma arquitetura de limite em primeira pessoa.'
               : namedFlameCreated
                 ? 'A Chama Nomeada está pronta para receber uma prática de intervalo antes do gesto.'
                 : 'A primeira missão distingue intensidade, impulso, necessidade e ação proporcional.'}</p>
-            <div className="mission-meta"><span>Capítulo do Fogo</span><span>{intervalEmberCreated ? 'Brasa do Intervalo criada' : namedFlameCreated ? 'Próxima missão disponível' : 'Missão disponível'}</span></div>
-            <Button variant="secondary" onClick={() => navigate(fireRoute)}>{fireAction} <ArrowRight size={18}/></Button>
-          </Card>
-        )}
+          <div className="mission-meta"><span>Capítulo do Fogo</span><span>{boundaryPlateCreated ? 'Placa do Limite criada' : intervalEmberCreated ? 'Próxima missão disponível' : namedFlameCreated ? 'Próxima missão disponível' : 'Missão disponível'}</span></div>
+          <Button variant="secondary" onClick={() => navigate(fireRoute)}>{fireAction} <ArrowRight size={18}/></Button>
+        </Card>}
 
         <Card title="Mapa do Templo" eyebrow="Ambientes"><TempleMap temple={temple} onRoomSelect={roomSelect} unlockedRoomIds={[...(integrated ? ['psalms-chamber'] : []), ...(waterCompleted ? ['forge'] : [])]}/></Card>
-        <Card title="Instrumentos da Obra" eyebrow={intervalEmberCreated ? 'Ar, Água e Fogo' : namedFlameCreated ? 'Ar, Água e Fogo' : chaliceAvailable ? 'Água e Ar' : lamp ? integrated ? 'Instrumento integrado' : 'Instrumento em observação' : 'Nenhum item equipado'}>
+        <Card title="Instrumentos da Obra" eyebrow={namedFlameCreated ? 'Ar, Água e Fogo' : chaliceAvailable ? 'Água e Ar' : lamp ? integrated ? 'Instrumento integrado' : 'Instrumento em observação' : 'Nenhum item equipado'}>
           {lamp ? <div className="item-mini"><div className="lamp-icon"><LampDesk/></div><div><strong>{lamp.name}</strong><p>{lamp.action}</p></div></div> : <div className="empty-state"><LampDesk/><p>Sua primeira receita será desbloqueada na Biblioteca.</p></div>}
           {chaliceAvailable && <div className="item-mini"><div className="lamp-icon"><CupSoda/></div><div><strong>Cálice da Memória Serena</strong><p>{waterCompleted ? 'Ciclo da Água registrado' : 'Ciclo em revisão'}</p></div></div>}
           {namedFlameCreated && <div className="item-mini"><div className="lamp-icon"><Flame/></div><div><strong>Chama Nomeada</strong><p>Primeiro componente do Fogo</p></div></div>}
           {intervalEmberCreated && <div className="item-mini"><div className="lamp-icon"><Clock3/></div><div><strong>Brasa do Intervalo</strong><p>Segundo componente do Fogo</p></div></div>}
+          {boundaryPlateCreated && <div className="item-mini"><div className="lamp-icon"><Shield/></div><div><strong>Placa do Limite</strong><p>Terceiro componente do Fogo</p></div></div>}
         </Card>
         <Card title="Limites do sistema" eyebrow="Segurança"><div className="safety-summary"><ShieldCheck/><p>Nenhum status é diagnóstico. Símbolos não determinam o futuro, e toda ação pode ser recusada.</p></div></Card>
       </div>
