@@ -1,4 +1,4 @@
-import { ArrowLeft, CheckCircle2, Droplet, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, ArrowRight, CheckCircle2, Droplet, ShieldCheck } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/Button';
 import { Card } from '../components/Card';
@@ -53,9 +53,12 @@ export function WaterMissionPage() {
               ? 'Você concluiu a missão sem registrar o check-in. A recusa foi preservada como escolha válida.'
               : `${waterJourney.checkIn.emotions.length} movimento(s) foram reconhecidos sem receber pontuação moral.`}</p>
           </Card>
-          <Card title="O que acontece agora" eyebrow="Fundação do Cálice">
-            <div className="review-status review-status--complete"><CheckCircle2/><p>A Câmara mantém o componente disponível. A receita completa do Cálice será aberta em uma fase posterior, depois de lamento, memória e confiança.</p></div>
-            <Button onClick={() => navigate('/temple/psalms-chamber')}>Voltar à Câmara dos Salmos</Button>
+          <Card title="Próxima etapa" eyebrow="Fundação do Cálice">
+            <div className="review-status review-status--complete"><CheckCircle2/><p>A Gota Nomeada permanece disponível. A Voz do Lamento pode ser realizada por escrita opcional ou em silêncio.</p></div>
+            <div className="button-row">
+              <Button variant="ghost" onClick={() => navigate('/temple/psalms-chamber')}>Voltar à Câmara</Button>
+              <Button onClick={() => navigate('/mission/voice-of-lament')}>Abrir A Voz do Lamento <ArrowRight size={18}/></Button>
+            </div>
           </Card>
         </div>
       </div>

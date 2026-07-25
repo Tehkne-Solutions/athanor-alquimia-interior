@@ -20,6 +20,7 @@ import { ReviewPage } from '../pages/ReviewPage';
 import { SafetyPage } from '../pages/SafetyPage';
 import { TempleFoundationPage } from '../pages/TempleFoundationPage';
 import { TemplePage } from '../pages/TemplePage';
+import { WaterLamentPage } from '../pages/WaterLamentPage';
 import { WaterMissionPage } from '../pages/WaterMissionPage';
 import { WelcomePage } from '../pages/WelcomePage';
 import { useAthanorStore } from '../state/useAthanorStore';
@@ -61,6 +62,7 @@ export function App() {
       <Route path="/mission/word-before-response/classification" element={<ClassificationPage/>}/>
       <Route path="/mission/word-before-response/chain" element={<ChainPage/>}/>
       <Route path="/mission/name-the-waters" element={<WaterMissionPage/>}/>
+      <Route path="/mission/voice-of-lament" element={<WaterLamentPage/>}/>
       <Route path="/crafting/clear-word-lamp" element={<CraftingPage/>}/>
       <Route path="/items/clear-word-lamp" element={<ItemPage/>}/>
       <Route path="/review/clear-word-lamp" element={<ReviewPage/>}/>

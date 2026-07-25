@@ -19,6 +19,25 @@ export const waterBiblicalUnit: BiblicalUnit = {
   ]
 };
 
+export const waterLamentBiblicalUnit: BiblicalUnit = {
+  id: 'psalm_voice_of_lament_01',
+  reference: 'Salmo 13',
+  title: 'A voz do lamento',
+  principle: 'O lamento pode reunir pergunta, sofrimento, desejo e pedido de apoio sem exigir uma solução imediata.',
+  context: 'O Salmo 13 é apresentado como forma poética de lamento. O Athanor não presume que toda experiência precise terminar em gratidão, resposta ou explicação, e não utiliza o texto para avaliar fé, saúde ou risco.',
+  themes: ['lamento', 'pergunta', 'desejo', 'apoio'],
+  application: 'Registrar somente o que fizer sentido, permanecer em silêncio ou procurar apoio humano quando necessário.',
+  provenance: [
+    {
+      id: 'bib-psalm-13',
+      label: 'Fonte bíblica',
+      class: 'BIB',
+      explanation: 'Referência dos Salmos usada como núcleo editorial da segunda missão da Água.',
+      sourceLabel: 'Salmo 13'
+    }
+  ]
+};
+
 export const waterEmotions: { id: WaterEmotionId; label: string; description: string }[] = [
   { id: 'fear', label: 'Medo', description: 'Percepção de ameaça, risco ou incerteza.' },
   { id: 'hope', label: 'Esperança', description: 'Abertura para uma possibilidade desejada.' },
@@ -38,4 +57,11 @@ export const waterNeeds: { id: WaterNeedId; label: string }[] = [
   { id: 'clarity', label: 'Clareza' },
   { id: 'time', label: 'Tempo' },
   { id: 'unknown', label: 'Não sei' }
+];
+
+export const waterLamentWarnings = [
+  'O registro é opcional e fica armazenado localmente neste dispositivo.',
+  'Você pode concluir em silêncio, pausar ou sair a qualquer momento.',
+  'O Athanor não interpreta causas, memórias, transtornos ou vontade divina.',
+  'Em situação de risco imediato, use o botão de apoio direto em vez do fluxo simbólico.'
 ];
