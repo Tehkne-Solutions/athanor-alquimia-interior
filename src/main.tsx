@@ -6,6 +6,7 @@ import { validateContent } from './content/validate';
 import './styles/global.css';
 import './styles/homologation.css';
 import './styles/research.css';
+import './styles/water.css';
 
 validateContent();
 
