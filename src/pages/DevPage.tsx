@@ -5,16 +5,20 @@ import { Card } from '../components/Card';
 import { PageHeader } from '../components/PageHeader';
 import { useAthanorStore } from '../state/useAthanorStore';
 import { useWaterLamentStore } from '../state/useWaterLamentStore';
+import { useWaterMemoryStore } from '../state/useWaterMemoryStore';
 
 export function DevPage() {
   const navigate = useNavigate();
   const resetAll = useAthanorStore((state) => state.resetAll);
   const resetLament = useWaterLamentStore((state) => state.reset);
+  const resetMemory = useWaterMemoryStore((state) => state.reset);
   const lamentProgress = useWaterLamentStore((state) => state.progress);
+  const memoryProgress = useWaterMemoryStore((state) => state.progress);
   const state = useAthanorStore();
   const reset = async () => {
     await resetAll();
     resetLament();
+    resetMemory();
     navigate('/welcome');
   };
 
@@ -30,6 +34,7 @@ export function DevPage() {
             mission: state.activeMission?.status,
             water: state.waterJourney?.status,
             lament: lamentProgress?.status,
+            memory: memoryProgress?.status,
             inventory: state.inventory.map((item) => item.name)
           }, null, 2)}</pre>
         </Card>

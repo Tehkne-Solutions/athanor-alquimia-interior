@@ -1,11 +1,12 @@
-import { ArrowRight, BookOpenText, Droplets, Feather, LockKeyhole, ShieldCheck } from 'lucide-react';
+import { ArrowRight, BookOpenText, Droplets, Eye, Feather, LockKeyhole, ShieldCheck } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/Button';
 import { Card } from '../components/Card';
 import { PageHeader } from '../components/PageHeader';
-import { waterBiblicalUnit, waterLamentBiblicalUnit } from '../content/water';
+import { waterBiblicalUnit, waterLamentBiblicalUnit, waterMemoryBiblicalUnit } from '../content/water';
 import { useAthanorStore } from '../state/useAthanorStore';
 import { useWaterLamentStore } from '../state/useWaterLamentStore';
+import { useWaterMemoryStore } from '../state/useWaterMemoryStore';
 
 export function PsalmsChamberPage() {
   const navigate = useNavigate();
@@ -15,7 +16,9 @@ export function PsalmsChamberPage() {
   const startWaterJourney = useAthanorStore((state) => state.startWaterJourney);
   const rawLamentProgress = useWaterLamentStore((state) => state.progress);
   const lamentJourneyStartedAt = useWaterLamentStore((state) => state.journeyStartedAt);
+  const rawMemoryProgress = useWaterMemoryStore((state) => state.progress);
   const lamentProgress = waterJourney?.startedAt === lamentJourneyStartedAt ? rawLamentProgress : undefined;
+  const memoryProgress = waterJourney?.startedAt === rawMemoryProgress?.journeyStartedAt ? rawMemoryProgress : undefined;
   const chamber = temple?.rooms.find((room) => room.roomId === 'psalms-chamber');
   const lampIntegrated = inventory.some((item) => item.id === 'item_clear_word_lamp_v1' && item.lifecycle === 'integrated');
   const available = Boolean(lampIntegrated || (chamber && chamber.status !== 'dormant' && chamber.status !== 'hidden'));
@@ -53,6 +56,13 @@ export function PsalmsChamberPage() {
         ? 'Continuar A Voz do Lamento'
         : 'Abrir A Voz do Lamento';
 
+  const memoryCompleted = memoryProgress?.status === 'completed';
+  const memoryActionLabel = memoryCompleted
+    ? 'Revisar o Espelho das Águas'
+    : memoryProgress
+      ? 'Continuar O Espelho das Memórias'
+      : 'Abrir O Espelho das Memórias';
+
   const openNamingJourney = () => {
     startWaterJourney();
     navigate('/mission/name-the-waters');
@@ -62,7 +72,7 @@ export function PsalmsChamberPage() {
     navigate(lamentInterrupted ? '/safety?source=lament' : '/mission/voice-of-lament');
   };
 
-  const componentCount = Number(namingCompleted) + Number(lamentCompleted);
+  const componentCount = Number(namingCompleted) + Number(lamentCompleted) + Number(memoryCompleted);
 
   return (
     <div className="page page--water">
@@ -109,6 +119,18 @@ export function PsalmsChamberPage() {
           </ul>
           <Button disabled={!namingCompleted} onClick={openLamentJourney}>{lamentActionLabel} <ArrowRight size={18}/></Button>
           {!namingCompleted && <p className="field-help">Conclua primeiro O Nome das Águas para abrir esta etapa.</p>}
+        </Card>
+
+        <Card title="O Espelho das Memórias" eyebrow={waterMemoryBiblicalUnit.reference}>
+          <div className="lament-card-intro"><Eye aria-hidden="true"/><p>Diferencie memória, sensação atual, previsão, necessidade e ação usando somente frases fictícias.</p></div>
+          <ul className="simple-list">
+            <li>nenhuma memória pessoal é solicitada;</li>
+            <li>o resultado oferece feedback didático, não pontuação;</li>
+            <li>a prática de presença registra somente tipos de observação;</li>
+            <li>Yesod, Mem, Kan e Tarot permanecem camadas opcionais.</li>
+          </ul>
+          <Button disabled={!lamentCompleted} onClick={() => navigate('/mission/mirror-of-memories')}>{memoryActionLabel} <ArrowRight size={18}/></Button>
+          {!lamentCompleted && <p className="field-help">Conclua primeiro A Voz do Lamento para abrir esta etapa.</p>}
         </Card>
 
         <Card title="Limites da experiência" eyebrow="Segurança">
