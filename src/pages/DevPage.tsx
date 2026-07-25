@@ -6,19 +6,23 @@ import { PageHeader } from '../components/PageHeader';
 import { useAthanorStore } from '../state/useAthanorStore';
 import { useWaterLamentStore } from '../state/useWaterLamentStore';
 import { useWaterMemoryStore } from '../state/useWaterMemoryStore';
+import { useWaterTrustStore } from '../state/useWaterTrustStore';
 
 export function DevPage() {
   const navigate = useNavigate();
   const resetAll = useAthanorStore((state) => state.resetAll);
   const resetLament = useWaterLamentStore((state) => state.reset);
   const resetMemory = useWaterMemoryStore((state) => state.reset);
+  const resetTrust = useWaterTrustStore((state) => state.reset);
   const lamentProgress = useWaterLamentStore((state) => state.progress);
   const memoryProgress = useWaterMemoryStore((state) => state.progress);
+  const trustProgress = useWaterTrustStore((state) => state.progress);
   const state = useAthanorStore();
   const reset = async () => {
     await resetAll();
     resetLament();
     resetMemory();
+    resetTrust();
     navigate('/welcome');
   };
 
@@ -35,6 +39,7 @@ export function DevPage() {
             water: state.waterJourney?.status,
             lament: lamentProgress?.status,
             memory: memoryProgress?.status,
+            trust: trustProgress?.status,
             inventory: state.inventory.map((item) => item.name)
           }, null, 2)}</pre>
         </Card>
