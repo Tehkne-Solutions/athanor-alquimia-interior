@@ -23,6 +23,7 @@ import { TemplePage } from '../pages/TemplePage';
 import { WaterLamentPage } from '../pages/WaterLamentPage';
 import { WaterMemoryPage } from '../pages/WaterMemoryPage';
 import { WaterMissionPage } from '../pages/WaterMissionPage';
+import { WaterTrustPage } from '../pages/WaterTrustPage';
 import { WelcomePage } from '../pages/WelcomePage';
 import { useAthanorStore } from '../state/useAthanorStore';
 
@@ -65,6 +66,7 @@ export function App() {
       <Route path="/mission/name-the-waters" element={<WaterMissionPage/>}/>
       <Route path="/mission/voice-of-lament" element={<WaterLamentPage/>}/>
       <Route path="/mission/mirror-of-memories" element={<WaterMemoryPage/>}/>
+      <Route path="/mission/space-of-trust" element={<WaterTrustPage/>}/>
       <Route path="/crafting/clear-word-lamp" element={<CraftingPage/>}/>
       <Route path="/items/clear-word-lamp" element={<ItemPage/>}/>
       <Route path="/review/clear-word-lamp" element={<ReviewPage/>}/>
