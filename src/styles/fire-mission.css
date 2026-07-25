@@ -1,0 +1,229 @@
+.page--fire-mission {
+  --fire-border: color-mix(in srgb, var(--color-fire, #d86b32) 34%, var(--color-border));
+}
+
+.fire-mission-intro-grid,
+.fire-result-grid,
+.fire-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-5);
+}
+
+.fire-mission-actions,
+.fire-inline-controls {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.fire-choice-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-3);
+  margin-bottom: var(--space-4);
+}
+
+.fire-choice,
+.fire-option-list button,
+.fire-action-grid button,
+.classification-actions button {
+  border: 1px solid var(--fire-border);
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--color-surface) 92%, #c95522 8%);
+  color: inherit;
+  cursor: pointer;
+  transition: transform var(--motion-fast), border-color var(--motion-fast), background var(--motion-fast);
+}
+
+.fire-choice {
+  min-height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  font: inherit;
+  font-weight: 700;
+}
+
+.fire-choice[aria-pressed="true"],
+.fire-option-list button[aria-pressed="true"],
+.fire-action-grid button[aria-pressed="true"],
+.classification-actions button[aria-pressed="true"] {
+  border-color: #e88745;
+  background: color-mix(in srgb, var(--color-surface) 70%, #d86b32 30%);
+  box-shadow: 0 0 0 2px color-mix(in srgb, #e88745 25%, transparent);
+}
+
+.fire-choice:hover,
+.fire-option-list button:hover,
+.fire-action-grid button:hover,
+.classification-actions button:hover {
+  transform: translateY(-1px);
+}
+
+.intensity-button {
+  inline-size: 42px;
+  block-size: 42px;
+  border-radius: 999px;
+  border: 1px solid var(--fire-border);
+  background: var(--color-surface);
+  color: inherit;
+  cursor: pointer;
+}
+
+.intensity-button[aria-pressed="true"] {
+  background: #d86b32;
+  color: #fff;
+  border-color: #d86b32;
+}
+
+.fire-classification-list {
+  display: grid;
+  gap: var(--space-4);
+  margin-block: var(--space-4);
+}
+
+.fire-classification-entry {
+  padding: var(--space-4);
+  border: 1px solid var(--fire-border);
+  border-radius: var(--radius-xl);
+  background: color-mix(in srgb, var(--color-surface) 96%, #d86b32 4%);
+}
+
+.fire-classification-entry > p:first-child {
+  font-weight: 700;
+}
+
+.classification-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.classification-actions button {
+  padding: 10px 14px;
+  font: inherit;
+}
+
+.classification-feedback {
+  margin-top: var(--space-3);
+  padding: var(--space-3);
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--color-surface) 82%, #d86b32 18%);
+}
+
+.fire-option-list,
+.fire-action-grid {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.fire-option-list button,
+.fire-action-grid button {
+  width: 100%;
+  min-height: 68px;
+  padding: var(--space-3) var(--space-4);
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  text-align: left;
+  font: inherit;
+}
+
+.fire-option-list button span,
+.fire-action-grid button span {
+  display: block;
+  color: var(--color-text-muted);
+  font-size: .92rem;
+}
+
+.fire-action-grid {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.named-flame-card {
+  text-align: center;
+  display: grid;
+  place-items: center;
+}
+
+.named-flame-visual {
+  inline-size: 132px;
+  block-size: 132px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  color: #ffb25f;
+  background: radial-gradient(circle, rgba(255, 155, 66, .34), rgba(121, 38, 18, .08) 68%, transparent 70%);
+}
+
+.named-flame-visual svg {
+  inline-size: 72px;
+  block-size: 72px;
+  filter: drop-shadow(0 0 18px rgba(255, 132, 49, .55));
+}
+
+.fire-chain-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.fire-chain-node {
+  padding: var(--space-4);
+  border: 1px solid var(--fire-border);
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--color-surface) 94%, #c95522 6%);
+}
+
+.fire-chain-node h3 {
+  margin-block: var(--space-2);
+}
+
+.fire-component-summary {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+}
+
+.fire-hero-card--named .fire-hero-symbol {
+  color: #ffb25f;
+  filter: drop-shadow(0 0 14px rgba(255, 132, 49, .45));
+}
+
+@media (max-width: 900px) {
+  .fire-mission-intro-grid,
+  .fire-result-grid,
+  .fire-form-grid,
+  .fire-action-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .fire-choice-grid,
+  .fire-chain-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 520px) {
+  .fire-choice-grid,
+  .fire-chain-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .fire-inline-controls {
+    align-items: flex-start;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fire-choice,
+  .fire-option-list button,
+  .fire-action-grid button,
+  .classification-actions button {
+    transition: none;
+  }
+}

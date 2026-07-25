@@ -4,6 +4,7 @@ import { Button } from '../components/Button';
 import { Card } from '../components/Card';
 import { PageHeader } from '../components/PageHeader';
 import { useAthanorStore } from '../state/useAthanorStore';
+import { useFireMissionStore } from '../state/useFireMissionStore';
 import { useWaterChaliceStore } from '../state/useWaterChaliceStore';
 import { useWaterChapterStore } from '../state/useWaterChapterStore';
 import { useWaterLamentStore } from '../state/useWaterLamentStore';
@@ -18,11 +19,13 @@ export function DevPage() {
   const resetTrust = useWaterTrustStore((state) => state.reset);
   const resetChalice = useWaterChaliceStore((state) => state.reset);
   const resetWaterChapter = useWaterChapterStore((state) => state.reset);
+  const resetFireMission = useFireMissionStore((state) => state.reset);
   const lamentProgress = useWaterLamentStore((state) => state.progress);
   const memoryProgress = useWaterMemoryStore((state) => state.progress);
   const trustProgress = useWaterTrustStore((state) => state.progress);
   const chaliceProgress = useWaterChaliceStore((state) => state.progress);
   const waterChapterProgress = useWaterChapterStore((state) => state.progress);
+  const fireProgress = useFireMissionStore((state) => state.progress);
   const state = useAthanorStore();
 
   const reset = async () => {
@@ -32,6 +35,7 @@ export function DevPage() {
     resetTrust();
     resetChalice();
     resetWaterChapter();
+    resetFireMission();
     navigate('/welcome');
   };
 
@@ -60,6 +64,13 @@ export function DevPage() {
               status: waterChapterProgress.status,
               cycleId: waterChapterProgress.cycleId,
               destinations: waterChapterProgress.destinations
+            } : undefined,
+            fireMission: fireProgress ? {
+              status: fireProgress.status,
+              emotions: fireProgress.emotions,
+              intensity: fireProgress.intensity,
+              namedFlameCreated: fireProgress.namedFlameCreated,
+              action: fireProgress.action
             } : undefined,
             inventory: state.inventory.map((item) => item.name)
           }, null, 2)}</pre>

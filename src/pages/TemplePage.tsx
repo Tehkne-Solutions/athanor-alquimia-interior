@@ -7,6 +7,7 @@ import { PageHeader } from '../components/PageHeader';
 import { TempleMap } from '../components/TempleMap';
 import { biblicalUnits } from '../content/seed';
 import { useAthanorStore } from '../state/useAthanorStore';
+import { useFireMissionStore } from '../state/useFireMissionStore';
 import { useWaterChaliceStore } from '../state/useWaterChaliceStore';
 import { useWaterChapterStore } from '../state/useWaterChapterStore';
 
@@ -29,6 +30,7 @@ export function TemplePage() {
   const reviews = useAthanorStore((state) => state.reviews ?? []);
   const chaliceProgress = useWaterChaliceStore((state) => state.progress);
   const chapterProgress = useWaterChapterStore((state) => state.progress);
+  const rawFireProgress = useFireMissionStore((state) => state.progress);
   const passage = biblicalUnits[0];
 
   if (!character || !temple) return null;
@@ -52,6 +54,11 @@ export function TemplePage() {
       && chaliceProgress.journeyStartedAt === waterJourney.startedAt
       && chaliceProgress.chaliceCreated
   );
+  const sourceWaterCycleId = chapterProgress?.cycleId ?? chapterProgress?.completedAt;
+  const fireProgress = sourceWaterCycleId && rawFireProgress?.sourceWaterCycleId === sourceWaterCycleId
+    ? rawFireProgress
+    : undefined;
+  const namedFlameCreated = fireProgress?.status === 'completed' && fireProgress.namedFlameCreated;
 
   const roomSelect = (roomId: string) => {
     if (roomId === 'proverbs-library') navigate('/temple/proverbs-library');
@@ -75,9 +82,14 @@ export function TemplePage() {
         : waterJourney
           ? 'Continuar missão da Água'
           : 'Entrar na Câmara dos Salmos';
+  const fireAction = namedFlameCreated
+    ? 'Revisar a Chama Nomeada'
+    : fireProgress
+      ? 'Continuar O Nome da Chama'
+      : 'Iniciar O Nome da Chama';
 
   const activeRoomCount = temple.rooms.filter((room) => room.status === 'active' || room.status === 'restored' || room.status === 'available').length;
-  const componentCount = inventory.length + Number(waterJourney?.namedDropCreated) + Number(chaliceAvailable);
+  const componentCount = inventory.length + Number(waterJourney?.namedDropCreated) + Number(chaliceAvailable) + Number(namedFlameCreated);
 
   return (
     <div className="page page--temple">
@@ -88,13 +100,15 @@ export function TemplePage() {
           <div className="hero-card__content">
             <p className="eyebrow">Nível da Obra</p>
             <h2>{workLevelLabels[character.workLevel]}</h2>
-            <p>{waterCompleted
-              ? 'O primeiro ciclo da Água foi registrado, a Câmara está restaurada e a Forja foi aberta.'
-              : integrated
-                ? 'A primeira Obra foi revisada e a Câmara dos Salmos está disponível.'
-                : awaitingReview
-                  ? 'A Biblioteca foi restaurada e aguarda o retorno da sua ação.'
-                  : 'A Biblioteca dos Provérbios aguarda sua primeira restauração.'}</p>
+            <p>{namedFlameCreated
+              ? 'A primeira prática do Fogo foi concluída sem integrar automaticamente o capítulo.'
+              : waterCompleted
+                ? 'O primeiro ciclo da Água foi registrado, a Câmara está restaurada e a Forja foi aberta.'
+                : integrated
+                  ? 'A primeira Obra foi revisada e a Câmara dos Salmos está disponível.'
+                  : awaitingReview
+                    ? 'A Biblioteca foi restaurada e aguarda o retorno da sua ação.'
+                    : 'A Biblioteca dos Provérbios aguarda sua primeira restauração.'}</p>
             <div className="status-row">
               <span><strong>{activeRoomCount}</strong> salas acessíveis</span>
               <span><strong>{componentCount}</strong> componentes e itens</span>
@@ -130,18 +144,21 @@ export function TemplePage() {
         )}
 
         {forgeAvailable && (
-          <Card eyebrow="Novo capítulo disponível" title="A Forja dos Elementos" className="mission-card mission-card--fire">
+          <Card eyebrow={namedFlameCreated ? 'Primeiro componente criado' : 'Novo capítulo disponível'} title="A Forja dos Elementos" className="mission-card mission-card--fire">
             <div className="mission-card__icon"><Flame/></div>
-            <p>A fundação do Fogo está aberta. A próxima missão distinguirá intensidade, impulso, necessidade e ação proporcional.</p>
-            <div className="mission-meta"><span>Capítulo do Fogo</span><span>Fundação técnica</span></div>
-            <Button variant="secondary" onClick={() => navigate('/temple/forge')}>Entrar na Forja <ArrowRight size={18}/></Button>
+            <p>{namedFlameCreated
+              ? 'A Chama Nomeada registra reconhecimento, pausa, necessidade e ação proporcional sem concluir automaticamente o Fogo.'
+              : 'A primeira missão distingue intensidade, impulso, necessidade e ação proporcional.'}</p>
+            <div className="mission-meta"><span>Capítulo do Fogo</span><span>{namedFlameCreated ? 'Chama Nomeada criada' : 'Missão disponível'}</span></div>
+            <Button variant="secondary" onClick={() => navigate(namedFlameCreated ? '/temple/forge' : '/mission/name-the-flame')}>{fireAction} <ArrowRight size={18}/></Button>
           </Card>
         )}
 
         <Card title="Mapa do Templo" eyebrow="Ambientes"><TempleMap temple={temple} onRoomSelect={roomSelect} unlockedRoomIds={[...(integrated ? ['psalms-chamber'] : []), ...(waterCompleted ? ['forge'] : [])]}/></Card>
-        <Card title="Instrumentos da Obra" eyebrow={chaliceAvailable ? 'Água e Ar' : lamp ? integrated ? 'Instrumento integrado' : 'Instrumento em observação' : 'Nenhum item equipado'}>
+        <Card title="Instrumentos da Obra" eyebrow={namedFlameCreated ? 'Ar, Água e Fogo' : chaliceAvailable ? 'Água e Ar' : lamp ? integrated ? 'Instrumento integrado' : 'Instrumento em observação' : 'Nenhum item equipado'}>
           {lamp ? <div className="item-mini"><div className="lamp-icon"><LampDesk/></div><div><strong>{lamp.name}</strong><p>{lamp.action}</p></div></div> : <div className="empty-state"><LampDesk/><p>Sua primeira receita será desbloqueada na Biblioteca.</p></div>}
           {chaliceAvailable && <div className="item-mini"><div className="lamp-icon"><CupSoda/></div><div><strong>Cálice da Memória Serena</strong><p>{waterCompleted ? 'Ciclo da Água registrado' : 'Ciclo em revisão'}</p></div></div>}
+          {namedFlameCreated && <div className="item-mini"><div className="lamp-icon"><Flame/></div><div><strong>Chama Nomeada</strong><p>Primeiro componente do Fogo</p></div></div>}
         </Card>
         <Card title="Limites do sistema" eyebrow="Segurança"><div className="safety-summary"><ShieldCheck/><p>Nenhum status é diagnóstico. Símbolos não determinam o futuro, e toda ação pode ser recusada.</p></div></Card>
       </div>

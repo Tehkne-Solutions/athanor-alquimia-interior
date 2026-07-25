@@ -13,6 +13,7 @@ import './styles/water-trust.css';
 import './styles/water-chalice.css';
 import './styles/water-chapter.css';
 import './styles/fire.css';
+import './styles/fire-mission.css';
 
 validateContent();
 
