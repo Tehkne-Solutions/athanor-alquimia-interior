@@ -4,18 +4,24 @@ on:
   push:
     branches:
       - agent/fase-4.1-vertical-slice
+  pull_request:
+    branches:
+      - main
+    types: [opened, synchronize, reopened]
 
 permissions:
   contents: write
 
 jobs:
   restore-and-validate:
+    if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout branch
+      - name: Checkout implementation branch
         uses: actions/checkout@v4
         with:
+          ref: agent/fase-4.1-vertical-slice
           fetch-depth: 0
 
       - name: Restore project archive
