@@ -36,4 +36,20 @@ jobs:
         run: npm test
 
       - name: Build production bundle
-        run: npm run build
+        id: build
+        shell: bash
+        run: |
+          set +e
+          npm run build > build.log 2>&1
+          status=$?
+          tail -n 80 build.log
+          exit $status
+
+      - name: Upload build diagnostics
+        if: failure() && steps.build.outcome == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          name: athanor-build-diagnostics
+          path: build.log
+          if-no-files-found: error
+          retention-days: 1
