@@ -13,7 +13,9 @@ export function PsalmsChamberPage() {
   const inventory = useAthanorStore((state) => state.inventory);
   const waterJourney = useAthanorStore((state) => state.waterJourney);
   const startWaterJourney = useAthanorStore((state) => state.startWaterJourney);
-  const lamentProgress = useWaterLamentStore((state) => state.progress);
+  const rawLamentProgress = useWaterLamentStore((state) => state.progress);
+  const lamentJourneyStartedAt = useWaterLamentStore((state) => state.journeyStartedAt);
+  const lamentProgress = waterJourney?.startedAt === lamentJourneyStartedAt ? rawLamentProgress : undefined;
   const chamber = temple?.rooms.find((room) => room.roomId === 'psalms-chamber');
   const lampIntegrated = inventory.some((item) => item.id === 'item_clear_word_lamp_v1' && item.lifecycle === 'integrated');
   const available = Boolean(lampIntegrated || (chamber && chamber.status !== 'dormant' && chamber.status !== 'hidden'));
