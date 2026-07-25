@@ -11,6 +11,8 @@ import './styles/water-lament.css';
 import './styles/water-memory.css';
 import './styles/water-trust.css';
 import './styles/water-chalice.css';
+import './styles/water-chapter.css';
+import './styles/fire.css';
 
 validateContent();
 

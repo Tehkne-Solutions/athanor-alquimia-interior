@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { provenanceClassSchema } from '../domain/types';
+import { fireFoundationBiblicalUnit, fireFoundationNodes } from './fireFoundation';
 import { biblicalUnits, chainNodes, classificationEntries } from './seed';
 import {
   waterBiblicalUnit,
@@ -73,10 +74,11 @@ export function validateContent(): void {
     waterBiblicalUnit,
     waterLamentBiblicalUnit,
     waterMemoryBiblicalUnit,
-    waterTrustBiblicalUnit
+    waterTrustBiblicalUnit,
+    fireFoundationBiblicalUnit
   ]);
 
-  const allNodes = [...chainNodes, ...waterMemoryNodes, ...waterTrustNodes];
+  const allNodes = [...chainNodes, ...waterMemoryNodes, ...waterTrustNodes, ...fireFoundationNodes];
   z.array(nodeSchema).parse(allNodes);
   z.array(waterMemoryEntrySchema).min(5).parse(waterMemoryEntries);
   z.array(waterTrustStatementSchema).min(6).parse(waterTrustStatements);

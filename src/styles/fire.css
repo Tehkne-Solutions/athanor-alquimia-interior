@@ -1,0 +1,56 @@
+.page--fire {
+  --fire-border: rgba(237, 153, 83, 0.28);
+}
+
+.fire-foundation-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-5);
+}
+
+.fire-hero-card {
+  display: flex;
+  gap: var(--space-5);
+  align-items: center;
+  grid-column: 1 / -1;
+  background: radial-gradient(circle at 20% 25%, rgba(216, 105, 45, 0.22), transparent 38%), rgba(35, 21, 18, 0.66);
+  border-color: var(--fire-border);
+}
+
+.fire-hero-symbol {
+  display: grid;
+  width: 5rem;
+  height: 5rem;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid rgba(237, 153, 83, 0.5);
+  border-radius: 50%;
+  background: rgba(108, 48, 22, 0.38);
+  box-shadow: 0 0 2rem rgba(220, 93, 42, 0.2);
+}
+
+.fire-hero-symbol svg {
+  width: 2.5rem;
+  height: 2.5rem;
+}
+
+.fire-lock {
+  display: flex;
+  gap: var(--space-3);
+  align-items: flex-start;
+  padding: var(--space-4);
+  margin-bottom: var(--space-4);
+  border: 1px solid var(--fire-border);
+  border-radius: var(--radius-lg);
+  background: rgba(69, 36, 24, 0.25);
+}
+
+@media (max-width: 820px) {
+  .fire-foundation-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .fire-hero-card {
+    align-items: flex-start;
+  }
+}

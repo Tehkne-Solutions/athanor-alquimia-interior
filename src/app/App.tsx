@@ -9,6 +9,7 @@ import { ClassificationPage } from '../pages/ClassificationPage';
 import { CodexPage } from '../pages/CodexPage';
 import { CraftingPage } from '../pages/CraftingPage';
 import { DevPage } from '../pages/DevPage';
+import { ForgePage } from '../pages/ForgePage';
 import { HomologationPage } from '../pages/HomologationPage';
 import { InventoryPage } from '../pages/InventoryPage';
 import { ItemPage } from '../pages/ItemPage';
@@ -21,6 +22,7 @@ import { SafetyPage } from '../pages/SafetyPage';
 import { TempleFoundationPage } from '../pages/TempleFoundationPage';
 import { TemplePage } from '../pages/TemplePage';
 import { WaterChalicePage } from '../pages/WaterChalicePage';
+import { WaterChapterReviewPage } from '../pages/WaterChapterReviewPage';
 import { WaterLamentPage } from '../pages/WaterLamentPage';
 import { WaterMemoryPage } from '../pages/WaterMemoryPage';
 import { WaterMissionPage } from '../pages/WaterMissionPage';
@@ -61,6 +63,7 @@ export function App() {
       <Route path="/temple/map" element={<TemplePage/>}/>
       <Route path="/temple/proverbs-library" element={<LibraryPage/>}/>
       <Route path="/temple/psalms-chamber" element={<PsalmsChamberPage/>}/>
+      <Route path="/temple/forge" element={<ForgePage/>}/>
       <Route path="/mission/word-before-response" element={<MissionPage/>}/>
       <Route path="/mission/word-before-response/classification" element={<ClassificationPage/>}/>
       <Route path="/mission/word-before-response/chain" element={<ChainPage/>}/>
@@ -69,6 +72,7 @@ export function App() {
       <Route path="/mission/mirror-of-memories" element={<WaterMemoryPage/>}/>
       <Route path="/mission/space-of-trust" element={<WaterTrustPage/>}/>
       <Route path="/crafting/memory-serene-chalice" element={<WaterChalicePage/>}/>
+      <Route path="/review/water-chapter" element={<WaterChapterReviewPage/>}/>
       <Route path="/crafting/clear-word-lamp" element={<CraftingPage/>}/>
       <Route path="/items/clear-word-lamp" element={<ItemPage/>}/>
       <Route path="/review/clear-word-lamp" element={<ReviewPage/>}/>
