@@ -15,10 +15,12 @@ import { ItemPage } from '../pages/ItemPage';
 import { LibraryPage } from '../pages/LibraryPage';
 import { LimitsPage } from '../pages/LimitsPage';
 import { MissionPage } from '../pages/MissionPage';
+import { PsalmsChamberPage } from '../pages/PsalmsChamberPage';
 import { ReviewPage } from '../pages/ReviewPage';
 import { SafetyPage } from '../pages/SafetyPage';
 import { TempleFoundationPage } from '../pages/TempleFoundationPage';
 import { TemplePage } from '../pages/TemplePage';
+import { WaterMissionPage } from '../pages/WaterMissionPage';
 import { WelcomePage } from '../pages/WelcomePage';
 import { useAthanorStore } from '../state/useAthanorStore';
 
@@ -54,9 +56,11 @@ export function App() {
       <Route path="/temple" element={<TemplePage/>}/>
       <Route path="/temple/map" element={<TemplePage/>}/>
       <Route path="/temple/proverbs-library" element={<LibraryPage/>}/>
+      <Route path="/temple/psalms-chamber" element={<PsalmsChamberPage/>}/>
       <Route path="/mission/word-before-response" element={<MissionPage/>}/>
       <Route path="/mission/word-before-response/classification" element={<ClassificationPage/>}/>
       <Route path="/mission/word-before-response/chain" element={<ChainPage/>}/>
+      <Route path="/mission/name-the-waters" element={<WaterMissionPage/>}/>
       <Route path="/crafting/clear-word-lamp" element={<CraftingPage/>}/>
       <Route path="/items/clear-word-lamp" element={<ItemPage/>}/>
       <Route path="/review/clear-word-lamp" element={<ReviewPage/>}/>

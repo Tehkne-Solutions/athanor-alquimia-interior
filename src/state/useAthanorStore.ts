@@ -1,6 +1,11 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { resolveReviewOutcome } from '../domain/review';
+import {
+  completeWaterNaming as completeWaterNamingProgress,
+  createEmptyWaterCheckIn,
+  toggleWaterEmotion as toggleWaterEmotionSelection
+} from '../domain/water';
 import type {
   AthanorCharacter,
   AthanorPreferences,
@@ -14,7 +19,10 @@ import type {
   ReviewEntry,
   ReviewOutcome,
   SymbolicLayer,
-  TempleTheme
+  TempleTheme,
+  WaterEmotionId,
+  WaterJourneyProgress,
+  WaterNeedId
 } from '../domain/types';
 import { idbStateStorage } from '../storage/idbStorage';
 
@@ -54,7 +62,7 @@ const createTemple = (theme: TempleTheme): AstralTemple => ({
   ],
   createdAt: now(),
   updatedAt: now(),
-  version: '1.1.0'
+  version: '1.2.0'
 });
 
 interface DraftCharacter {
@@ -76,6 +84,7 @@ interface AthanorStoreState {
   character?: AthanorCharacter;
   temple?: AstralTemple;
   activeMission?: MissionProgress;
+  waterJourney?: WaterJourneyProgress;
   inventory: CraftedItem[];
   reviews: ReviewEntry[];
   activePassageId: string;
@@ -95,14 +104,20 @@ interface AthanorStoreState {
   craftLamp: () => void;
   placeLamp: () => void;
   completeLampReview: (outcome: ReviewOutcome, reflection?: string, adjustedAction?: string) => void;
+  startWaterJourney: () => void;
+  toggleWaterEmotion: (emotion: WaterEmotionId) => void;
+  setWaterIntensity: (intensity?: 1 | 2 | 3 | 4 | 5) => void;
+  setWaterNeed: (need?: WaterNeedId) => void;
+  skipWaterCheckIn: () => void;
+  completeWaterNaming: () => void;
   resetAll: () => Promise<void>;
 }
 
 export const useAthanorStore = create<AthanorStoreState>()(
   persist(
     (set, get) => ({
-      schemaVersion: 2,
-      contentVersion: 'bible-core-seed-1.1.0',
+      schemaVersion: 3,
+      contentVersion: 'bible-core-seed-1.2.0',
       initialized: false,
       onboardingCompleted: false,
       limitsAccepted: false,
@@ -144,7 +159,7 @@ export const useAthanorStore = create<AthanorStoreState>()(
             workLevel: 'foundation',
             createdAt: now(),
             updatedAt: now(),
-            version: '1.1.0'
+            version: '1.2.0'
           }
         });
       },
@@ -203,7 +218,7 @@ export const useAthanorStore = create<AthanorStoreState>()(
             action: mission.action,
             createdAt: now(),
             updatedAt: now(),
-            version: '1.1.0'
+            version: '1.2.0'
           }],
           activeMission: mission ? { ...mission, status: 'awaiting_action', currentStep: 3, updatedAt: now() } : mission
         }));
@@ -256,6 +271,21 @@ export const useAthanorStore = create<AthanorStoreState>()(
           adjustedAction: outcome === 'adjusted' ? nextAction : undefined,
           createdAt: now()
         };
+        const temple = outcome === 'integrated' && state.temple
+          ? {
+              ...state.temple,
+              rooms: state.temple.rooms.map((room) => room.roomId === 'psalms-chamber'
+                ? {
+                    ...room,
+                    status: 'available' as const,
+                    restorationProgress: Math.max(room.restorationProgress, 8),
+                    activeMissionId: 'mission_name_waters_v1'
+                  }
+                : room),
+              restorationLevel: Math.max(state.temple.restorationLevel, 3),
+              updatedAt: now()
+            }
+          : state.temple;
 
         return {
           reviews: [...state.reviews, review],
@@ -272,8 +302,58 @@ export const useAthanorStore = create<AthanorStoreState>()(
             : candidate),
           character: resolution.shouldAdvanceWorkLevel && state.character
             ? { ...state.character, workLevel: 'first_fire', updatedAt: now() }
-            : state.character
+            : state.character,
+          temple
         };
+      }),
+      startWaterJourney: () => {
+        const lampIntegrated = get().inventory.some((item) => item.id === 'item_clear_word_lamp_v1' && item.lifecycle === 'integrated');
+        const chamberAvailable = get().temple?.rooms.some((room) => room.roomId === 'psalms-chamber' && room.status !== 'dormant' && room.status !== 'hidden');
+        if (!lampIntegrated || !chamberAvailable) return;
+        if (get().waterJourney) return;
+        const startedAt = now();
+        set({
+          waterJourney: {
+            id: 'mission_name_waters_v1',
+            status: 'active',
+            checkIn: createEmptyWaterCheckIn(),
+            namedDropCreated: false,
+            startedAt,
+            updatedAt: startedAt
+          }
+        });
+      },
+      toggleWaterEmotion: (emotion) => set((state) => state.waterJourney ? ({
+        waterJourney: {
+          ...state.waterJourney,
+          checkIn: toggleWaterEmotionSelection(state.waterJourney.checkIn, emotion),
+          updatedAt: now()
+        }
+      }) : state),
+      setWaterIntensity: (intensity) => set((state) => state.waterJourney ? ({
+        waterJourney: {
+          ...state.waterJourney,
+          checkIn: { ...state.waterJourney.checkIn, intensity, skipped: false },
+          updatedAt: now()
+        }
+      }) : state),
+      setWaterNeed: (need) => set((state) => state.waterJourney ? ({
+        waterJourney: {
+          ...state.waterJourney,
+          checkIn: { ...state.waterJourney.checkIn, need, skipped: false },
+          updatedAt: now()
+        }
+      }) : state),
+      skipWaterCheckIn: () => set((state) => state.waterJourney ? ({
+        waterJourney: {
+          ...state.waterJourney,
+          checkIn: { emotions: [], skipped: true },
+          updatedAt: now()
+        }
+      }) : state),
+      completeWaterNaming: () => set((state) => {
+        if (!state.waterJourney) return state;
+        return { waterJourney: completeWaterNamingProgress(state.waterJourney, now()) };
       }),
       resetAll: async () => {
         set({
@@ -291,6 +371,7 @@ export const useAthanorStore = create<AthanorStoreState>()(
           character: undefined,
           temple: undefined,
           activeMission: undefined,
+          waterJourney: undefined,
           inventory: [],
           reviews: [],
           activePassageId: 'proverb_listen_before_reply_01'
@@ -310,6 +391,7 @@ export const useAthanorStore = create<AthanorStoreState>()(
         character: state.character,
         temple: state.temple,
         activeMission: state.activeMission,
+        waterJourney: state.waterJourney,
         inventory: state.inventory,
         reviews: state.reviews,
         activePassageId: state.activePassageId
