@@ -5,6 +5,7 @@ import { App } from './app/App';
 import { validateContent } from './content/validate';
 import './styles/global.css';
 import './styles/homologation.css';
+import './styles/research.css';
 
 validateContent();
 

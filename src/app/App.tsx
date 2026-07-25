@@ -9,6 +9,7 @@ import { ClassificationPage } from '../pages/ClassificationPage';
 import { CodexPage } from '../pages/CodexPage';
 import { CraftingPage } from '../pages/CraftingPage';
 import { DevPage } from '../pages/DevPage';
+import { HomologationPage } from '../pages/HomologationPage';
 import { InventoryPage } from '../pages/InventoryPage';
 import { ItemPage } from '../pages/ItemPage';
 import { LibraryPage } from '../pages/LibraryPage';
@@ -63,6 +64,7 @@ export function App() {
       <Route path="/codex" element={<CodexPage/>}/>
       <Route path="/character" element={<CharacterPage/>}/>
       <Route path="/settings/accessibility" element={<AccessibilityPage/>}/>
+      <Route path="/homologation" element={<HomologationPage/>}/>
       {import.meta.env.DEV && <Route path="/dev" element={<DevPage/>}/>} 
     </Route>
     <Route path="*" element={<Navigate to="/" replace/>}/>

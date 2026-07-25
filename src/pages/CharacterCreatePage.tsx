@@ -2,6 +2,7 @@ import { ArrowRight, Palette, UserRound } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/Button';
 import { Card } from '../components/Card';
+import { OnboardingProgress } from '../components/OnboardingProgress';
 import { useAthanorStore } from '../state/useAthanorStore';
 import type { CharacterClass, CharacterOrigin } from '../domain/types';
 
@@ -30,22 +31,23 @@ export function CharacterCreatePage() {
   const createCharacter = useAthanorStore((state) => state.createCharacter);
   const submit = () => { createCharacter(); navigate('/temple/foundation'); };
   return (
-    <main className="onboarding-page">
-      <header className="onboarding-header"><p className="eyebrow">Fundação · 1 de 3</p><h1>Crie quem atravessará o Templo.</h1><p>As escolhas definem sua introdução e aparência. Nenhuma classe bloqueia outros caminhos.</p></header>
+    <main className="onboarding-page" id="main-content">
+      <OnboardingProgress current={1}/>
+      <header className="onboarding-header"><p className="eyebrow">Fundação · personagem</p><h1>Crie quem atravessará o Templo.</h1><p>As escolhas definem sua introdução e aparência. Nenhuma classe bloqueia outros caminhos, e tudo poderá ser revisado depois.</p></header>
       <div className="onboarding-grid">
         <Card title="Identidade" eyebrow="Nome e título">
-          <label className="field"><span>Nome do personagem</span><input value={draft.name} onChange={(event) => updateDraft({ name: event.target.value })} placeholder="Como deseja ser chamado?" /></label>
+          <label className="field"><span>Nome do personagem</span><input value={draft.name} onChange={(event) => updateDraft({ name: event.target.value })} placeholder="Como deseja ser chamado?" autoComplete="off" /></label>
           <label className="field"><span>Título narrativo</span><input value={draft.title} onChange={(event) => updateDraft({ title: event.target.value })} /></label>
           <div className="avatar-builder" aria-label="Prévia visual do personagem"><div className="avatar-builder__head" /><div className="avatar-builder__body"><Palette /></div><small>Personalização visual expandida nas próximas sprints</small></div>
         </Card>
         <Card title="Origem" eyebrow="Introdução narrativa">
           <div className="option-grid option-grid--2">
-            {origins.map((origin) => <button key={origin.id} type="button" className={`choice-card ${draft.origin === origin.id ? 'choice-card--selected' : ''}`} onClick={() => updateDraft({ origin: origin.id })}><UserRound size={18}/><strong>{origin.label}</strong><span>{origin.description}</span></button>)}
+            {origins.map((origin) => <button key={origin.id} type="button" aria-pressed={draft.origin === origin.id} className={`choice-card ${draft.origin === origin.id ? 'choice-card--selected' : ''}`} onClick={() => updateDraft({ origin: origin.id })}><UserRound size={18}/><strong>{origin.label}</strong><span>{origin.description}</span></button>)}
           </div>
         </Card>
         <Card title="Classe inicial" eyebrow="Caminho de gameplay" className="onboarding-grid__wide">
           <div className="option-grid option-grid--3">
-            {classes.map((item) => <button key={item.id} type="button" className={`choice-card ${draft.primaryClass === item.id ? 'choice-card--selected' : ''}`} onClick={() => updateDraft({ primaryClass: item.id })}><strong>{item.label}</strong><span>{item.description}</span></button>)}
+            {classes.map((item) => <button key={item.id} type="button" aria-pressed={draft.primaryClass === item.id} className={`choice-card ${draft.primaryClass === item.id ? 'choice-card--selected' : ''}`} onClick={() => updateDraft({ primaryClass: item.id })}><strong>{item.label}</strong><span>{item.description}</span></button>)}
           </div>
         </Card>
       </div>
