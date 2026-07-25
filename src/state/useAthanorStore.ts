@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
+import { resolveReviewOutcome } from '../domain/review';
 import type {
   AthanorCharacter,
   AthanorPreferences,
@@ -10,6 +11,8 @@ import type {
   ClassificationEntry,
   CraftedItem,
   MissionProgress,
+  ReviewEntry,
+  ReviewOutcome,
   SymbolicLayer,
   TempleTheme
 } from '../domain/types';
@@ -51,7 +54,7 @@ const createTemple = (theme: TempleTheme): AstralTemple => ({
   ],
   createdAt: now(),
   updatedAt: now(),
-  version: '1.0.0'
+  version: '1.1.0'
 });
 
 interface DraftCharacter {
@@ -74,6 +77,7 @@ interface AthanorStoreState {
   temple?: AstralTemple;
   activeMission?: MissionProgress;
   inventory: CraftedItem[];
+  reviews: ReviewEntry[];
   activePassageId: string;
   setInitialized: (value: boolean) => void;
   acceptLimits: () => void;
@@ -90,14 +94,15 @@ interface AthanorStoreState {
   completeClassification: () => void;
   craftLamp: () => void;
   placeLamp: () => void;
+  completeLampReview: (outcome: ReviewOutcome, reflection?: string, adjustedAction?: string) => void;
   resetAll: () => Promise<void>;
 }
 
 export const useAthanorStore = create<AthanorStoreState>()(
   persist(
     (set, get) => ({
-      schemaVersion: 1,
-      contentVersion: 'bible-core-seed-1.0.0',
+      schemaVersion: 2,
+      contentVersion: 'bible-core-seed-1.1.0',
       initialized: false,
       onboardingCompleted: false,
       limitsAccepted: false,
@@ -110,6 +115,7 @@ export const useAthanorStore = create<AthanorStoreState>()(
         appearance: defaultAppearance
       },
       inventory: [],
+      reviews: [],
       activePassageId: 'proverb_listen_before_reply_01',
       setInitialized: (value) => set({ initialized: value }),
       acceptLimits: () => set({ limitsAccepted: true }),
@@ -138,7 +144,7 @@ export const useAthanorStore = create<AthanorStoreState>()(
             workLevel: 'foundation',
             createdAt: now(),
             updatedAt: now(),
-            version: '1.0.0'
+            version: '1.1.0'
           }
         });
       },
@@ -197,7 +203,7 @@ export const useAthanorStore = create<AthanorStoreState>()(
             action: mission.action,
             createdAt: now(),
             updatedAt: now(),
-            version: '1.0.0'
+            version: '1.1.0'
           }],
           activeMission: mission ? { ...mission, status: 'awaiting_action', currentStep: 3, updatedAt: now() } : mission
         }));
@@ -210,7 +216,7 @@ export const useAthanorStore = create<AthanorStoreState>()(
             ? { ...room, restorationProgress: Math.max(room.restorationProgress, 55) }
             : room);
         const inventory = state.inventory.map((item) => item.id === 'item_clear_word_lamp_v1'
-          ? { ...item, lifecycle: 'integrated' as const, updatedAt: now() }
+          ? { ...item, lifecycle: 'awaiting_review' as const, updatedAt: now() }
           : item);
         return {
           temple: {
@@ -221,7 +227,52 @@ export const useAthanorStore = create<AthanorStoreState>()(
             updatedAt: now()
           },
           inventory,
-          activeMission: state.activeMission ? { ...state.activeMission, status: 'integrated', currentStep: 4, updatedAt: now() } : state.activeMission
+          activeMission: state.activeMission ? {
+            ...state.activeMission,
+            status: 'awaiting_review',
+            currentStep: 4,
+            reviewDueAt: now(),
+            updatedAt: now()
+          } : state.activeMission
+        };
+      }),
+      completeLampReview: (outcome, reflection, adjustedAction) => set((state) => {
+        const mission = state.activeMission;
+        const item = state.inventory.find((candidate) => candidate.id === 'item_clear_word_lamp_v1');
+        if (!mission || !item) return state;
+
+        const resolution = resolveReviewOutcome(outcome);
+        const reviewId = crypto.randomUUID();
+        const normalizedReflection = reflection?.trim() || undefined;
+        const normalizedAdjustedAction = adjustedAction?.trim() || undefined;
+        const nextAction = outcome === 'adjusted' ? normalizedAdjustedAction || mission.action : mission.action;
+        const review: ReviewEntry = {
+          id: reviewId,
+          missionId: mission.id,
+          itemId: item.id,
+          outcome,
+          reflection: normalizedReflection,
+          previousAction: mission.action,
+          adjustedAction: outcome === 'adjusted' ? nextAction : undefined,
+          createdAt: now()
+        };
+
+        return {
+          reviews: [...state.reviews, review],
+          activeMission: {
+            ...mission,
+            action: nextAction,
+            status: resolution.missionStatus,
+            lastReviewId: reviewId,
+            reviewDueAt: outcome === 'integrated' ? undefined : now(),
+            updatedAt: now()
+          },
+          inventory: state.inventory.map((candidate) => candidate.id === item.id
+            ? { ...candidate, action: nextAction, lifecycle: resolution.itemLifecycle, updatedAt: now() }
+            : candidate),
+          character: resolution.shouldAdvanceWorkLevel && state.character
+            ? { ...state.character, workLevel: 'first_fire', updatedAt: now() }
+            : state.character
         };
       }),
       resetAll: async () => {
@@ -241,6 +292,7 @@ export const useAthanorStore = create<AthanorStoreState>()(
           temple: undefined,
           activeMission: undefined,
           inventory: [],
+          reviews: [],
           activePassageId: 'proverb_listen_before_reply_01'
         });
       }
@@ -259,6 +311,7 @@ export const useAthanorStore = create<AthanorStoreState>()(
         temple: state.temple,
         activeMission: state.activeMission,
         inventory: state.inventory,
+        reviews: state.reviews,
         activePassageId: state.activePassageId
       }),
       onRehydrateStorage: () => (state) => state?.setInitialized(true)
