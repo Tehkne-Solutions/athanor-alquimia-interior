@@ -1,0 +1,202 @@
+.page--trust {
+  --trust-surface: rgba(42, 80, 91, 0.38);
+  --trust-border: rgba(150, 216, 222, 0.3);
+}
+
+.trust-intro-grid,
+.trust-result-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-5);
+}
+
+.trust-category-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-bottom: var(--space-5);
+}
+
+.trust-category-legend span {
+  border: 1px solid var(--trust-border);
+  background: var(--trust-surface);
+  border-radius: var(--radius-full);
+  padding: 0.45rem 0.8rem;
+  font-size: 0.82rem;
+}
+
+.trust-statement-list,
+.trust-differences {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.trust-statement-card {
+  border-color: var(--trust-border);
+}
+
+.trust-statement-text {
+  margin: 0 0 var(--space-4);
+  font-size: clamp(1rem, 2vw, 1.15rem);
+  line-height: 1.55;
+}
+
+.trust-category-buttons {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+
+.trust-category-button,
+.trust-resource,
+.trust-action {
+  border: 1px solid var(--trust-border);
+  background: rgba(7, 27, 35, 0.54);
+  color: inherit;
+  border-radius: var(--radius-md);
+  padding: 0.8rem;
+  cursor: pointer;
+  transition: border-color var(--motion-fast), background var(--motion-fast), transform var(--motion-fast);
+}
+
+.trust-category-button:hover,
+.trust-resource:hover,
+.trust-action:hover {
+  border-color: rgba(181, 235, 238, 0.68);
+}
+
+.trust-category-button:focus-visible,
+.trust-resource:focus-visible,
+.trust-action:focus-visible {
+  outline: 3px solid var(--focus-ring, #f2cf78);
+  outline-offset: 3px;
+}
+
+.trust-category-button--selected,
+.trust-resource--selected,
+.trust-action--selected {
+  border-color: rgba(181, 235, 238, 0.92);
+  background: rgba(52, 130, 142, 0.48);
+  transform: translateY(-1px);
+}
+
+.trust-resource-grid,
+.trust-action-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.trust-resource,
+.trust-action {
+  display: grid;
+  gap: 0.35rem;
+  text-align: left;
+}
+
+.trust-resource span,
+.trust-action span {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.trust-bridge-card {
+  text-align: center;
+  background: radial-gradient(circle at 50% 20%, rgba(134, 216, 218, 0.2), transparent 42%), rgba(10, 37, 45, 0.64);
+}
+
+.trust-bridge {
+  width: 7rem;
+  height: 7rem;
+  margin: 0 auto var(--space-4);
+  border: 1px solid rgba(181, 235, 238, 0.74);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(circle, rgba(203, 241, 241, 0.28), rgba(19, 69, 79, 0.7));
+  box-shadow: inset 0 0 2rem rgba(203, 241, 241, 0.18), 0 0 2.5rem rgba(73, 168, 179, 0.18);
+}
+
+.trust-bridge svg {
+  width: 2rem;
+  height: 2rem;
+}
+
+.trust-difference {
+  display: grid;
+  gap: 0.3rem;
+  padding: var(--space-3);
+  border: 1px solid var(--trust-border);
+  border-radius: var(--radius-md);
+  background: rgba(8, 30, 37, 0.44);
+}
+
+.trust-difference span,
+.trust-difference small {
+  color: var(--text-muted);
+}
+
+.trust-chain {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.trust-chain-node {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: start;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: 1px solid var(--trust-border);
+  border-radius: var(--radius-lg);
+  background: rgba(7, 27, 34, 0.54);
+}
+
+.trust-chain-node h3 {
+  margin: 0.45rem 0;
+  font-size: 1rem;
+}
+
+.trust-chain-node p,
+.trust-chain-node small {
+  overflow-wrap: anywhere;
+}
+
+.trust-chain-node p {
+  margin: 0 0 0.4rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+
+@media (max-width: 1100px) {
+  .trust-resource-grid,
+  .trust-action-grid,
+  .trust-chain {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .trust-intro-grid,
+  .trust-result-grid,
+  .trust-category-buttons,
+  .trust-resource-grid,
+  .trust-action-grid,
+  .trust-chain {
+    grid-template-columns: 1fr;
+  }
+
+  .trust-category-button {
+    min-height: 2.85rem;
+  }
+}
+
+[data-reduced-motion='true'] .trust-category-button,
+[data-reduced-motion='true'] .trust-resource,
+[data-reduced-motion='true'] .trust-action {
+  transition: none;
+  transform: none;
+}

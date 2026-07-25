@@ -1,12 +1,14 @@
-import { ArrowRight, BookOpenText, Droplets, Eye, Feather, LockKeyhole, ShieldCheck } from 'lucide-react';
+import { ArrowRight, BookOpenText, Droplets, Eye, Feather, HeartHandshake, LockKeyhole, ShieldCheck } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/Button';
 import { Card } from '../components/Card';
 import { PageHeader } from '../components/PageHeader';
 import { waterBiblicalUnit, waterLamentBiblicalUnit, waterMemoryBiblicalUnit } from '../content/water';
+import { waterTrustBiblicalUnit } from '../content/waterTrust';
 import { useAthanorStore } from '../state/useAthanorStore';
 import { useWaterLamentStore } from '../state/useWaterLamentStore';
 import { useWaterMemoryStore } from '../state/useWaterMemoryStore';
+import { useWaterTrustStore } from '../state/useWaterTrustStore';
 
 export function PsalmsChamberPage() {
   const navigate = useNavigate();
@@ -17,8 +19,10 @@ export function PsalmsChamberPage() {
   const rawLamentProgress = useWaterLamentStore((state) => state.progress);
   const lamentJourneyStartedAt = useWaterLamentStore((state) => state.journeyStartedAt);
   const rawMemoryProgress = useWaterMemoryStore((state) => state.progress);
+  const rawTrustProgress = useWaterTrustStore((state) => state.progress);
   const lamentProgress = waterJourney?.startedAt === lamentJourneyStartedAt ? rawLamentProgress : undefined;
   const memoryProgress = waterJourney?.startedAt === rawMemoryProgress?.journeyStartedAt ? rawMemoryProgress : undefined;
+  const trustProgress = waterJourney?.startedAt === rawTrustProgress?.journeyStartedAt ? rawTrustProgress : undefined;
   const chamber = temple?.rooms.find((room) => room.roomId === 'psalms-chamber');
   const lampIntegrated = inventory.some((item) => item.id === 'item_clear_word_lamp_v1' && item.lifecycle === 'integrated');
   const available = Boolean(lampIntegrated || (chamber && chamber.status !== 'dormant' && chamber.status !== 'hidden'));
@@ -63,6 +67,13 @@ export function PsalmsChamberPage() {
       ? 'Continuar O Espelho das Memórias'
       : 'Abrir O Espelho das Memórias';
 
+  const trustCompleted = trustProgress?.status === 'completed';
+  const trustActionLabel = trustCompleted
+    ? 'Revisar a Ponte da Confiança'
+    : trustProgress
+      ? 'Continuar O Espaço da Confiança'
+      : 'Abrir O Espaço da Confiança';
+
   const openNamingJourney = () => {
     startWaterJourney();
     navigate('/mission/name-the-waters');
@@ -72,7 +83,7 @@ export function PsalmsChamberPage() {
     navigate(lamentInterrupted ? '/safety?source=lament' : '/mission/voice-of-lament');
   };
 
-  const componentCount = Number(namingCompleted) + Number(lamentCompleted) + Number(memoryCompleted);
+  const componentCount = Number(namingCompleted) + Number(lamentCompleted) + Number(memoryCompleted) + Number(trustCompleted);
 
   return (
     <div className="page page--water">
@@ -88,7 +99,9 @@ export function PsalmsChamberPage() {
           <div>
             <p className="eyebrow">Estado da Câmara</p>
             <h2>{componentCount === 0 ? 'Fundação disponível' : `${componentCount} de 4 componentes iniciais`}</h2>
-            <p>A sala permanece em construção. O Cálice completo só será criado depois de nomeação, lamento, memória, confiança, ação de cuidado e revisão.</p>
+            <p>{componentCount < 4
+              ? 'A sala permanece em construção. O Cálice completo só será criado depois de nomeação, lamento, memória, confiança, ação de cuidado e revisão.'
+              : 'Os quatro componentes iniciais estão disponíveis. A próxima fase reunirá ação de cuidado, revisão e crafting do Cálice.'}</p>
           </div>
         </Card>
 
@@ -133,8 +146,20 @@ export function PsalmsChamberPage() {
           {!lamentCompleted && <p className="field-help">Conclua primeiro A Voz do Lamento para abrir esta etapa.</p>}
         </Card>
 
+        <Card title="O Espaço da Confiança" eyebrow={waterTrustBiblicalUnit.reference}>
+          <div className="lament-card-intro"><HeartHandshake aria-hidden="true"/><p>Diferencie apoio, garantia e previsão e mapeie somente recursos realmente disponíveis.</p></div>
+          <ul className="simple-list">
+            <li>nenhum recurso é presumido;</li>
+            <li>o mapa pode permanecer vazio;</li>
+            <li>a ação de cuidado é opcional;</li>
+            <li>Chesed, Kun e A Estrela são camadas comparativas.</li>
+          </ul>
+          <Button disabled={!memoryCompleted} onClick={() => navigate('/mission/space-of-trust')}>{trustActionLabel} <ArrowRight size={18}/></Button>
+          {!memoryCompleted && <p className="field-help">Conclua primeiro O Espelho das Memórias para abrir esta etapa.</p>}
+        </Card>
+
         <Card title="Limites da experiência" eyebrow="Segurança">
-          <div className="safety-summary"><ShieldCheck/><p>O Athanor não interpreta sintomas, memórias ou causas. Em situação crítica, o fluxo simbólico é interrompido pela tela direta de segurança.</p></div>
+          <div className="safety-summary"><ShieldCheck/><p>O Athanor não interpreta sintomas, memórias ou causas e não promete proteção ou resultado. Em situação crítica, o fluxo simbólico é interrompido pela tela direta de segurança.</p></div>
         </Card>
       </div>
     </div>
