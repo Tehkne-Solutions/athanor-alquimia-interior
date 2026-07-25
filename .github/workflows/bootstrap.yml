@@ -72,10 +72,17 @@ jobs:
       - name: Run tests
         run: npm test
 
-      - name: Build production bundle
-        run: npm run build
+      - name: Capture production build
+        id: production_build
+        shell: bash
+        run: |
+          set +e
+          npm run build 2>&1 | tee build-error.log
+          status=${PIPESTATUS[0]}
+          echo "exit_code=$status" >> "$GITHUB_OUTPUT"
+          exit 0
 
-      - name: Commit restored implementation
+      - name: Commit restored implementation and diagnostics
         shell: bash
         run: |
           set -euo pipefail
@@ -84,3 +91,7 @@ jobs:
           git add -A
           git commit -m "feat: implement Athanor vertical slice"
           git push origin HEAD:agent/fase-4.1-vertical-slice
+
+      - name: Enforce production build result
+        if: steps.production_build.outputs.exit_code != '0'
+        run: exit 1
