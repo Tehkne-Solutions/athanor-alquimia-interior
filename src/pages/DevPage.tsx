@@ -8,6 +8,7 @@ import { useFireBoundaryStore } from '../state/useFireBoundaryStore';
 import { useFireCourageStore } from '../state/useFireCourageStore';
 import { useFireIntervalStore } from '../state/useFireIntervalStore';
 import { useFireMissionStore } from '../state/useFireMissionStore';
+import { useFireTransformationStore } from '../state/useFireTransformationStore';
 import { useWaterChaliceStore } from '../state/useWaterChaliceStore';
 import { useWaterChapterStore } from '../state/useWaterChapterStore';
 import { useWaterLamentStore } from '../state/useWaterLamentStore';
@@ -26,6 +27,7 @@ export function DevPage() {
   const resetFireInterval = useFireIntervalStore((state) => state.reset);
   const resetFireBoundary = useFireBoundaryStore((state) => state.reset);
   const resetFireCourage = useFireCourageStore((state) => state.reset);
+  const resetFireTransformation = useFireTransformationStore((state) => state.reset);
   const lamentProgress = useWaterLamentStore((state) => state.progress);
   const memoryProgress = useWaterMemoryStore((state) => state.progress);
   const trustProgress = useWaterTrustStore((state) => state.progress);
@@ -35,6 +37,7 @@ export function DevPage() {
   const fireIntervalProgress = useFireIntervalStore((state) => state.progress);
   const fireBoundaryProgress = useFireBoundaryStore((state) => state.progress);
   const fireCourageProgress = useFireCourageStore((state) => state.progress);
+  const fireTransformationProgress = useFireTransformationStore((state) => state.progress);
   const state = useAthanorStore();
 
   const reset = async () => {
@@ -48,6 +51,7 @@ export function DevPage() {
     resetFireInterval();
     resetFireBoundary();
     resetFireCourage();
+    resetFireTransformation();
     navigate('/welcome');
   };
 
@@ -71,8 +75,9 @@ export function DevPage() {
             waterChapter: waterChapterProgress ? { status: waterChapterProgress.status, cycleId: waterChapterProgress.cycleId, destinations: waterChapterProgress.destinations } : undefined,
             fireMission: fireProgress ? { status: fireProgress.status, emotions: fireProgress.emotions, intensity: fireProgress.intensity, namedFlameCreated: fireProgress.namedFlameCreated, action: fireProgress.action } : undefined,
             fireInterval: fireIntervalProgress ? { status: fireIntervalProgress.status, timelineSkipped: fireIntervalProgress.timelineSkipped, urgencySkipped: fireIntervalProgress.urgencySkipped, interval: fireIntervalProgress.interval, exit: fireIntervalProgress.exit, intervalEmberCreated: fireIntervalProgress.intervalEmberCreated } : undefined,
-            fireBoundary: fireBoundaryProgress ? { status: fireBoundaryProgress.status, classificationSkipped: fireBoundaryProgress.classificationSkipped, scope: fireBoundaryProgress.scope, condition: fireBoundaryProgress.condition, action: fireBoundaryProgress.action, duration: fireBoundaryProgress.duration, review: fireBoundaryProgress.review, boundaryPlateCreated: fireBoundaryProgress.boundaryPlateCreated } : undefined,
-            fireCourage: fireCourageProgress ? { status: fireCourageProgress.status, classificationSkipped: fireCourageProgress.classificationSkipped, context: fireCourageProgress.context, action: fireCourageProgress.action, resources: fireCourageProgress.resources, readiness: fireCourageProgress.readiness, proportionalCourageMarkCreated: fireCourageProgress.proportionalCourageMarkCreated } : undefined,
+            fireBoundary: fireBoundaryProgress ? { status: fireBoundaryProgress.status, scope: fireBoundaryProgress.scope, action: fireBoundaryProgress.action, duration: fireBoundaryProgress.duration, boundaryPlateCreated: fireBoundaryProgress.boundaryPlateCreated } : undefined,
+            fireCourage: fireCourageProgress ? { status: fireCourageProgress.status, context: fireCourageProgress.context, action: fireCourageProgress.action, resources: fireCourageProgress.resources, readiness: fireCourageProgress.readiness, proportionalCourageMarkCreated: fireCourageProgress.proportionalCourageMarkCreated } : undefined,
+            fireTransformation: fireTransformationProgress ? { status: fireTransformationProgress.status, object: fireTransformationProgress.object, decision: fireTransformationProgress.decision, action: fireTransformationProgress.action, safeguard: fireTransformationProgress.safeguard, review: fireTransformationProgress.review, transformedMetalCreated: fireTransformationProgress.transformedMetalCreated } : undefined,
             inventory: state.inventory.map((item) => item.name)
           }, null, 2)}</pre>
         </Card>

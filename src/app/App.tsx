@@ -13,6 +13,7 @@ import { FireBoundaryPage } from '../pages/FireBoundaryPage';
 import { FireCouragePage } from '../pages/FireCouragePage';
 import { FireIntervalPage } from '../pages/FireIntervalPage';
 import { FireMissionPage } from '../pages/FireMissionPage';
+import { FireTransformationPage } from '../pages/FireTransformationPage';
 import { ForgePage } from '../pages/ForgePage';
 import { HomologationPage } from '../pages/HomologationPage';
 import { InventoryPage } from '../pages/InventoryPage';
@@ -79,6 +80,7 @@ export function App() {
       <Route path="/mission/before-the-gesture" element={<FireIntervalPage/>}/>
       <Route path="/mission/limit-that-protects" element={<FireBoundaryPage/>}/>
       <Route path="/mission/proportional-courage" element={<FireCouragePage/>}/>
+      <Route path="/mission/what-needs-transformation" element={<FireTransformationPage/>}/>
       <Route path="/crafting/memory-serene-chalice" element={<WaterChalicePage/>}/>
       <Route path="/review/water-chapter" element={<WaterChapterReviewPage/>}/>
       <Route path="/crafting/clear-word-lamp" element={<CraftingPage/>}/>
