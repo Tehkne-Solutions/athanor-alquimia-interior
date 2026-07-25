@@ -8,6 +8,11 @@ import {
   waterMemoryEntries,
   waterMemoryNodes
 } from './water';
+import {
+  waterTrustBiblicalUnit,
+  waterTrustNodes,
+  waterTrustStatements
+} from './waterTrust';
 
 const provenanceSchema = z.object({
   id: z.string().min(1),
@@ -45,17 +50,26 @@ const waterMemoryEntrySchema = z.object({
   explanation: z.string().min(1)
 });
 
+const waterTrustStatementSchema = z.object({
+  id: z.string().min(1),
+  text: z.string().min(1),
+  suggestedCategory: z.enum(['support', 'guarantee', 'prediction']),
+  explanation: z.string().min(1)
+});
+
 export function validateContent(): void {
   z.array(biblicalUnitSchema).parse([
     ...biblicalUnits,
     waterBiblicalUnit,
     waterLamentBiblicalUnit,
-    waterMemoryBiblicalUnit
+    waterMemoryBiblicalUnit,
+    waterTrustBiblicalUnit
   ]);
 
-  const allNodes = [...chainNodes, ...waterMemoryNodes];
+  const allNodes = [...chainNodes, ...waterMemoryNodes, ...waterTrustNodes];
   z.array(nodeSchema).parse(allNodes);
   z.array(waterMemoryEntrySchema).min(5).parse(waterMemoryEntries);
+  z.array(waterTrustStatementSchema).min(6).parse(waterTrustStatements);
   z.array(z.object({ id: z.string(), text: z.string(), correctCategory: z.enum(['fact', 'interpretation', 'prediction', 'intention']) })).parse(classificationEntries);
 
   const nodeIds = new Set(allNodes.map((node) => node.id));
