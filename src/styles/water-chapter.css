@@ -1,0 +1,95 @@
+.page--water-review {
+  --water-review-border: rgba(126, 210, 231, 0.25);
+}
+
+.water-review-intro-grid,
+.water-completion-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-5);
+}
+
+.water-review-symbol {
+  display: grid;
+  width: 4.5rem;
+  height: 4.5rem;
+  place-items: center;
+  border: 1px solid var(--water-review-border);
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(99, 205, 231, 0.26), rgba(34, 71, 93, 0.08));
+  margin-bottom: var(--space-4);
+}
+
+.water-review-symbol svg {
+  width: 2.25rem;
+  height: 2.25rem;
+}
+
+.water-review-symbol--complete {
+  box-shadow: 0 0 2rem rgba(99, 205, 231, 0.22);
+}
+
+.water-review-list {
+  display: grid;
+  gap: var(--space-5);
+}
+
+.water-destination-options {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.water-destination-option {
+  display: flex;
+  gap: var(--space-3);
+  align-items: flex-start;
+  min-height: 7rem;
+  padding: var(--space-4);
+  border: 1px solid var(--water-review-border);
+  border-radius: var(--radius-lg);
+  background: rgba(12, 31, 43, 0.42);
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.water-destination-option:hover,
+.water-destination-option:focus-visible {
+  border-color: rgba(126, 210, 231, 0.65);
+}
+
+.water-destination-option[aria-pressed='true'] {
+  border-color: rgba(126, 210, 231, 0.85);
+  background: rgba(38, 107, 130, 0.34);
+  box-shadow: inset 0 0 0 1px rgba(126, 210, 231, 0.18);
+}
+
+.water-destination-option span {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.water-destination-option small {
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+
+.water-review-note {
+  padding: var(--space-4);
+  border-left: 3px solid rgba(126, 210, 231, 0.7);
+  background: rgba(18, 52, 67, 0.38);
+  white-space: pre-wrap;
+}
+
+.water-completion-card code {
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 900px) {
+  .water-review-intro-grid,
+  .water-completion-grid,
+  .water-destination-options {
+    grid-template-columns: 1fr;
+  }
+}
