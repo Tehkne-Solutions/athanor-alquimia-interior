@@ -1,5 +1,11 @@
 import { z } from 'zod';
 import { provenanceClassSchema } from '../domain/types';
+import {
+  fireIntervalBiblicalUnit,
+  fireIntervalNodes,
+  fireTimelineEntries,
+  fireUrgencyEntries
+} from './fireInterval';
 import { fireFoundationBiblicalUnit, fireFoundationNodes } from './fireFoundation';
 import { fireClassificationEntries, fireMissionNodes } from './fireMission';
 import { biblicalUnits, chainNodes, classificationEntries } from './seed';
@@ -67,6 +73,20 @@ const fireClassificationEntrySchema = z.object({
   explanation: z.string().min(1)
 });
 
+const fireTimelineEntrySchema = z.object({
+  id: z.string().min(1),
+  text: z.string().min(1),
+  suggestedPhase: z.enum(['trigger', 'body_signal', 'impulse', 'gesture']),
+  explanation: z.string().min(1)
+});
+
+const fireUrgencyEntrySchema = z.object({
+  id: z.string().min(1),
+  text: z.string().min(1),
+  suggestedCategory: z.enum(['immediate_safety', 'time_sensitive', 'perceived_pressure', 'insufficient_information']),
+  explanation: z.string().min(1)
+});
+
 const waterChaliceRecipeSchema = z.object({
   id: z.literal('recipe_memory_serene_chalice_v1'),
   name: z.string().min(1),
@@ -83,7 +103,8 @@ export function validateContent(): void {
     waterLamentBiblicalUnit,
     waterMemoryBiblicalUnit,
     waterTrustBiblicalUnit,
-    fireFoundationBiblicalUnit
+    fireFoundationBiblicalUnit,
+    fireIntervalBiblicalUnit
   ]);
 
   const allNodes = [
@@ -91,12 +112,15 @@ export function validateContent(): void {
     ...waterMemoryNodes,
     ...waterTrustNodes,
     ...fireFoundationNodes,
-    ...fireMissionNodes
+    ...fireMissionNodes,
+    ...fireIntervalNodes
   ];
   z.array(nodeSchema).parse(allNodes);
   z.array(waterMemoryEntrySchema).min(5).parse(waterMemoryEntries);
   z.array(waterTrustStatementSchema).min(6).parse(waterTrustStatements);
   z.array(fireClassificationEntrySchema).length(8).parse(fireClassificationEntries);
+  z.array(fireTimelineEntrySchema).length(8).parse(fireTimelineEntries);
+  z.array(fireUrgencyEntrySchema).length(8).parse(fireUrgencyEntries);
   waterChaliceRecipeSchema.parse(waterChaliceRecipe);
   z.array(z.object({ id: z.string(), text: z.string(), correctCategory: z.enum(['fact', 'interpretation', 'prediction', 'intention']) })).parse(classificationEntries);
 
