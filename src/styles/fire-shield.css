@@ -1,0 +1,32 @@
+.page--fire-shield { --shield-glow: rgba(224, 112, 52, 0.22); }
+.fire-shield-intro-grid,
+.fire-shield-result-grid,
+.fire-shield-review-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: var(--space-5); }
+.shield-preview { width: 92px; height: 92px; display: grid; place-items: center; border-radius: 28px; background: radial-gradient(circle, var(--shield-glow), transparent 72%); border: 1px solid rgba(238, 154, 89, 0.32); margin-bottom: var(--space-4); }
+.shield-preview svg { width: 52px; height: 52px; }
+.shield-preview--complete { box-shadow: 0 0 42px var(--shield-glow); }
+.shield-item-card { display: flex; flex-direction: column; align-items: flex-start; }
+.fire-shield-components-grid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: var(--space-3); }
+.fire-shield-component { display: grid; gap: var(--space-2); padding: var(--space-4); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); background: var(--surface-raised); }
+.fire-shield-component svg { color: var(--success); }
+.fire-shield-option-list { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--space-3); }
+.fire-shield-option-list button { min-height: 112px; display: flex; flex-direction: column; align-items: flex-start; gap: var(--space-2); padding: var(--space-4); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); background: var(--surface-raised); color: inherit; text-align: left; cursor: pointer; }
+.fire-shield-option-list button[aria-pressed='true'] { border-color: var(--chapter-fire); box-shadow: 0 0 0 2px var(--shield-glow); }
+.fire-shield-option-list span { color: var(--text-muted); font-size: 0.9rem; }
+.fire-shield-chain-grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--space-3); }
+.fire-shield-chain-node { padding: var(--space-4); border: 1px solid var(--border-subtle); border-radius: var(--radius-lg); background: var(--surface-raised); }
+.fire-shield-actions { display: flex; flex-wrap: wrap; gap: var(--space-3); align-items: center; }
+.shield-reflection { padding: var(--space-4); border-left: 3px solid var(--chapter-fire); background: var(--surface-raised); }
+@media (max-width: 1000px) {
+  .fire-shield-components-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .fire-shield-chain-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 760px) {
+  .fire-shield-intro-grid,
+  .fire-shield-result-grid,
+  .fire-shield-review-grid,
+  .fire-shield-option-list,
+  .fire-shield-chain-grid,
+  .fire-shield-components-grid { grid-template-columns: 1fr; }
+  .fire-shield-actions > * { width: 100%; }
+}
