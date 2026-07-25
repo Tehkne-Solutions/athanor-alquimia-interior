@@ -10,12 +10,14 @@ import { CodexPage } from '../pages/CodexPage';
 import { CraftingPage } from '../pages/CraftingPage';
 import { DevPage } from '../pages/DevPage';
 import { FireBoundaryPage } from '../pages/FireBoundaryPage';
+import { FireChapterReviewPage } from '../pages/FireChapterReviewPage';
 import { FireCouragePage } from '../pages/FireCouragePage';
 import { FireIntervalPage } from '../pages/FireIntervalPage';
 import { FireMissionPage } from '../pages/FireMissionPage';
 import { FireShieldPage } from '../pages/FireShieldPage';
 import { FireTransformationPage } from '../pages/FireTransformationPage';
 import { ForgePage } from '../pages/ForgePage';
+import { GardenPage } from '../pages/GardenPage';
 import { HomologationPage } from '../pages/HomologationPage';
 import { InventoryPage } from '../pages/InventoryPage';
 import { ItemPage } from '../pages/ItemPage';
@@ -70,6 +72,7 @@ export function App() {
       <Route path="/temple/proverbs-library" element={<LibraryPage/>}/>
       <Route path="/temple/psalms-chamber" element={<PsalmsChamberPage/>}/>
       <Route path="/temple/forge" element={<ForgePage/>}/>
+      <Route path="/temple/garden" element={<GardenPage/>}/>
       <Route path="/mission/word-before-response" element={<MissionPage/>}/>
       <Route path="/mission/word-before-response/classification" element={<ClassificationPage/>}/>
       <Route path="/mission/word-before-response/chain" element={<ChainPage/>}/>
@@ -83,6 +86,7 @@ export function App() {
       <Route path="/mission/proportional-courage" element={<FireCouragePage/>}/>
       <Route path="/mission/what-needs-transformation" element={<FireTransformationPage/>}/>
       <Route path="/crafting/just-boundary-shield" element={<FireShieldPage/>}/>
+      <Route path="/review/fire-chapter" element={<FireChapterReviewPage/>}/>
       <Route path="/crafting/memory-serene-chalice" element={<WaterChalicePage/>}/>
       <Route path="/review/water-chapter" element={<WaterChapterReviewPage/>}/>
       <Route path="/crafting/clear-word-lamp" element={<CraftingPage/>}/>
