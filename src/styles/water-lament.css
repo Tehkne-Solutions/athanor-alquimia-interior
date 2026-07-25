@@ -1,0 +1,147 @@
+.page--lament {
+  --lament-accent: #a9b9e8;
+  --lament-surface: rgba(33, 43, 74, 0.72);
+}
+
+.lament-layout,
+.lament-result-grid {
+  display: grid;
+  gap: var(--space-5, 24px);
+}
+
+.lament-warning-card {
+  border-color: rgba(230, 188, 111, 0.45);
+  background: linear-gradient(145deg, rgba(87, 65, 34, 0.28), rgba(25, 31, 53, 0.82));
+}
+
+.lament-warning-heading,
+.lament-card-intro,
+.lament-privacy-note {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--space-3, 12px);
+}
+
+.lament-warning-heading svg,
+.lament-privacy-note svg,
+.lament-card-intro svg {
+  flex: 0 0 auto;
+  margin-top: 2px;
+}
+
+.lament-fields {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-5, 24px);
+}
+
+.lament-field {
+  display: grid;
+  gap: var(--space-2, 8px);
+}
+
+.lament-field > span {
+  font-weight: 700;
+  color: var(--text-strong, #f6f1e8);
+}
+
+.lament-field small {
+  color: var(--text-muted, #bbb7c8);
+  line-height: 1.45;
+}
+
+.lament-field textarea {
+  width: 100%;
+  min-height: 132px;
+  resize: vertical;
+  border: 1px solid rgba(169, 185, 232, 0.36);
+  border-radius: var(--radius-lg, 16px);
+  padding: var(--space-4, 16px);
+  background: rgba(10, 17, 32, 0.72);
+  color: var(--text-strong, #f6f1e8);
+  font: inherit;
+  line-height: 1.55;
+}
+
+.lament-field textarea:focus-visible {
+  outline: 3px solid rgba(169, 185, 232, 0.72);
+  outline-offset: 3px;
+}
+
+.lament-privacy-note {
+  margin-top: var(--space-5, 24px);
+  padding: var(--space-4, 16px);
+  border-radius: var(--radius-lg, 16px);
+  background: rgba(94, 111, 156, 0.18);
+  border: 1px solid rgba(169, 185, 232, 0.28);
+}
+
+.lament-actions {
+  margin-top: var(--space-5, 24px);
+  flex-wrap: wrap;
+}
+
+.lament-result-grid {
+  grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+}
+
+.lament-fragment-card {
+  text-align: center;
+  background: radial-gradient(circle at top, rgba(169, 185, 232, 0.22), rgba(25, 31, 53, 0.88) 60%);
+}
+
+.lament-fragment {
+  width: 96px;
+  height: 96px;
+  margin: 0 auto var(--space-4, 16px);
+  border-radius: 44% 56% 56% 44%;
+  display: grid;
+  place-items: center;
+  color: #f4ecff;
+  background: linear-gradient(145deg, rgba(139, 165, 225, 0.7), rgba(85, 65, 137, 0.72));
+  box-shadow: 0 18px 48px rgba(64, 83, 137, 0.32);
+  transform: rotate(-8deg);
+}
+
+.lament-fragment svg {
+  transform: rotate(8deg);
+}
+
+@media (max-width: 860px) {
+  .lament-fields,
+  .lament-result-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 520px) {
+  .lament-actions,
+  .lament-warning-card .button-row {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .lament-actions .button,
+  .lament-warning-card .button {
+    width: 100%;
+  }
+
+  .lament-field textarea {
+    min-height: 116px;
+  }
+}
+
+html[data-high-contrast='true'] .lament-field textarea,
+html[data-high-contrast='true'] .lament-warning-card,
+html[data-high-contrast='true'] .lament-privacy-note {
+  border-color: currentColor;
+}
+
+html[data-reduced-motion='true'] .lament-fragment {
+  transform: none;
+  box-shadow: none;
+}
+
+html[data-reduced-motion='true'] .lament-fragment svg {
+  transform: none;
+}
