@@ -8,6 +8,7 @@ import './styles/homologation.css';
 import './styles/research.css';
 import './styles/water.css';
 import './styles/water-lament.css';
+import './styles/water-memory.css';
 
 validateContent();
 
