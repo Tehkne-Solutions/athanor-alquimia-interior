@@ -10,6 +10,7 @@ import './styles/water.css';
 import './styles/water-lament.css';
 import './styles/water-memory.css';
 import './styles/water-trust.css';
+import './styles/water-chalice.css';
 
 validateContent();
 
