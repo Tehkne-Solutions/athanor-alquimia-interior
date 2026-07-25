@@ -4,6 +4,7 @@ import { Button } from '../components/Button';
 import { Card } from '../components/Card';
 import { PageHeader } from '../components/PageHeader';
 import { useAthanorStore } from '../state/useAthanorStore';
+import { useFireBoundaryStore } from '../state/useFireBoundaryStore';
 import { useFireIntervalStore } from '../state/useFireIntervalStore';
 import { useFireMissionStore } from '../state/useFireMissionStore';
 import { useWaterChaliceStore } from '../state/useWaterChaliceStore';
@@ -22,6 +23,7 @@ export function DevPage() {
   const resetWaterChapter = useWaterChapterStore((state) => state.reset);
   const resetFireMission = useFireMissionStore((state) => state.reset);
   const resetFireInterval = useFireIntervalStore((state) => state.reset);
+  const resetFireBoundary = useFireBoundaryStore((state) => state.reset);
   const lamentProgress = useWaterLamentStore((state) => state.progress);
   const memoryProgress = useWaterMemoryStore((state) => state.progress);
   const trustProgress = useWaterTrustStore((state) => state.progress);
@@ -29,6 +31,7 @@ export function DevPage() {
   const waterChapterProgress = useWaterChapterStore((state) => state.progress);
   const fireProgress = useFireMissionStore((state) => state.progress);
   const fireIntervalProgress = useFireIntervalStore((state) => state.progress);
+  const fireBoundaryProgress = useFireBoundaryStore((state) => state.progress);
   const state = useAthanorStore();
 
   const reset = async () => {
@@ -40,6 +43,7 @@ export function DevPage() {
     resetWaterChapter();
     resetFireMission();
     resetFireInterval();
+    resetFireBoundary();
     navigate('/welcome');
   };
 
@@ -59,31 +63,11 @@ export function DevPage() {
             lament: lamentProgress?.status,
             memory: memoryProgress?.status,
             trust: trustProgress?.status,
-            chalice: chaliceProgress ? {
-              status: chaliceProgress.status,
-              created: chaliceProgress.chaliceCreated,
-              positioned: chaliceProgress.positioned
-            } : undefined,
-            waterChapter: waterChapterProgress ? {
-              status: waterChapterProgress.status,
-              cycleId: waterChapterProgress.cycleId,
-              destinations: waterChapterProgress.destinations
-            } : undefined,
-            fireMission: fireProgress ? {
-              status: fireProgress.status,
-              emotions: fireProgress.emotions,
-              intensity: fireProgress.intensity,
-              namedFlameCreated: fireProgress.namedFlameCreated,
-              action: fireProgress.action
-            } : undefined,
-            fireInterval: fireIntervalProgress ? {
-              status: fireIntervalProgress.status,
-              timelineSkipped: fireIntervalProgress.timelineSkipped,
-              urgencySkipped: fireIntervalProgress.urgencySkipped,
-              interval: fireIntervalProgress.interval,
-              exit: fireIntervalProgress.exit,
-              intervalEmberCreated: fireIntervalProgress.intervalEmberCreated
-            } : undefined,
+            chalice: chaliceProgress ? { status: chaliceProgress.status, created: chaliceProgress.chaliceCreated, positioned: chaliceProgress.positioned } : undefined,
+            waterChapter: waterChapterProgress ? { status: waterChapterProgress.status, cycleId: waterChapterProgress.cycleId, destinations: waterChapterProgress.destinations } : undefined,
+            fireMission: fireProgress ? { status: fireProgress.status, emotions: fireProgress.emotions, intensity: fireProgress.intensity, namedFlameCreated: fireProgress.namedFlameCreated, action: fireProgress.action } : undefined,
+            fireInterval: fireIntervalProgress ? { status: fireIntervalProgress.status, timelineSkipped: fireIntervalProgress.timelineSkipped, urgencySkipped: fireIntervalProgress.urgencySkipped, interval: fireIntervalProgress.interval, exit: fireIntervalProgress.exit, intervalEmberCreated: fireIntervalProgress.intervalEmberCreated } : undefined,
+            fireBoundary: fireBoundaryProgress ? { status: fireBoundaryProgress.status, classificationSkipped: fireBoundaryProgress.classificationSkipped, scope: fireBoundaryProgress.scope, condition: fireBoundaryProgress.condition, action: fireBoundaryProgress.action, duration: fireBoundaryProgress.duration, review: fireBoundaryProgress.review, boundaryPlateCreated: fireBoundaryProgress.boundaryPlateCreated } : undefined,
             inventory: state.inventory.map((item) => item.name)
           }, null, 2)}</pre>
         </Card>
