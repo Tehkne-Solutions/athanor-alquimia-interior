@@ -4,6 +4,7 @@ import { Button } from '../components/Button';
 import { Card } from '../components/Card';
 import { PageHeader } from '../components/PageHeader';
 import { useAthanorStore } from '../state/useAthanorStore';
+import { useWaterChaliceStore } from '../state/useWaterChaliceStore';
 import { useWaterLamentStore } from '../state/useWaterLamentStore';
 import { useWaterMemoryStore } from '../state/useWaterMemoryStore';
 import { useWaterTrustStore } from '../state/useWaterTrustStore';
@@ -14,15 +15,18 @@ export function DevPage() {
   const resetLament = useWaterLamentStore((state) => state.reset);
   const resetMemory = useWaterMemoryStore((state) => state.reset);
   const resetTrust = useWaterTrustStore((state) => state.reset);
+  const resetChalice = useWaterChaliceStore((state) => state.reset);
   const lamentProgress = useWaterLamentStore((state) => state.progress);
   const memoryProgress = useWaterMemoryStore((state) => state.progress);
   const trustProgress = useWaterTrustStore((state) => state.progress);
+  const chaliceProgress = useWaterChaliceStore((state) => state.progress);
   const state = useAthanorStore();
   const reset = async () => {
     await resetAll();
     resetLament();
     resetMemory();
     resetTrust();
+    resetChalice();
     navigate('/welcome');
   };
 
@@ -40,6 +44,11 @@ export function DevPage() {
             lament: lamentProgress?.status,
             memory: memoryProgress?.status,
             trust: trustProgress?.status,
+            chalice: chaliceProgress ? {
+              status: chaliceProgress.status,
+              created: chaliceProgress.chaliceCreated,
+              positioned: chaliceProgress.positioned
+            } : undefined,
             inventory: state.inventory.map((item) => item.name)
           }, null, 2)}</pre>
         </Card>

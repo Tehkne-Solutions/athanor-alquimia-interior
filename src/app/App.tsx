@@ -20,6 +20,7 @@ import { ReviewPage } from '../pages/ReviewPage';
 import { SafetyPage } from '../pages/SafetyPage';
 import { TempleFoundationPage } from '../pages/TempleFoundationPage';
 import { TemplePage } from '../pages/TemplePage';
+import { WaterChalicePage } from '../pages/WaterChalicePage';
 import { WaterLamentPage } from '../pages/WaterLamentPage';
 import { WaterMemoryPage } from '../pages/WaterMemoryPage';
 import { WaterMissionPage } from '../pages/WaterMissionPage';
@@ -67,6 +68,7 @@ export function App() {
       <Route path="/mission/voice-of-lament" element={<WaterLamentPage/>}/>
       <Route path="/mission/mirror-of-memories" element={<WaterMemoryPage/>}/>
       <Route path="/mission/space-of-trust" element={<WaterTrustPage/>}/>
+      <Route path="/crafting/memory-serene-chalice" element={<WaterChalicePage/>}/>
       <Route path="/crafting/clear-word-lamp" element={<CraftingPage/>}/>
       <Route path="/items/clear-word-lamp" element={<ItemPage/>}/>
       <Route path="/review/clear-word-lamp" element={<ReviewPage/>}/>

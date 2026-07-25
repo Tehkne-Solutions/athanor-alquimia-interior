@@ -8,6 +8,7 @@ import {
   waterMemoryEntries,
   waterMemoryNodes
 } from './water';
+import { waterChaliceRecipe } from './waterChalice';
 import {
   waterTrustBiblicalUnit,
   waterTrustNodes,
@@ -57,6 +58,15 @@ const waterTrustStatementSchema = z.object({
   explanation: z.string().min(1)
 });
 
+const waterChaliceRecipeSchema = z.object({
+  id: z.literal('recipe_memory_serene_chalice_v1'),
+  name: z.string().min(1),
+  componentIds: z.array(z.string().min(1)).length(4),
+  principle: z.string().min(1),
+  restrictions: z.array(z.string().min(1)).min(4),
+  version: z.string().min(1)
+});
+
 export function validateContent(): void {
   z.array(biblicalUnitSchema).parse([
     ...biblicalUnits,
@@ -70,6 +80,7 @@ export function validateContent(): void {
   z.array(nodeSchema).parse(allNodes);
   z.array(waterMemoryEntrySchema).min(5).parse(waterMemoryEntries);
   z.array(waterTrustStatementSchema).min(6).parse(waterTrustStatements);
+  waterChaliceRecipeSchema.parse(waterChaliceRecipe);
   z.array(z.object({ id: z.string(), text: z.string(), correctCategory: z.enum(['fact', 'interpretation', 'prediction', 'intention']) })).parse(classificationEntries);
 
   const nodeIds = new Set(allNodes.map((node) => node.id));

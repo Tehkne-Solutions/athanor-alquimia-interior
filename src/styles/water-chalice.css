@@ -1,0 +1,178 @@
+.page--chalice {
+  --chalice-border: rgba(150, 218, 231, 0.3);
+  --chalice-surface: rgba(20, 61, 78, 0.42);
+}
+
+.chalice-intro-grid,
+.chalice-result-grid,
+.chalice-review-grid,
+.chalice-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-5);
+}
+
+.chalice-preview {
+  width: 8rem;
+  height: 8rem;
+  margin: 0 auto var(--space-4);
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--chalice-border);
+  border-radius: 45% 45% 32% 32%;
+  background:
+    radial-gradient(circle at 50% 25%, rgba(204, 244, 250, 0.3), transparent 36%),
+    linear-gradient(180deg, rgba(64, 139, 160, 0.42), rgba(9, 38, 52, 0.72));
+  box-shadow: inset 0 0 2rem rgba(187, 239, 247, 0.12), 0 0 2.5rem rgba(73, 165, 190, 0.16);
+}
+
+.chalice-preview--complete {
+  border-color: rgba(210, 246, 249, 0.78);
+  box-shadow: inset 0 0 2.5rem rgba(215, 249, 252, 0.2), 0 0 3rem rgba(85, 185, 208, 0.25);
+}
+
+.chalice-preview svg {
+  width: 2.7rem;
+  height: 2.7rem;
+}
+
+.chalice-component-list,
+.chalice-components-grid {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.chalice-component-list {
+  list-style: none;
+  padding: 0;
+}
+
+.chalice-component-list li,
+.chalice-component {
+  border: 1px solid var(--chalice-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  background: var(--chalice-surface);
+}
+
+.chalice-component-list li[data-complete='true'] {
+  border-color: rgba(150, 236, 214, 0.58);
+}
+
+.chalice-components-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.chalice-component {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 0.35rem var(--space-2);
+}
+
+.chalice-component small {
+  grid-column: 2;
+  color: var(--text-muted);
+}
+
+.chalice-option-list {
+  display: grid;
+  gap: var(--space-2);
+}
+
+.chalice-option-list button {
+  display: grid;
+  gap: 0.35rem;
+  text-align: left;
+  border: 1px solid var(--chalice-border);
+  border-radius: var(--radius-md);
+  padding: var(--space-3);
+  color: inherit;
+  background: rgba(7, 27, 38, 0.5);
+  cursor: pointer;
+  transition: border-color var(--motion-fast), background var(--motion-fast), transform var(--motion-fast);
+}
+
+.chalice-option-list button span {
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+
+.chalice-option-list button:hover {
+  border-color: rgba(182, 235, 244, 0.66);
+}
+
+.chalice-option-list button[aria-pressed='true'] {
+  border-color: rgba(179, 241, 246, 0.9);
+  background: rgba(48, 125, 147, 0.45);
+  transform: translateY(-1px);
+}
+
+.chalice-option-list button:focus-visible {
+  outline: 3px solid var(--focus-ring, #f2cf78);
+  outline-offset: 3px;
+}
+
+.chalice-item-card {
+  text-align: center;
+  background: radial-gradient(circle at 50% 18%, rgba(123, 205, 224, 0.18), transparent 46%), rgba(8, 31, 43, 0.58);
+}
+
+.chalice-reflection {
+  margin-top: var(--space-4);
+  padding: var(--space-3);
+  border-left: 3px solid rgba(156, 226, 237, 0.64);
+  color: var(--text-muted);
+}
+
+.chalice-review-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+}
+
+.page--chalice textarea {
+  width: 100%;
+  resize: vertical;
+  min-height: 8rem;
+  border: 1px solid var(--chalice-border);
+  border-radius: var(--radius-md);
+  background: rgba(7, 25, 34, 0.58);
+  color: inherit;
+  padding: var(--space-3);
+  font: inherit;
+}
+
+.page--chalice textarea:focus-visible {
+  outline: 3px solid var(--focus-ring, #f2cf78);
+  outline-offset: 3px;
+}
+
+@media (max-width: 980px) {
+  .chalice-components-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .chalice-intro-grid,
+  .chalice-result-grid,
+  .chalice-review-grid,
+  .chalice-form-grid,
+  .chalice-components-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .chalice-review-actions {
+    display: grid;
+  }
+
+  .chalice-review-actions > * {
+    width: 100%;
+  }
+}
+
+[data-reduced-motion='true'] .chalice-option-list button {
+  transition: none;
+  transform: none;
+}
