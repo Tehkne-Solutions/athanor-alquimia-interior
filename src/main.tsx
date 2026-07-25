@@ -18,6 +18,7 @@ import './styles/fire-interval.css';
 import './styles/fire-boundary.css';
 import './styles/fire-courage.css';
 import './styles/fire-transformation.css';
+import './styles/fire-shield.css';
 
 validateContent();
 

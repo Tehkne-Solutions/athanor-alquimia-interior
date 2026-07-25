@@ -5,6 +5,7 @@ import { fireCourageBiblicalUnit, fireCourageNodes, fireCourageStatements } from
 import { fireIntervalBiblicalUnit, fireIntervalNodes, fireTimelineEntries, fireUrgencyEntries } from './fireInterval';
 import { fireFoundationBiblicalUnit, fireFoundationNodes } from './fireFoundation';
 import { fireClassificationEntries, fireMissionNodes } from './fireMission';
+import { fireShieldBiblicalUnit, fireShieldNodes, fireShieldRecipe } from './fireShield';
 import { fireTransformationBiblicalUnit, fireTransformationNodes, fireTransformationStatements } from './fireTransformation';
 import { biblicalUnits, chainNodes, classificationEntries } from './seed';
 import { waterBiblicalUnit, waterLamentBiblicalUnit, waterMemoryBiblicalUnit, waterMemoryEntries, waterMemoryNodes } from './water';
@@ -23,6 +24,7 @@ const fireBoundaryStatementSchema = z.object({ id: z.string().min(1), text: z.st
 const fireCourageStatementSchema = z.object({ id: z.string().min(1), text: z.string().min(1), suggestedCategory: z.enum(['proportional_courage', 'imprudent_exposure', 'avoidance', 'external_pressure']), explanation: z.string().min(1) });
 const fireTransformationStatementSchema = z.object({ id: z.string().min(1), text: z.string().min(1), suggestedCategory: z.enum(['preserve', 'repair', 'transform', 'close', 'archive']), explanation: z.string().min(1) });
 const waterChaliceRecipeSchema = z.object({ id: z.literal('recipe_memory_serene_chalice_v1'), name: z.string().min(1), componentIds: z.array(z.string().min(1)).length(4), principle: z.string().min(1), restrictions: z.array(z.string().min(1)).min(4), version: z.string().min(1) });
+const fireShieldRecipeSchema = z.object({ id: z.literal('recipe_just_boundary_shield_v1'), name: z.string().min(1), componentIds: z.array(z.string().min(1)).length(5), principle: z.string().min(1), restrictions: z.array(z.string().min(1)).min(5), version: z.string().min(1) });
 
 export function validateContent(): void {
   z.array(biblicalUnitSchema).parse([
@@ -35,7 +37,8 @@ export function validateContent(): void {
     fireIntervalBiblicalUnit,
     fireBoundaryBiblicalUnit,
     fireCourageBiblicalUnit,
-    fireTransformationBiblicalUnit
+    fireTransformationBiblicalUnit,
+    fireShieldBiblicalUnit
   ]);
 
   const allNodes = [
@@ -47,7 +50,8 @@ export function validateContent(): void {
     ...fireIntervalNodes,
     ...fireBoundaryNodes,
     ...fireCourageNodes,
-    ...fireTransformationNodes
+    ...fireTransformationNodes,
+    ...fireShieldNodes
   ];
 
   z.array(nodeSchema).parse(allNodes);
@@ -60,6 +64,7 @@ export function validateContent(): void {
   z.array(fireCourageStatementSchema).length(8).parse(fireCourageStatements);
   z.array(fireTransformationStatementSchema).length(10).parse(fireTransformationStatements);
   waterChaliceRecipeSchema.parse(waterChaliceRecipe);
+  fireShieldRecipeSchema.parse(fireShieldRecipe);
   z.array(z.object({ id: z.string(), text: z.string(), correctCategory: z.enum(['fact', 'interpretation', 'prediction', 'intention']) })).parse(classificationEntries);
 
   const nodeIds = new Set(allNodes.map((node) => node.id));
