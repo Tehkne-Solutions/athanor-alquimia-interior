@@ -1,9 +1,10 @@
-import { Archive, CupSoda, LampDesk } from 'lucide-react';
+import { Archive, CupSoda, LampDesk, Shield } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/Button';
 import { Card } from '../components/Card';
 import { PageHeader } from '../components/PageHeader';
 import { useAthanorStore } from '../state/useAthanorStore';
+import { useFireShieldStore } from '../state/useFireShieldStore';
 import { useWaterChaliceStore } from '../state/useWaterChaliceStore';
 
 const lifecycleLabel = (lifecycle: string) => {
@@ -11,6 +12,7 @@ const lifecycleLabel = (lifecycle: string) => {
   if (lifecycle === 'awaiting_review') return 'Em revisão';
   if (lifecycle === 'adjusted') return 'Ajustado';
   if (lifecycle === 'resting') return 'Em repouso';
+  if (lifecycle === 'crafting') return 'Em preparação';
   return 'Ativo';
 };
 
@@ -18,8 +20,10 @@ export function InventoryPage() {
   const navigate = useNavigate();
   const inventory = useAthanorStore((state) => state.inventory);
   const chalice = useWaterChaliceStore((state) => state.progress);
+  const shield = useFireShieldStore((state) => state.progress);
   const hasChalice = Boolean(chalice?.chaliceCreated);
-  const empty = inventory.length === 0 && !hasChalice;
+  const hasShield = Boolean(shield?.shieldCreated);
+  const empty = inventory.length === 0 && !hasChalice && !hasShield;
 
   return (
     <div className="page">
@@ -42,6 +46,14 @@ export function InventoryPage() {
               <span className={`item-status item-status--${chalice.status}`}>{lifecycleLabel(chalice.status)}</span>
               <strong>Cálice da Memória Serena</strong>
               <small>{chalice.positioned ? 'Posicionado na Câmara dos Salmos' : 'Ciclo da Água em andamento'}</small>
+            </button>
+          )}
+          {hasShield && shield && (
+            <button className="inventory-item" type="button" onClick={() => navigate('/crafting/just-boundary-shield')}>
+              <div className="inventory-item__icon"><Shield/></div>
+              <span className={`item-status item-status--${shield.status}`}>{lifecycleLabel(shield.status)}</span>
+              <strong>Escudo do Limite Justo</strong>
+              <small>{shield.positioned ? 'Posicionado na Forja' : 'Ciclo do Fogo em andamento'}</small>
             </button>
           )}
         </div>
