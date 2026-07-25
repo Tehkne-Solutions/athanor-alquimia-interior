@@ -5,6 +5,7 @@ import { Card } from '../components/Card';
 import { PageHeader } from '../components/PageHeader';
 import { useAthanorStore } from '../state/useAthanorStore';
 import { useWaterChaliceStore } from '../state/useWaterChaliceStore';
+import { useWaterChapterStore } from '../state/useWaterChapterStore';
 import { useWaterLamentStore } from '../state/useWaterLamentStore';
 import { useWaterMemoryStore } from '../state/useWaterMemoryStore';
 import { useWaterTrustStore } from '../state/useWaterTrustStore';
@@ -16,17 +17,21 @@ export function DevPage() {
   const resetMemory = useWaterMemoryStore((state) => state.reset);
   const resetTrust = useWaterTrustStore((state) => state.reset);
   const resetChalice = useWaterChaliceStore((state) => state.reset);
+  const resetWaterChapter = useWaterChapterStore((state) => state.reset);
   const lamentProgress = useWaterLamentStore((state) => state.progress);
   const memoryProgress = useWaterMemoryStore((state) => state.progress);
   const trustProgress = useWaterTrustStore((state) => state.progress);
   const chaliceProgress = useWaterChaliceStore((state) => state.progress);
+  const waterChapterProgress = useWaterChapterStore((state) => state.progress);
   const state = useAthanorStore();
+
   const reset = async () => {
     await resetAll();
     resetLament();
     resetMemory();
     resetTrust();
     resetChalice();
+    resetWaterChapter();
     navigate('/welcome');
   };
 
@@ -38,7 +43,9 @@ export function DevPage() {
           <pre className="state-preview">{JSON.stringify({
             onboardingCompleted: state.onboardingCompleted,
             character: state.character?.name,
+            workLevel: state.character?.workLevel,
             temple: state.temple?.theme,
+            rooms: state.temple?.rooms.map((room) => ({ id: room.roomId, status: room.status, progress: room.restorationProgress })),
             mission: state.activeMission?.status,
             water: state.waterJourney?.status,
             lament: lamentProgress?.status,
@@ -48,6 +55,11 @@ export function DevPage() {
               status: chaliceProgress.status,
               created: chaliceProgress.chaliceCreated,
               positioned: chaliceProgress.positioned
+            } : undefined,
+            waterChapter: waterChapterProgress ? {
+              status: waterChapterProgress.status,
+              cycleId: waterChapterProgress.cycleId,
+              destinations: waterChapterProgress.destinations
             } : undefined,
             inventory: state.inventory.map((item) => item.name)
           }, null, 2)}</pre>
