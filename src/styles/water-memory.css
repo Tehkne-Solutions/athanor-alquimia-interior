@@ -1,0 +1,203 @@
+.page--memory {
+  --memory-surface: rgba(28, 72, 89, 0.36);
+  --memory-border: rgba(135, 211, 226, 0.28);
+}
+
+.memory-intro-grid,
+.memory-result-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-5);
+}
+
+.memory-category-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  margin-bottom: var(--space-5);
+}
+
+.memory-category-legend span {
+  border: 1px solid var(--memory-border);
+  background: var(--memory-surface);
+  border-radius: var(--radius-full);
+  padding: 0.45rem 0.8rem;
+  font-size: 0.82rem;
+}
+
+.memory-entry-list {
+  display: grid;
+  gap: var(--space-4);
+}
+
+.memory-entry-card {
+  border-color: var(--memory-border);
+}
+
+.memory-entry-text {
+  margin: 0 0 var(--space-4);
+  font-size: clamp(1rem, 2vw, 1.15rem);
+  line-height: 1.55;
+}
+
+.memory-category-buttons {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: var(--space-2);
+}
+
+.memory-category-button,
+.presence-anchor {
+  border: 1px solid var(--memory-border);
+  background: rgba(7, 25, 34, 0.52);
+  color: inherit;
+  border-radius: var(--radius-md);
+  padding: 0.75rem;
+  cursor: pointer;
+  transition: border-color var(--motion-fast), background var(--motion-fast), transform var(--motion-fast);
+}
+
+.memory-category-button:hover,
+.presence-anchor:hover {
+  border-color: rgba(169, 232, 243, 0.62);
+}
+
+.memory-category-button:focus-visible,
+.presence-anchor:focus-visible {
+  outline: 3px solid var(--focus-ring, #f2cf78);
+  outline-offset: 3px;
+}
+
+.memory-category-button--selected,
+.presence-anchor--selected {
+  border-color: rgba(170, 238, 246, 0.9);
+  background: rgba(50, 129, 151, 0.44);
+  transform: translateY(-1px);
+}
+
+.presence-anchor-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.presence-anchor {
+  display: grid;
+  gap: 0.35rem;
+  text-align: left;
+}
+
+.presence-anchor span {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  line-height: 1.4;
+}
+
+.water-mirror-card {
+  text-align: center;
+  background: radial-gradient(circle at 50% 20%, rgba(121, 208, 225, 0.2), transparent 42%), rgba(10, 35, 47, 0.62);
+}
+
+.water-mirror {
+  width: 7rem;
+  height: 7rem;
+  margin: 0 auto var(--space-4);
+  border: 1px solid rgba(170, 238, 246, 0.72);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: radial-gradient(circle, rgba(188, 238, 247, 0.28), rgba(14, 54, 70, 0.68));
+  box-shadow: inset 0 0 2rem rgba(190, 242, 249, 0.18), 0 0 2.5rem rgba(74, 164, 190, 0.18);
+}
+
+.water-mirror svg {
+  width: 2rem;
+  height: 2rem;
+}
+
+.memory-differences {
+  display: grid;
+  gap: var(--space-3);
+}
+
+.memory-difference {
+  display: grid;
+  gap: 0.3rem;
+  padding: var(--space-3);
+  border: 1px solid var(--memory-border);
+  border-radius: var(--radius-md);
+  background: rgba(8, 29, 39, 0.42);
+}
+
+.memory-difference span,
+.memory-difference small {
+  color: var(--text-muted);
+}
+
+.memory-chain {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.memory-chain-node {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: start;
+  gap: var(--space-2);
+  padding: var(--space-3);
+  border: 1px solid var(--memory-border);
+  border-radius: var(--radius-lg);
+  background: rgba(7, 26, 36, 0.52);
+}
+
+.memory-chain-node h3 {
+  margin: 0.45rem 0;
+  font-size: 1rem;
+}
+
+.memory-chain-node p,
+.memory-chain-node small {
+  overflow-wrap: anywhere;
+}
+
+.memory-chain-node p {
+  margin: 0 0 0.4rem;
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+
+@media (max-width: 1100px) {
+  .memory-category-buttons,
+  .presence-anchor-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .memory-chain {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .memory-intro-grid,
+  .memory-result-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .memory-category-buttons,
+  .presence-anchor-grid,
+  .memory-chain {
+    grid-template-columns: 1fr;
+  }
+
+  .memory-category-button {
+    min-height: 2.85rem;
+  }
+}
+
+[data-reduced-motion='true'] .memory-category-button,
+[data-reduced-motion='true'] .presence-anchor {
+  transition: none;
+  transform: none;
+}
