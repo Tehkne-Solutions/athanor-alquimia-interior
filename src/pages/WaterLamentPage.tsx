@@ -39,7 +39,8 @@ const fields: { id: WaterLamentField; label: string; help: string; placeholder: 
 export function WaterLamentPage() {
   const navigate = useNavigate();
   const waterJourney = useAthanorStore((state) => state.waterJourney);
-  const progress = useWaterLamentStore((state) => state.progress);
+  const storedProgress = useWaterLamentStore((state) => state.progress);
+  const storedJourneyStartedAt = useWaterLamentStore((state) => state.journeyStartedAt);
   const start = useWaterLamentStore((state) => state.start);
   const updateField = useWaterLamentStore((state) => state.updateField);
   const skip = useWaterLamentStore((state) => state.skip);
@@ -47,14 +48,20 @@ export function WaterLamentPage() {
   const [acknowledged, setAcknowledged] = useState(false);
 
   const namingCompleted = Boolean(waterJourney?.namedDropCreated);
+  const sessionMatches = Boolean(waterJourney && storedJourneyStartedAt === waterJourney.startedAt);
+  const progress = sessionMatches ? storedProgress : undefined;
   const draft = progress?.draft ?? createEmptyWaterLamentDraft();
 
   const handleOutcome = (outcome: WaterLamentCompletionOutcome) => {
     if (outcome === 'safety') navigate('/safety?source=lament');
   };
 
+  const ensureStarted = () => {
+    if (waterJourney) start(waterJourney.startedAt);
+  };
+
   const completeSilently = () => {
-    start();
+    ensureStarted();
     skip();
     handleOutcome(complete());
   };
@@ -119,7 +126,7 @@ export function WaterLamentPage() {
   }
 
   const beginWriting = () => {
-    start();
+    ensureStarted();
     setAcknowledged(true);
   };
 
