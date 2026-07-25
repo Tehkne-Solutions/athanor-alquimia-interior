@@ -1,0 +1,21 @@
+{
+  "name": "Athanor — Alquimia Interior",
+  "short_name": "Athanor",
+  "description": "RPG contemplativo local-first criado pela Tehkné Solutions.",
+  "lang": "pt-BR",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0d1211",
+  "theme_color": "#111817",
+  "categories": ["games", "lifestyle", "education"],
+  "icons": [
+    {
+      "src": "/icons/athanor-icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}

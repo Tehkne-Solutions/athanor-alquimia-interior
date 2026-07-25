@@ -1,5 +1,6 @@
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { AppShell } from '../components/AppShell';
+import { AccessibilityPage } from '../pages/AccessibilityPage';
 import { BibleSetupPage } from '../pages/BibleSetupPage';
 import { ChainPage } from '../pages/ChainPage';
 import { CharacterCreatePage } from '../pages/CharacterCreatePage';
@@ -13,23 +14,35 @@ import { ItemPage } from '../pages/ItemPage';
 import { LibraryPage } from '../pages/LibraryPage';
 import { LimitsPage } from '../pages/LimitsPage';
 import { MissionPage } from '../pages/MissionPage';
+import { ReviewPage } from '../pages/ReviewPage';
 import { SafetyPage } from '../pages/SafetyPage';
 import { TempleFoundationPage } from '../pages/TempleFoundationPage';
 import { TemplePage } from '../pages/TemplePage';
 import { WelcomePage } from '../pages/WelcomePage';
 import { useAthanorStore } from '../state/useAthanorStore';
 
+function BootScreen() {
+  return <div className="boot-screen"><span className="brand__mark">A</span><p>Preparando o Templo…</p></div>;
+}
+
+function RootRedirect() {
+  const initialized = useAthanorStore((state) => state.initialized);
+  const onboardingCompleted = useAthanorStore((state) => state.onboardingCompleted);
+  if (!initialized) return <BootScreen/>;
+  return <Navigate to={onboardingCompleted ? '/temple' : '/welcome'} replace/>;
+}
+
 function ProtectedShell() {
   const initialized = useAthanorStore((state) => state.initialized);
   const onboardingCompleted = useAthanorStore((state) => state.onboardingCompleted);
-  if (!initialized) return <div className="boot-screen"><span className="brand__mark">A</span><p>Preparando o Templo…</p></div>;
+  if (!initialized) return <BootScreen/>;
   if (!onboardingCompleted) return <Navigate to="/welcome" replace/>;
   return <AppShell/>;
 }
 
 export function App() {
   return <Routes>
-    <Route path="/" element={<Navigate to="/welcome" replace/>}/>
+    <Route path="/" element={<RootRedirect/>}/>
     <Route path="/welcome" element={<WelcomePage/>}/>
     <Route path="/limits" element={<LimitsPage/>}/>
     <Route path="/character/create" element={<CharacterCreatePage/>}/>
@@ -45,11 +58,13 @@ export function App() {
       <Route path="/mission/word-before-response/chain" element={<ChainPage/>}/>
       <Route path="/crafting/clear-word-lamp" element={<CraftingPage/>}/>
       <Route path="/items/clear-word-lamp" element={<ItemPage/>}/>
+      <Route path="/review/clear-word-lamp" element={<ReviewPage/>}/>
       <Route path="/inventory" element={<InventoryPage/>}/>
       <Route path="/codex" element={<CodexPage/>}/>
       <Route path="/character" element={<CharacterPage/>}/>
+      <Route path="/settings/accessibility" element={<AccessibilityPage/>}/>
       {import.meta.env.DEV && <Route path="/dev" element={<DevPage/>}/>} 
     </Route>
-    <Route path="*" element={<Navigate to="/welcome" replace/>}/>
+    <Route path="*" element={<Navigate to="/" replace/>}/>
   </Routes>;
 }

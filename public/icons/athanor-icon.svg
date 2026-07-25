@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">Athanor</title>
+  <desc id="desc">Símbolo mineral luminal da letra A dentro de um recipiente alquímico.</desc>
+  <defs>
+    <radialGradient id="bg" cx="35%" cy="28%" r="78%">
+      <stop offset="0" stop-color="#33463f"/>
+      <stop offset="1" stop-color="#0d1211"/>
+    </radialGradient>
+    <linearGradient id="gold" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#f4ddb0"/>
+      <stop offset=".52" stop-color="#d9ad63"/>
+      <stop offset="1" stop-color="#9a6b31"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="116" fill="url(#bg)"/>
+  <path d="M256 74c56 0 117 31 145 83 28 52 22 119-4 173-27 55-76 108-141 108s-114-53-141-108c-26-54-32-121-4-173 28-52 89-83 145-83Z" fill="none" stroke="url(#gold)" stroke-width="18"/>
+  <path d="M174 354 246 154h22l72 200h-42l-14-43h-58l-14 43h-38Zm66-82h31l-15-52-16 52Z" fill="url(#gold)"/>
+  <circle cx="256" cy="398" r="12" fill="#f4ddb0"/>
+</svg>
