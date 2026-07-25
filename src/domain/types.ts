@@ -45,6 +45,44 @@ export type ItemLifecycle = 'recipe' | 'discovered' | 'incomplete' | 'created' |
 
 export type ReviewOutcome = 'integrated' | 'adjusted' | 'resting';
 
+export type WaterEmotionId =
+  | 'fear'
+  | 'hope'
+  | 'sadness'
+  | 'gratitude'
+  | 'anger'
+  | 'loneliness'
+  | 'trust'
+  | 'confusion';
+
+export type WaterNeedId =
+  | 'expression'
+  | 'silence'
+  | 'rest'
+  | 'support'
+  | 'clarity'
+  | 'time'
+  | 'unknown';
+
+export type WaterJourneyStatus = 'available' | 'active' | 'named';
+
+export interface WaterCheckIn {
+  emotions: WaterEmotionId[];
+  intensity?: 1 | 2 | 3 | 4 | 5;
+  need?: WaterNeedId;
+  skipped: boolean;
+}
+
+export interface WaterJourneyProgress {
+  id: 'mission_name_waters_v1';
+  status: WaterJourneyStatus;
+  checkIn: WaterCheckIn;
+  namedDropCreated: boolean;
+  startedAt: string;
+  updatedAt: string;
+  completedAt?: string;
+}
+
 export interface ProvenanceEntry {
   id: string;
   label: string;
