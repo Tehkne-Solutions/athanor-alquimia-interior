@@ -1,10 +1,11 @@
-import { ArrowRight, BookOpenText, Droplets, LockKeyhole, ShieldCheck } from 'lucide-react';
+import { ArrowRight, BookOpenText, Droplets, Feather, LockKeyhole, ShieldCheck } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/Button';
 import { Card } from '../components/Card';
 import { PageHeader } from '../components/PageHeader';
-import { waterBiblicalUnit } from '../content/water';
+import { waterBiblicalUnit, waterLamentBiblicalUnit } from '../content/water';
 import { useAthanorStore } from '../state/useAthanorStore';
+import { useWaterLamentStore } from '../state/useWaterLamentStore';
 
 export function PsalmsChamberPage() {
   const navigate = useNavigate();
@@ -12,6 +13,7 @@ export function PsalmsChamberPage() {
   const inventory = useAthanorStore((state) => state.inventory);
   const waterJourney = useAthanorStore((state) => state.waterJourney);
   const startWaterJourney = useAthanorStore((state) => state.startWaterJourney);
+  const lamentProgress = useWaterLamentStore((state) => state.progress);
   const chamber = temple?.rooms.find((room) => room.roomId === 'psalms-chamber');
   const lampIntegrated = inventory.some((item) => item.id === 'item_clear_word_lamp_v1' && item.lifecycle === 'integrated');
   const available = Boolean(lampIntegrated || (chamber && chamber.status !== 'dormant' && chamber.status !== 'hidden'));
@@ -32,16 +34,33 @@ export function PsalmsChamberPage() {
     );
   }
 
-  const actionLabel = waterJourney?.status === 'named'
+  const namingCompleted = Boolean(waterJourney?.namedDropCreated);
+  const namingActionLabel = namingCompleted
     ? 'Revisar a Gota Nomeada'
     : waterJourney
       ? 'Continuar O Nome das Águas'
       : 'Iniciar O Nome das Águas';
 
-  const openJourney = () => {
+  const lamentCompleted = lamentProgress?.status === 'completed';
+  const lamentInterrupted = lamentProgress?.status === 'safety_interrupted';
+  const lamentActionLabel = lamentCompleted
+    ? 'Revisar o Fragmento do Lamento'
+    : lamentInterrupted
+      ? 'Abrir apoio direto'
+      : lamentProgress
+        ? 'Continuar A Voz do Lamento'
+        : 'Abrir A Voz do Lamento';
+
+  const openNamingJourney = () => {
     startWaterJourney();
     navigate('/mission/name-the-waters');
   };
+
+  const openLamentJourney = () => {
+    navigate(lamentInterrupted ? '/safety?source=lament' : '/mission/voice-of-lament');
+  };
+
+  const componentCount = Number(namingCompleted) + Number(lamentCompleted);
 
   return (
     <div className="page page--water">
@@ -56,8 +75,8 @@ export function PsalmsChamberPage() {
           <div className="water-hero-card__visual" aria-hidden="true"><Droplets/><span/></div>
           <div>
             <p className="eyebrow">Estado da Câmara</p>
-            <h2>Fundação disponível</h2>
-            <p>A sala está aberta, mas ainda não restaurada. A primeira missão cria somente um componente inicial do futuro Cálice.</p>
+            <h2>{componentCount === 0 ? 'Fundação disponível' : `${componentCount} de 4 componentes iniciais`}</h2>
+            <p>A sala permanece em construção. O Cálice completo só será criado depois de nomeação, lamento, memória, confiança, ação de cuidado e revisão.</p>
           </div>
         </Card>
 
@@ -75,11 +94,23 @@ export function PsalmsChamberPage() {
             <li>não existe emoção correta, elevada ou negativa;</li>
             <li>o resultado não gera diagnóstico ou recomendação clínica.</li>
           </ul>
-          <Button onClick={openJourney}>{actionLabel} <ArrowRight size={18}/></Button>
+          <Button onClick={openNamingJourney}>{namingActionLabel} <ArrowRight size={18}/></Button>
+        </Card>
+
+        <Card title="A Voz do Lamento" eyebrow={waterLamentBiblicalUnit.reference}>
+          <div className="lament-card-intro"><Feather aria-hidden="true"/><p>Organize, se desejar, o que aconteceu, o que sente, o que deseja e de que apoio precisa.</p></div>
+          <ul className="simple-list">
+            <li>todos os campos são opcionais;</li>
+            <li>a missão pode ser concluída em silêncio;</li>
+            <li>o texto não altera a recompensa;</li>
+            <li>sinais críticos interrompem o simbolismo.</li>
+          </ul>
+          <Button disabled={!namingCompleted} onClick={openLamentJourney}>{lamentActionLabel} <ArrowRight size={18}/></Button>
+          {!namingCompleted && <p className="field-help">Conclua primeiro O Nome das Águas para abrir esta etapa.</p>}
         </Card>
 
         <Card title="Limites da experiência" eyebrow="Segurança">
-          <div className="safety-summary"><ShieldCheck/><p>O Athanor não interpreta sintomas, memórias ou causas. Em situação crítica, o fluxo simbólico deve ser interrompido pela tela direta de segurança.</p></div>
+          <div className="safety-summary"><ShieldCheck/><p>O Athanor não interpreta sintomas, memórias ou causas. Em situação crítica, o fluxo simbólico é interrompido pela tela direta de segurança.</p></div>
         </Card>
       </div>
     </div>
