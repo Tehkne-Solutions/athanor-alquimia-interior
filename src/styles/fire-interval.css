@@ -1,0 +1,177 @@
+.page--fire-interval {
+  --interval-glow: rgba(240, 140, 58, 0.2);
+}
+
+.fire-interval-intro-grid,
+.fire-interval-result-grid,
+.fire-interval-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.fire-interval-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.fire-interval-entry-list {
+  display: grid;
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.fire-interval-entry {
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 1rem;
+  background: rgba(15, 18, 23, 0.38);
+}
+
+.fire-interval-entry > p:first-child {
+  margin-top: 0;
+  font-weight: 650;
+}
+
+.fire-interval-classification-actions {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.5rem;
+}
+
+.fire-interval-classification-actions button,
+.fire-interval-option-list button {
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.035);
+  color: inherit;
+  padding: 0.75rem;
+  cursor: pointer;
+  text-align: left;
+}
+
+.fire-interval-classification-actions button[aria-pressed='true'],
+.fire-interval-option-list button[aria-pressed='true'] {
+  border-color: var(--accent);
+  background: var(--interval-glow);
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent) 50%, transparent);
+}
+
+.fire-interval-classification-actions button:focus-visible,
+.fire-interval-option-list button:focus-visible {
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 2px;
+}
+
+.fire-interval-option-list {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.fire-interval-option-list button {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+}
+
+.fire-interval-option-list span {
+  display: grid;
+  gap: 0.2rem;
+}
+
+.fire-interval-option-list small {
+  color: var(--text-muted);
+  line-height: 1.45;
+}
+
+.interval-ember-card {
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  text-align: center;
+  min-height: 17rem;
+  background:
+    radial-gradient(circle at center, rgba(255, 170, 72, 0.22), transparent 48%),
+    linear-gradient(145deg, rgba(65, 31, 18, 0.76), rgba(18, 19, 23, 0.92));
+}
+
+.interval-ember-visual {
+  display: grid;
+  place-items: center;
+  position: relative;
+  width: 6.5rem;
+  height: 6.5rem;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 196, 120, 0.45);
+  background: rgba(255, 146, 54, 0.12);
+}
+
+.interval-ember-visual svg:first-child {
+  width: 3.2rem;
+  height: 3.2rem;
+}
+
+.interval-ember-visual svg:last-child {
+  position: absolute;
+  width: 1.35rem;
+  height: 1.35rem;
+  color: #ffd08a;
+}
+
+.fire-interval-chain-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.fire-interval-chain-node {
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.025);
+}
+
+.fire-interval-chain-node h3 {
+  margin: 0.7rem 0 0.45rem;
+}
+
+.fire-interval-chain-node small {
+  color: var(--text-muted);
+}
+
+@media (max-width: 900px) {
+  .fire-interval-intro-grid,
+  .fire-interval-result-grid,
+  .fire-interval-form-grid,
+  .fire-interval-chain-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .fire-interval-classification-actions,
+  .fire-interval-classification-actions--urgency {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 520px) {
+  .fire-interval-classification-actions,
+  .fire-interval-classification-actions--urgency {
+    grid-template-columns: 1fr;
+  }
+
+  .fire-interval-actions {
+    align-items: stretch;
+  }
+
+  .fire-interval-actions > * {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .interval-ember-visual {
+    animation: none;
+  }
+}

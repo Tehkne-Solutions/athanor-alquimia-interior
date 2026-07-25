@@ -14,6 +14,7 @@ import './styles/water-chalice.css';
 import './styles/water-chapter.css';
 import './styles/fire.css';
 import './styles/fire-mission.css';
+import './styles/fire-interval.css';
 
 validateContent();
 

@@ -4,6 +4,7 @@ import { Button } from '../components/Button';
 import { Card } from '../components/Card';
 import { PageHeader } from '../components/PageHeader';
 import { useAthanorStore } from '../state/useAthanorStore';
+import { useFireIntervalStore } from '../state/useFireIntervalStore';
 import { useFireMissionStore } from '../state/useFireMissionStore';
 import { useWaterChaliceStore } from '../state/useWaterChaliceStore';
 import { useWaterChapterStore } from '../state/useWaterChapterStore';
@@ -20,12 +21,14 @@ export function DevPage() {
   const resetChalice = useWaterChaliceStore((state) => state.reset);
   const resetWaterChapter = useWaterChapterStore((state) => state.reset);
   const resetFireMission = useFireMissionStore((state) => state.reset);
+  const resetFireInterval = useFireIntervalStore((state) => state.reset);
   const lamentProgress = useWaterLamentStore((state) => state.progress);
   const memoryProgress = useWaterMemoryStore((state) => state.progress);
   const trustProgress = useWaterTrustStore((state) => state.progress);
   const chaliceProgress = useWaterChaliceStore((state) => state.progress);
   const waterChapterProgress = useWaterChapterStore((state) => state.progress);
   const fireProgress = useFireMissionStore((state) => state.progress);
+  const fireIntervalProgress = useFireIntervalStore((state) => state.progress);
   const state = useAthanorStore();
 
   const reset = async () => {
@@ -36,6 +39,7 @@ export function DevPage() {
     resetChalice();
     resetWaterChapter();
     resetFireMission();
+    resetFireInterval();
     navigate('/welcome');
   };
 
@@ -71,6 +75,14 @@ export function DevPage() {
               intensity: fireProgress.intensity,
               namedFlameCreated: fireProgress.namedFlameCreated,
               action: fireProgress.action
+            } : undefined,
+            fireInterval: fireIntervalProgress ? {
+              status: fireIntervalProgress.status,
+              timelineSkipped: fireIntervalProgress.timelineSkipped,
+              urgencySkipped: fireIntervalProgress.urgencySkipped,
+              interval: fireIntervalProgress.interval,
+              exit: fireIntervalProgress.exit,
+              intervalEmberCreated: fireIntervalProgress.intervalEmberCreated
             } : undefined,
             inventory: state.inventory.map((item) => item.name)
           }, null, 2)}</pre>
