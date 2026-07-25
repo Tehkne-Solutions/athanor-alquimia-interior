@@ -5,7 +5,12 @@ import { Button } from '../components/Button';
 import { Card } from '../components/Card';
 import { PageHeader } from '../components/PageHeader';
 import { waterLamentBiblicalUnit, waterLamentWarnings } from '../content/water';
-import { createEmptyWaterLamentDraft, type WaterLamentCompletionOutcome, type WaterLamentField } from '../domain/waterLament';
+import {
+  canCompleteWaterLament,
+  createEmptyWaterLamentDraft,
+  type WaterLamentCompletionOutcome,
+  type WaterLamentField
+} from '../domain/waterLament';
 import { useAthanorStore } from '../state/useAthanorStore';
 import { useWaterLamentStore } from '../state/useWaterLamentStore';
 
@@ -51,6 +56,7 @@ export function WaterLamentPage() {
   const sessionMatches = Boolean(waterJourney && storedJourneyStartedAt === waterJourney.startedAt);
   const progress = sessionMatches ? storedProgress : undefined;
   const draft = progress?.draft ?? createEmptyWaterLamentDraft();
+  const canCreateFragment = canCompleteWaterLament(draft) && !draft.skipped;
 
   const handleOutcome = (outcome: WaterLamentCompletionOutcome) => {
     if (outcome === 'safety') navigate('/safety?source=lament');
@@ -183,7 +189,7 @@ export function WaterLamentPage() {
             <div className="water-mission-actions lament-actions">
               <Button variant="ghost" onClick={() => navigate('/temple/psalms-chamber')}><Pause size={18}/> Pausar e voltar</Button>
               <Button variant="secondary" onClick={completeSilently}>Concluir sem escrever</Button>
-              <Button onClick={() => handleOutcome(complete())}>Criar Fragmento do Lamento</Button>
+              <Button disabled={!canCreateFragment} onClick={() => handleOutcome(complete())}>Criar Fragmento do Lamento</Button>
             </div>
           </Card>
         )}
