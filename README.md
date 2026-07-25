@@ -2,7 +2,7 @@
 
 RPG contemplativo local-first criado pela **Tehkné Solutions**.
 
-Este repositório contém o primeiro vertical slice funcional: **A Palavra Antes da Resposta**.
+Este repositório contém o vertical slice funcional **A Palavra Antes da Resposta**, preparado para homologação como aplicação web instalável.
 
 ## Funcionalidades implementadas
 
@@ -16,10 +16,31 @@ Este repositório contém o primeiro vertical slice funcional: **A Palavra Antes
 - cadeia simbólica com proveniência e fallbacks autorais;
 - crafting da Lâmpada da Palavra Clara;
 - inventário, posicionamento e restauração da Biblioteca;
+- ciclo completo de retorno e revisão;
+- integração, ajuste ou repouso sem perda de progresso;
 - armazenamento local em IndexedDB;
+- alto contraste e redução de movimento;
+- PWA com application shell offline;
+- configuração de deploy SPA para Vercel;
 - Design System responsivo;
 - fluxo de segurança sem simbolismo;
 - painel de QA em `/dev` durante desenvolvimento.
+
+## Ciclo validável
+
+```text
+Fonte bíblica
+→ missão
+→ classificação
+→ cadeia simbólica
+→ crafting
+→ ação
+→ retorno
+→ revisão
+→ transformação do Templo
+```
+
+A progressão para **Primeiro Fogo** ocorre somente após o retorno e a integração da revisão.
 
 ## Stack
 
@@ -31,6 +52,7 @@ Este repositório contém o primeiro vertical slice funcional: **A Palavra Antes
 - Zod
 - IndexedDB
 - Vitest
+- PWA sem dependência de runtime externo
 
 ## Executar
 
@@ -47,9 +69,13 @@ npm run test
 npm run build
 ```
 
+## Deploy
+
+O projeto inclui `vercel.json` com fallback para rotas SPA e cabeçalhos específicos para o service worker e o manifesto.
+
 ## Privacidade
 
-A versão atual funciona sem conta e persiste o progresso no próprio dispositivo. Não há IA, sincronização ou analytics ativos.
+A versão atual funciona sem conta e persiste o progresso no próprio dispositivo. Não há IA, sincronização ou analytics ativos. Registros de revisão permanecem locais e opcionais.
 
 ## Assinatura
 
