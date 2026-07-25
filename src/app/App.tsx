@@ -9,6 +9,7 @@ import { ClassificationPage } from '../pages/ClassificationPage';
 import { CodexPage } from '../pages/CodexPage';
 import { CraftingPage } from '../pages/CraftingPage';
 import { DevPage } from '../pages/DevPage';
+import { FireMissionPage } from '../pages/FireMissionPage';
 import { ForgePage } from '../pages/ForgePage';
 import { HomologationPage } from '../pages/HomologationPage';
 import { InventoryPage } from '../pages/InventoryPage';
@@ -71,6 +72,7 @@ export function App() {
       <Route path="/mission/voice-of-lament" element={<WaterLamentPage/>}/>
       <Route path="/mission/mirror-of-memories" element={<WaterMemoryPage/>}/>
       <Route path="/mission/space-of-trust" element={<WaterTrustPage/>}/>
+      <Route path="/mission/name-the-flame" element={<FireMissionPage/>}/>
       <Route path="/crafting/memory-serene-chalice" element={<WaterChalicePage/>}/>
       <Route path="/review/water-chapter" element={<WaterChapterReviewPage/>}/>
       <Route path="/crafting/clear-word-lamp" element={<CraftingPage/>}/>
