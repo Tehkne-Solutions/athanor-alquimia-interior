@@ -1,5 +1,7 @@
-import { BookOpen, Boxes, Map, ScrollText, UserRound } from 'lucide-react';
+import { BookOpen, Boxes, Map, ScrollText, Settings2, UserRound } from 'lucide-react';
+import { useEffect } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
+import { useAthanorStore } from '../state/useAthanorStore';
 
 const navItems = [
   { to: '/temple', label: 'Templo', icon: Map },
@@ -10,6 +12,15 @@ const navItems = [
 ] as const;
 
 export function AppShell() {
+  const highContrast = useAthanorStore((state) => state.preferences.highContrast);
+  const reducedMotion = useAthanorStore((state) => state.preferences.reducedMotion);
+
+  useEffect(() => {
+    const root = document.documentElement;
+    root.dataset.contrast = highContrast ? 'high' : 'standard';
+    root.dataset.motion = reducedMotion ? 'reduced' : 'full';
+  }, [highContrast, reducedMotion]);
+
   return (
     <div className="app-shell">
       <aside className="side-nav" aria-label="Navegação principal">
@@ -24,6 +35,10 @@ export function AppShell() {
             </NavLink>
           ))}
         </nav>
+        <NavLink className="side-nav__settings" to="/settings/accessibility">
+          <Settings2 size={18} aria-hidden="true" />
+          <span>Acessibilidade</span>
+        </NavLink>
         <p className="side-nav__signature">Tehkné Solutions</p>
       </aside>
       <main className="app-main"><Outlet /></main>
