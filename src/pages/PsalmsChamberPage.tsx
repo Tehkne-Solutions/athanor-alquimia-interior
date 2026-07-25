@@ -1,4 +1,4 @@
-import { ArrowRight, BookOpenText, Droplets, Eye, Feather, HeartHandshake, LockKeyhole, ShieldCheck } from 'lucide-react';
+import { ArrowRight, BookOpenText, CupSoda, Droplets, Eye, Feather, HeartHandshake, LockKeyhole, ShieldCheck } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/Button';
 import { Card } from '../components/Card';
@@ -6,6 +6,7 @@ import { PageHeader } from '../components/PageHeader';
 import { waterBiblicalUnit, waterLamentBiblicalUnit, waterMemoryBiblicalUnit } from '../content/water';
 import { waterTrustBiblicalUnit } from '../content/waterTrust';
 import { useAthanorStore } from '../state/useAthanorStore';
+import { useWaterChaliceStore } from '../state/useWaterChaliceStore';
 import { useWaterLamentStore } from '../state/useWaterLamentStore';
 import { useWaterMemoryStore } from '../state/useWaterMemoryStore';
 import { useWaterTrustStore } from '../state/useWaterTrustStore';
@@ -20,9 +21,11 @@ export function PsalmsChamberPage() {
   const lamentJourneyStartedAt = useWaterLamentStore((state) => state.journeyStartedAt);
   const rawMemoryProgress = useWaterMemoryStore((state) => state.progress);
   const rawTrustProgress = useWaterTrustStore((state) => state.progress);
+  const rawChaliceProgress = useWaterChaliceStore((state) => state.progress);
   const lamentProgress = waterJourney?.startedAt === lamentJourneyStartedAt ? rawLamentProgress : undefined;
   const memoryProgress = waterJourney?.startedAt === rawMemoryProgress?.journeyStartedAt ? rawMemoryProgress : undefined;
   const trustProgress = waterJourney?.startedAt === rawTrustProgress?.journeyStartedAt ? rawTrustProgress : undefined;
+  const chaliceProgress = waterJourney?.startedAt === rawChaliceProgress?.journeyStartedAt ? rawChaliceProgress : undefined;
   const chamber = temple?.rooms.find((room) => room.roomId === 'psalms-chamber');
   const lampIntegrated = inventory.some((item) => item.id === 'item_clear_word_lamp_v1' && item.lifecycle === 'integrated');
   const available = Boolean(lampIntegrated || (chamber && chamber.status !== 'dormant' && chamber.status !== 'hidden'));
@@ -74,6 +77,20 @@ export function PsalmsChamberPage() {
       ? 'Continuar O Espaço da Confiança'
       : 'Abrir O Espaço da Confiança';
 
+  const chaliceActionLabel = !chaliceProgress
+    ? 'Abrir a receita do Cálice'
+    : chaliceProgress.positioned
+      ? 'Revisar o Cálice posicionado'
+      : chaliceProgress.status === 'integrated'
+        ? 'Posicionar o Cálice'
+        : chaliceProgress.status === 'resting'
+          ? 'Retomar o Cálice'
+          : chaliceProgress.status === 'awaiting_review'
+            ? 'Revisar o Cálice'
+            : chaliceProgress.chaliceCreated
+              ? 'Continuar o ciclo do Cálice'
+              : 'Continuar a receita do Cálice';
+
   const openNamingJourney = () => {
     startWaterJourney();
     navigate('/mission/name-the-waters');
@@ -84,24 +101,33 @@ export function PsalmsChamberPage() {
   };
 
   const componentCount = Number(namingCompleted) + Number(lamentCompleted) + Number(memoryCompleted) + Number(trustCompleted);
+  const chamberTitle = chaliceProgress?.positioned
+    ? 'Câmara restaurada pelo primeiro ciclo da Água'
+    : chaliceProgress?.status === 'integrated'
+      ? 'Cálice integrado e pronto para posicionamento'
+      : componentCount === 0
+        ? 'Fundação disponível'
+        : `${componentCount} de 4 componentes iniciais`;
 
   return (
     <div className="page page--water">
       <PageHeader
         eyebrow="Câmara dos Salmos"
-        title="As águas começam a encontrar nome e recipiente."
+        title={chaliceProgress?.positioned ? 'As águas receberam forma sem perder movimento.' : 'As águas começam a encontrar nome e recipiente.'}
         description="Este capítulo trabalha emoção, memória, lamento e confiança sem transformar estados percebidos em diagnóstico ou identidade fixa."
       />
 
       <div className="water-chamber-grid">
-        <Card className="water-hero-card">
-          <div className="water-hero-card__visual" aria-hidden="true"><Droplets/><span/></div>
+        <Card className={chaliceProgress?.positioned ? 'water-hero-card water-hero-card--restored' : 'water-hero-card'}>
+          <div className="water-hero-card__visual" aria-hidden="true">{chaliceProgress?.positioned ? <CupSoda/> : <Droplets/>}<span/></div>
           <div>
             <p className="eyebrow">Estado da Câmara</p>
-            <h2>{componentCount === 0 ? 'Fundação disponível' : `${componentCount} de 4 componentes iniciais`}</h2>
-            <p>{componentCount < 4
-              ? 'A sala permanece em construção. O Cálice completo só será criado depois de nomeação, lamento, memória, confiança, ação de cuidado e revisão.'
-              : 'Os quatro componentes iniciais estão disponíveis. A próxima fase reunirá ação de cuidado, revisão e crafting do Cálice.'}</p>
+            <h2>{chamberTitle}</h2>
+            <p>{chaliceProgress?.positioned
+              ? 'O Cálice foi criado, revisado, integrado e posicionado. O item permanece simbólico, revisável e sem promessa de efeito externo.'
+              : componentCount < 4
+                ? 'A sala permanece em construção. O Cálice completo só será criado depois de nomeação, lamento, memória, confiança, ação de cuidado e revisão.'
+                : 'Os quatro componentes estão disponíveis. A receita agora pode organizar intenção, ação, limite e revisão.'}</p>
           </div>
         </Card>
 
@@ -158,8 +184,20 @@ export function PsalmsChamberPage() {
           {!memoryCompleted && <p className="field-help">Conclua primeiro O Espelho das Memórias para abrir esta etapa.</p>}
         </Card>
 
+        <Card title="Cálice da Memória Serena" eyebrow="Crafting e revisão">
+          <div className="lament-card-intro"><CupSoda aria-hidden="true"/><p>Reúna os quatro componentes em uma intenção, uma ação, um limite e uma revisão explícita.</p></div>
+          <ul className="simple-list">
+            <li>criar o item não conclui o ciclo;</li>
+            <li>“Nenhuma ação agora” é uma escolha válida;</li>
+            <li>ajuste e repouso não apagam progresso;</li>
+            <li>somente um Cálice integrado pode ser posicionado.</li>
+          </ul>
+          <Button disabled={!trustCompleted} onClick={() => navigate('/crafting/memory-serene-chalice')}>{chaliceActionLabel} <ArrowRight size={18}/></Button>
+          {!trustCompleted && <p className="field-help">Conclua primeiro O Espaço da Confiança para abrir o crafting.</p>}
+        </Card>
+
         <Card title="Limites da experiência" eyebrow="Segurança">
-          <div className="safety-summary"><ShieldCheck/><p>O Athanor não interpreta sintomas, memórias ou causas e não promete proteção ou resultado. Em situação crítica, o fluxo simbólico é interrompido pela tela direta de segurança.</p></div>
+          <div className="safety-summary"><ShieldCheck/><p>O Athanor não interpreta sintomas, memórias ou causas e não promete serenidade, proteção ou resultado. Em situação crítica, o fluxo simbólico é interrompido pela tela direta de segurança.</p></div>
         </Card>
       </div>
     </div>
