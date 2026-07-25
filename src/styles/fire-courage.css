@@ -1,0 +1,128 @@
+.page--fire-courage {
+  --courage-accent: #d5a54a;
+}
+
+.fire-courage-intro-grid,
+.fire-courage-result-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-5);
+}
+
+.fire-courage-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-3);
+  align-items: center;
+}
+
+.fire-courage-statement-list {
+  display: grid;
+  gap: var(--space-4);
+  margin-bottom: var(--space-4);
+}
+
+.fire-courage-statement {
+  padding: var(--space-4);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  background: color-mix(in srgb, var(--surface-elevated) 92%, var(--courage-accent));
+}
+
+.fire-courage-classification-actions,
+.fire-courage-option-list,
+.fire-courage-resource-grid,
+.fire-courage-action-scale {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.fire-courage-classification-actions button,
+.fire-courage-option-list button,
+.fire-courage-resource-grid button,
+.fire-courage-action-scale button {
+  min-height: 48px;
+  padding: var(--space-3);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
+  color: inherit;
+  background: var(--surface-elevated);
+  text-align: left;
+  cursor: pointer;
+}
+
+.fire-courage-option-list button,
+.fire-courage-resource-grid button,
+.fire-courage-action-scale button {
+  display: grid;
+  gap: var(--space-1);
+}
+
+.fire-courage-action-scale button > span:first-child {
+  color: var(--courage-accent);
+  font-size: .78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .04em;
+}
+
+.fire-courage-classification-actions button[aria-pressed='true'],
+.fire-courage-option-list button[aria-pressed='true'],
+.fire-courage-resource-grid button[aria-pressed='true'],
+.fire-courage-action-scale button[aria-pressed='true'] {
+  border-color: var(--courage-accent);
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--courage-accent) 25%, transparent);
+}
+
+.courage-mark-card {
+  position: relative;
+  overflow: hidden;
+}
+
+.courage-mark-visual {
+  display: flex;
+  gap: var(--space-3);
+  align-items: center;
+  margin-bottom: var(--space-4);
+  color: var(--courage-accent);
+}
+
+.courage-mark-visual svg:first-child {
+  width: 64px;
+  height: 64px;
+}
+
+.fire-courage-chain-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-3);
+}
+
+.fire-courage-chain-node {
+  padding: var(--space-4);
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-lg);
+  background: var(--surface-elevated);
+}
+
+@media (max-width: 900px) {
+  .fire-courage-intro-grid,
+  .fire-courage-result-grid,
+  .fire-courage-chain-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .fire-courage-classification-actions,
+  .fire-courage-option-list,
+  .fire-courage-resource-grid,
+  .fire-courage-action-scale {
+    grid-template-columns: 1fr;
+  }
+
+  .fire-courage-actions > * {
+    width: 100%;
+  }
+}
