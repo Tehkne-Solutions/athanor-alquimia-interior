@@ -16,6 +16,7 @@ import './styles/fire.css';
 import './styles/fire-mission.css';
 import './styles/fire-interval.css';
 import './styles/fire-boundary.css';
+import './styles/fire-courage.css';
 
 validateContent();
 
