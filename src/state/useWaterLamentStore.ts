@@ -15,8 +15,9 @@ const now = () => new Date().toISOString();
 
 interface WaterLamentStoreState {
   schemaVersion: number;
+  journeyStartedAt?: string;
   progress?: WaterLamentProgress;
-  start: () => void;
+  start: (journeyStartedAt: string) => void;
   updateField: (field: WaterLamentField, value: string) => void;
   skip: () => void;
   complete: () => WaterLamentCompletionOutcome;
@@ -26,11 +27,12 @@ interface WaterLamentStoreState {
 export const useWaterLamentStore = create<WaterLamentStoreState>()(
   persist(
     (set, get) => ({
-      schemaVersion: 1,
-      start: () => {
-        if (get().progress) return;
+      schemaVersion: 2,
+      start: (journeyStartedAt) => {
+        const current = get();
+        if (current.progress && current.journeyStartedAt === journeyStartedAt) return;
         const startedAt = now();
-        set({ progress: createWaterLamentProgress(startedAt) });
+        set({ journeyStartedAt, progress: createWaterLamentProgress(startedAt) });
       },
       updateField: (field, value) => set((state) => {
         const progress = state.progress ?? createWaterLamentProgress(now());
@@ -55,12 +57,16 @@ export const useWaterLamentStore = create<WaterLamentStoreState>()(
         set({ progress: result.progress });
         return result.outcome;
       },
-      reset: () => set({ progress: undefined })
+      reset: () => set({ journeyStartedAt: undefined, progress: undefined })
     }),
     {
       name: 'athanor-water-lament-state',
       storage: createJSONStorage(() => idbStateStorage),
-      partialize: (state) => ({ schemaVersion: state.schemaVersion, progress: state.progress })
+      partialize: (state) => ({
+        schemaVersion: state.schemaVersion,
+        journeyStartedAt: state.journeyStartedAt,
+        progress: state.progress
+      })
     }
   )
 );
