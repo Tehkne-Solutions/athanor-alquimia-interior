@@ -7,6 +7,7 @@ import './styles/global.css';
 import './styles/homologation.css';
 import './styles/research.css';
 import './styles/water.css';
+import './styles/water-lament.css';
 
 validateContent();
 
