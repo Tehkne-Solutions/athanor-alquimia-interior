@@ -1,7 +1,13 @@
 import { z } from 'zod';
 import { provenanceClassSchema } from '../domain/types';
 import { biblicalUnits, chainNodes, classificationEntries } from './seed';
-import { waterBiblicalUnit, waterLamentBiblicalUnit } from './water';
+import {
+  waterBiblicalUnit,
+  waterLamentBiblicalUnit,
+  waterMemoryBiblicalUnit,
+  waterMemoryEntries,
+  waterMemoryNodes
+} from './water';
 
 const provenanceSchema = z.object({
   id: z.string().min(1),
@@ -32,13 +38,28 @@ const nodeSchema = z.object({
   fallbackNodeId: z.string().optional()
 });
 
+const waterMemoryEntrySchema = z.object({
+  id: z.string().min(1),
+  text: z.string().min(1),
+  suggestedCategory: z.enum(['memory', 'present_sensation', 'prediction', 'need', 'action']),
+  explanation: z.string().min(1)
+});
+
 export function validateContent(): void {
-  z.array(biblicalUnitSchema).parse([...biblicalUnits, waterBiblicalUnit, waterLamentBiblicalUnit]);
-  z.array(nodeSchema).parse(chainNodes);
+  z.array(biblicalUnitSchema).parse([
+    ...biblicalUnits,
+    waterBiblicalUnit,
+    waterLamentBiblicalUnit,
+    waterMemoryBiblicalUnit
+  ]);
+
+  const allNodes = [...chainNodes, ...waterMemoryNodes];
+  z.array(nodeSchema).parse(allNodes);
+  z.array(waterMemoryEntrySchema).min(5).parse(waterMemoryEntries);
   z.array(z.object({ id: z.string(), text: z.string(), correctCategory: z.enum(['fact', 'interpretation', 'prediction', 'intention']) })).parse(classificationEntries);
 
-  const nodeIds = new Set(chainNodes.map((node) => node.id));
-  for (const node of chainNodes) {
+  const nodeIds = new Set(allNodes.map((node) => node.id));
+  for (const node of allNodes) {
     if (node.fallbackNodeId && !nodeIds.has(node.fallbackNodeId)) {
       throw new Error(`Fallback inexistente: ${node.fallbackNodeId}`);
     }
