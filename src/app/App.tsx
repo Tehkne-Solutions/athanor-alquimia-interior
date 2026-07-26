@@ -87,6 +87,7 @@ export function App() {
       <Route path="/temple/spirit-sanctuary" element={<SpiritSanctuaryPage/>}/>
       <Route path="/mission/thread-that-gathers" element={<SpiritThreadPage/>}/>
       <Route path="/mission/center-without-erasing-parts" element={<SpiritCenterPage/>}/>
+      <Route path="/mission/center-without-erasing" element={<SpiritCenterPage/>}/>
       <Route path="/mission/council-of-parts" element={<SpiritCouncilPage/>}/>
       <Route path="/mission/body-arrives-first" element={<EarthBodyPage/>}/>
       <Route path="/mission/work-that-fits-today" element={<EarthWorkPage/>}/>
