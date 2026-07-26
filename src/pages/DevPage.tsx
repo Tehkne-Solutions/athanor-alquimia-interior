@@ -5,6 +5,7 @@ import { Card } from '../components/Card';
 import { PageHeader } from '../components/PageHeader';
 import { useAthanorStore } from '../state/useAthanorStore';
 import { useEarthBodyStore } from '../state/useEarthBodyStore';
+import { useEarthResourcesStore } from '../state/useEarthResourcesStore';
 import { useEarthWorkStore } from '../state/useEarthWorkStore';
 import { useFireBoundaryStore } from '../state/useFireBoundaryStore';
 import { useFireChapterStore } from '../state/useFireChapterStore';
@@ -36,6 +37,7 @@ export function DevPage() {
   const resetFireChapter = useFireChapterStore((state) => state.reset);
   const resetEarthBody = useEarthBodyStore((state) => state.reset);
   const resetEarthWork = useEarthWorkStore((state) => state.reset);
+  const resetEarthResources = useEarthResourcesStore((state) => state.reset);
   const lamentProgress = useWaterLamentStore((state) => state.progress);
   const memoryProgress = useWaterMemoryStore((state) => state.progress);
   const trustProgress = useWaterTrustStore((state) => state.progress);
@@ -50,6 +52,7 @@ export function DevPage() {
   const fireChapterProgress = useFireChapterStore((state) => state.progress);
   const earthBodyProgress = useEarthBodyStore((state) => state.progress);
   const earthWorkProgress = useEarthWorkStore((state) => state.progress);
+  const earthResourcesProgress = useEarthResourcesStore((state) => state.progress);
   const state = useAthanorStore();
 
   const reset = async () => {
@@ -68,6 +71,7 @@ export function DevPage() {
     resetFireChapter();
     resetEarthBody();
     resetEarthWork();
+    resetEarthResources();
     navigate('/welcome');
   };
 
@@ -93,6 +97,7 @@ export function DevPage() {
     fireChapter: fireChapterProgress ? { status: fireChapterProgress.status, cycleId: fireChapterProgress.cycleId, destinations: fireChapterProgress.destinations } : undefined,
     earthBody: earthBodyProgress ? { status: earthBodyProgress.status, skipped: earthBodyProgress.checkInSkipped, resources: earthBodyProgress.resources, action: earthBodyProgress.action, bodyPresenceMarkCreated: earthBodyProgress.bodyPresenceMarkCreated } : undefined,
     earthWork: earthWorkProgress ? { status: earthWorkProgress.status, context: earthWorkProgress.context, capacity: earthWorkProgress.capacity, timeWindow: earthWorkProgress.timeWindow, smallStep: earthWorkProgress.smallStep, decision: earthWorkProgress.decision, firstStepSeedCreated: earthWorkProgress.firstStepSeedCreated } : undefined,
+    earthResources: earthResourcesProgress ? { status: earthResourcesProgress.status, availability: earthResourcesProgress.availability, substitution: earthResourcesProgress.substitution, scope: earthResourcesProgress.scope, decision: earthResourcesProgress.decision, possibleResourcesBasketCreated: earthResourcesProgress.possibleResourcesBasketCreated } : undefined,
     inventory: state.inventory.map((item) => item.name)
   }, null, 2)}</pre></Card><Card title="Ações"><Button variant="danger" onClick={reset}><RotateCcw size={18}/> Resetar todo o estado</Button></Card></div></div>;
 }
