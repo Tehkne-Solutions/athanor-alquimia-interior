@@ -14,6 +14,7 @@ import type { SymbolicNode } from '../domain/types';
 import { useAthanorStore } from '../state/useAthanorStore';
 import { useEarthChapterStore } from '../state/useEarthChapterStore';
 import { useSpiritCenterStore } from '../state/useSpiritCenterStore';
+import { useSpiritChapterStore } from '../state/useSpiritChapterStore';
 import { useSpiritCouncilStore } from '../state/useSpiritCouncilStore';
 import { useSpiritDecisionStore } from '../state/useSpiritDecisionStore';
 import { useSpiritOrbStore } from '../state/useSpiritOrbStore';
@@ -33,78 +34,99 @@ export function SpiritSanctuaryPage() {
   const sanctuary = useAthanorStore((state) => state.temple?.rooms.find((room) => room.roomId === 'central-tree'));
   const enabledLayers = useAthanorStore((state) => state.preferences.enabledLayers);
   const earthChapter = useEarthChapterStore((state) => state.progress);
-  const rawThreadProgress = useSpiritThreadStore((state) => state.progress);
-  const rawCenterProgress = useSpiritCenterStore((state) => state.progress);
-  const rawCouncilProgress = useSpiritCouncilStore((state) => state.progress);
-  const rawDecisionProgress = useSpiritDecisionStore((state) => state.progress);
-  const rawReturnProgress = useSpiritReturnStore((state) => state.progress);
-  const rawOrbProgress = useSpiritOrbStore((state) => state.progress);
+  const rawThread = useSpiritThreadStore((state) => state.progress);
+  const rawCenter = useSpiritCenterStore((state) => state.progress);
+  const rawCouncil = useSpiritCouncilStore((state) => state.progress);
+  const rawDecision = useSpiritDecisionStore((state) => state.progress);
+  const rawReturn = useSpiritReturnStore((state) => state.progress);
+  const rawOrb = useSpiritOrbStore((state) => state.progress);
+  const rawChapter = useSpiritChapterStore((state) => state.progress);
+
   const sourceEarthCycleId = earthChapter?.cycleId ?? earthChapter?.completedAt;
-  const threadProgress = sourceEarthCycleId && rawThreadProgress?.sourceEarthCycleId === sourceEarthCycleId ? rawThreadProgress : undefined;
-  const threadCompleted = threadProgress?.status === 'completed' && threadProgress.possibleSynthesisThreadCreated;
-  const sourceThreadId = threadCompleted && threadProgress ? threadProgress.completedAt ?? `${threadProgress.sourceEarthCycleId}:possible-synthesis-thread` : undefined;
-  const centerProgress = sourceThreadId && rawCenterProgress?.sourceThreadId === sourceThreadId ? rawCenterProgress : undefined;
-  const centerCompleted = centerProgress?.status === 'completed' && centerProgress.provisionalCenterKnotCreated;
-  const sourceCenterId = centerCompleted && centerProgress ? centerProgress.completedAt ?? `${centerProgress.sourceThreadId}:provisional-center-knot` : undefined;
-  const councilProgress = sourceCenterId && rawCouncilProgress?.sourceCenterId === sourceCenterId ? rawCouncilProgress : undefined;
-  const councilCompleted = councilProgress?.status === 'completed' && councilProgress.openCouncilSealCreated;
-  const sourceCouncilId = councilCompleted && councilProgress ? councilProgress.completedAt ?? `${councilProgress.sourceCenterId}:open-council-seal` : undefined;
-  const decisionProgress = sourceCouncilId && rawDecisionProgress?.sourceCouncilId === sourceCouncilId ? rawDecisionProgress : undefined;
-  const decisionCompleted = decisionProgress?.status === 'completed' && decisionProgress.revisableDecisionMarkCreated;
-  const sourceDecisionId = decisionCompleted && decisionProgress ? decisionProgress.completedAt ?? `${decisionProgress.sourceCouncilId}:revisable-decision-mark` : undefined;
-  const returnProgress = sourceDecisionId && rawReturnProgress?.sourceDecisionId === sourceDecisionId ? rawReturnProgress : undefined;
-  const returnCompleted = returnProgress?.status === 'completed' && returnProgress.possibleReturnKeyCreated;
-  const sourceReturnKeyId = returnCompleted && returnProgress ? returnProgress.completedAt ?? `${returnProgress.sourceDecisionId}:possible-return-key` : undefined;
-  const orbProgress = sourceReturnKeyId && rawOrbProgress?.sourceReturnKeyId === sourceReturnKeyId ? rawOrbProgress : undefined;
-  const orbCreated = Boolean(orbProgress?.orbCreated);
-  const orbIntegrated = orbProgress?.status === 'integrated';
+  const thread = sourceEarthCycleId && rawThread?.sourceEarthCycleId === sourceEarthCycleId ? rawThread : undefined;
+  const threadCompleted = thread?.status === 'completed' && thread.possibleSynthesisThreadCreated;
+  const sourceThreadId = threadCompleted && thread ? thread.completedAt ?? `${thread.sourceEarthCycleId}:possible-synthesis-thread` : undefined;
+  const center = sourceThreadId && rawCenter?.sourceThreadId === sourceThreadId ? rawCenter : undefined;
+  const centerCompleted = center?.status === 'completed' && center.provisionalCenterKnotCreated;
+  const sourceCenterId = centerCompleted && center ? center.completedAt ?? `${center.sourceThreadId}:provisional-center-knot` : undefined;
+  const council = sourceCenterId && rawCouncil?.sourceCenterId === sourceCenterId ? rawCouncil : undefined;
+  const councilCompleted = council?.status === 'completed' && council.openCouncilSealCreated;
+  const sourceCouncilId = councilCompleted && council ? council.completedAt ?? `${council.sourceCenterId}:open-council-seal` : undefined;
+  const decision = sourceCouncilId && rawDecision?.sourceCouncilId === sourceCouncilId ? rawDecision : undefined;
+  const decisionCompleted = decision?.status === 'completed' && decision.revisableDecisionMarkCreated;
+  const sourceDecisionId = decisionCompleted && decision ? decision.completedAt ?? `${decision.sourceCouncilId}:revisable-decision-mark` : undefined;
+  const spiritReturn = sourceDecisionId && rawReturn?.sourceDecisionId === sourceDecisionId ? rawReturn : undefined;
+  const returnCompleted = spiritReturn?.status === 'completed' && spiritReturn.possibleReturnKeyCreated;
+  const sourceReturnKeyId = returnCompleted && spiritReturn ? spiritReturn.completedAt ?? `${spiritReturn.sourceDecisionId}:possible-return-key` : undefined;
+  const orb = sourceReturnKeyId && rawOrb?.sourceReturnKeyId === sourceReturnKeyId ? rawOrb : undefined;
+  const orbCreated = Boolean(orb?.orbCreated);
+  const orbIntegrated = orb?.status === 'integrated';
+  const sourceOrbId = orb?.craftedAt ?? (orb ? `${orb.sourceReturnKeyId}:orb` : undefined);
+  const chapter = sourceOrbId && rawChapter?.sourceOrbId === sourceOrbId ? rawChapter : undefined;
+  const chapterCompleted = chapter?.status === 'completed';
   const available = Boolean(earthChapter?.status === 'completed' || (sanctuary && sanctuary.status !== 'dormant' && sanctuary.status !== 'hidden'));
 
   if (!available) {
     return <div className="page page--spirit"><PageHeader eyebrow="Capítulo do Espírito" title="O Santuário ainda está adormecido." description="Conclua a revisão geral da Terra. O Santuário não é aberto apenas pela criação ou pelo posicionamento da Pedra."/><Card title="Caminho ainda fechado" eyebrow="Dependência da jornada"><div className="spirit-lock"><LockKeyhole/><p>Integre e posicione a Pedra e escolha o destino das cinco práticas da Terra.</p></div><Button onClick={() => navigate('/review/earth-chapter')}>Revisar o capítulo da Terra</Button></Card></div>;
   }
 
-  const nodes = chainNodeIds.map((id) => allSpiritNodes.find((node) => node.id === id)).filter((node): node is SymbolicNode => Boolean(node)).map((node) => resolveNode(node, enabledLayers));
-  const heroState = orbIntegrated
-    ? { title: orbProgress?.positioned ? 'Orbe integrado e posicionado' : 'Orbe integrado', description: 'O item preserva as cinco práticas sem afirmar completude ou concluir o capítulo.' }
-    : orbCreated
-      ? { title: 'Orbe criado', description: 'A fórmula existe, mas ainda exige revisão explícita antes de qualquer integração.' }
-      : orbProgress
-        ? { title: 'Tecelagem em andamento', description: 'O Orbe pode ser ajustado ou pausado sem perder seus cinco componentes.' }
-        : returnCompleted
-          ? { title: 'Cinco componentes reunidos', description: 'A receita do Orbe está disponível sem exigir decisão, retorno ou coerência.' }
-          : returnProgress
-            ? { title: 'Quinta missão em andamento', description: 'O retorno fictício pode ser mantido, reduzido, refeito uma vez, arquivado ou encerrado.' }
-            : decisionCompleted
-              ? { title: 'Quarto componente criado', description: 'A Marca preserva decisões limitadas e permite observar o que mudou sem cobrança.' }
-              : decisionProgress
-                ? { title: 'Quarta missão em andamento', description: 'A decisão fictícia pode ser confirmada, reduzida, alterada, retirada ou recusada.' }
-                : councilCompleted
-                  ? { title: 'Terceiro componente criado', description: 'O Selo preserva fala, passagem, desconhecimento e discordância e permite revisar uma decisão.' }
-                  : councilProgress
-                    ? { title: 'Terceira missão em andamento', description: 'O conselho pode ser retomado sem votação, prazo ou perda de progresso.' }
-                    : centerCompleted
-                      ? { title: 'Segundo componente criado', description: 'O Nó preserva uma centralidade temporária, vazia ou recusada e permite abrir o conselho.' }
-                      : centerProgress
-                        ? { title: 'Segunda missão em andamento', description: 'O centro provisório pode ser alternado, removido ou recusado sem perder o Fio.' }
-                        : threadCompleted
-                          ? { title: 'Primeiro componente criado', description: 'O Fio está disponível e a segunda missão pode começar sem exigir coerência entre as partes.' }
-                          : threadProgress
-                            ? { title: 'Primeira missão em andamento', description: 'A missão pode ser retomada sem streak, prazo ou perda de progresso.' }
-                            : { title: 'Fundação disponível', description: 'O primeiro ciclo da Terra foi registrado e a primeira missão do Espírito está disponível.' };
+  const nodes = chainNodeIds
+    .map((id) => allSpiritNodes.find((node) => node.id === id))
+    .filter((node): node is SymbolicNode => Boolean(node))
+    .map((node) => resolveNode(node, enabledLayers));
 
-  return <div className="page page--spirit"><PageHeader eyebrow="Santuário do Espírito" title={orbIntegrated ? 'O Orbe preserva um conjunto possível e revisado.' : returnCompleted ? 'Os cinco componentes podem formar um Orbe revisável.' : decisionCompleted ? 'A decisão pode ser revisitada sem condenação.' : councilCompleted ? 'O conselho pode revisar uma decisão provisória.' : centerCompleted ? 'O centro provisório pode abrir um conselho.' : threadCompleted ? 'O Fio pode receber um centro provisório.' : 'As partes podem ser vistas juntas sem perder suas diferenças.'} description="O quinto elemento trabalha síntese entre palavra, emoção, impulso, corpo e ação. Não produz diagnóstico, leitura oculta ou previsão."/><div className="spirit-foundation-grid">
-    <Card className="spirit-hero-card"><div className="spirit-hero-symbol" aria-hidden="true"><Sparkles/></div><div><p className="eyebrow">Estado do Santuário</p><h2>{heroState.title}</h2><p>{heroState.description}</p></div></Card>
+  const heroTitle = chapterCompleted
+    ? 'Santuário restaurado e Nova Obra aberta'
+    : orb?.positioned
+      ? 'Orbe posicionado e revisão geral disponível'
+      : orbIntegrated
+        ? 'Orbe integrado'
+        : orbCreated
+          ? 'Orbe criado'
+          : returnCompleted
+            ? 'Cinco componentes reunidos'
+            : threadCompleted
+              ? 'O percurso do Espírito está em andamento'
+              : 'Fundação disponível';
+  const heroDescription = chapterCompleted
+    ? 'O primeiro percurso elemental foi registrado sem apagar partes, itens ou ciclos anteriores.'
+    : orb?.positioned
+      ? 'O item está pronto para a revisão das cinco práticas e para o fechamento do primeiro percurso.'
+      : orbIntegrated
+        ? 'O item ainda precisa ser posicionado antes do encerramento do capítulo.'
+        : orbCreated
+          ? 'A fórmula existe, mas ainda exige revisão explícita.'
+          : 'As práticas avançam sem pontuação de coerência, promessa de completude ou ação obrigatória.';
+
+  return <div className="page page--spirit"><PageHeader eyebrow={chapterCompleted ? 'Santuário restaurado' : 'Santuário do Espírito'} title={chapterCompleted ? 'O primeiro percurso foi concluído sem fechar o Templo.' : 'As partes podem ser vistas juntas sem perder suas diferenças.'} description="O quinto elemento trabalha síntese entre palavra, emoção, impulso, corpo e ação. Não produz diagnóstico, leitura oculta ou previsão."/><div className="spirit-foundation-grid">
+    <Card className="spirit-hero-card"><div className="spirit-hero-symbol" aria-hidden="true"><Sparkles/></div><div><p className="eyebrow">Estado do Santuário</p><h2>{heroTitle}</h2><p>{heroDescription}</p></div></Card>
     <Card title={spiritFoundationBiblicalUnit.title} eyebrow={spiritFoundationBiblicalUnit.reference}><blockquote>{spiritFoundationBiblicalUnit.principle}</blockquote><p>{spiritFoundationBiblicalUnit.context}</p><div className="provenance-inline"><BookOpenText size={17}/><span>A Bíblia permanece como núcleo. Sefer, Cabala, I Ching e Tarot aparecem apenas como camadas opcionais e identificadas.</span></div></Card>
-    <Card title="O Fio que Reúne" eyebrow="Primeira missão do Espírito"><div className="spirit-mission-preview">{threadCompleted ? <CheckCircle2/> : <Circle/>}<div><strong>{threadCompleted ? 'Fio da Síntese Possível criado' : 'Síntese sem apagamento'}</strong><p>{threadCompleted ? 'O componente não representa coerência, iluminação ou ausência de conflito.' : 'Distinguir e reunir cinco dimensões, mantendo desconhecimento, pausa, recusa e não agir.'}</p></div></div><Button onClick={() => navigate('/mission/thread-that-gathers')}>{threadCompleted ? 'Revisar o Fio criado' : threadProgress ? 'Continuar O Fio que Reúne' : 'Iniciar O Fio que Reúne'}</Button></Card>
-    {threadCompleted && <Card title="O Centro que Não Apaga as Partes" eyebrow="Segunda missão do Espírito"><div className="spirit-mission-preview">{centerCompleted ? <CheckCircle2/> : <GitBranch/>}<div><strong>{centerCompleted ? 'Nó do Centro Provisório criado' : 'Centralidade temporária e revisável'}</strong><p>{centerCompleted ? 'O componente preserva o histórico sem tornar uma dimensão superior.' : 'Escolher, alternar ou recusar um centro sem apagar o conjunto.'}</p></div></div><Button onClick={() => navigate('/mission/center-without-erasing-parts')}>{centerCompleted ? 'Revisar o Nó criado' : centerProgress ? 'Continuar a missão' : 'Iniciar a segunda missão'}</Button></Card>}
-    {centerCompleted && <Card title="O Conselho das Partes" eyebrow="Terceira missão do Espírito"><div className="spirit-mission-preview">{councilCompleted ? <CheckCircle2/> : <Circle/>}<div><strong>{councilCompleted ? 'Selo do Conselho Aberto criado' : 'Escuta sem maioria obrigatória'}</strong><p>{councilCompleted ? 'O componente preserva discordâncias e não converte quantidade de vozes em verdade.' : 'Permitir que cada parte fale, passe ou permaneça desconhecida.'}</p></div></div><Button onClick={() => navigate('/mission/council-of-parts')}>{councilCompleted ? 'Revisar o Selo criado' : councilProgress ? 'Continuar o conselho' : 'Iniciar a terceira missão'}</Button></Card>}
-    {councilCompleted && <Card title="A Decisão que Permanece Aberta" eyebrow="Quarta missão do Espírito"><div className="spirit-mission-preview">{decisionCompleted ? <CheckCircle2/> : <GitBranch/>}<div><strong>{decisionCompleted ? 'Marca da Decisão Revisável criada' : 'Decisão sem promessa ou obediência'}</strong><p>{decisionCompleted ? 'O componente preserva revisão, discordância, retirada e ausência de compromisso.' : 'Confirmar, reduzir, alterar, retirar ou não assumir uma decisão fictícia.'}</p></div></div><Button onClick={() => navigate('/mission/decision-that-remains-open')}>{decisionCompleted ? 'Revisar a Marca criada' : decisionProgress ? 'Continuar a decisão' : 'Iniciar a quarta missão'}</Button></Card>}
-    {decisionCompleted && <Card title="O Retorno que Não Condena" eyebrow="Quinta missão do Espírito"><div className="spirit-mission-preview">{returnCompleted ? <CheckCircle2/> : <RotateCcw/>}<div><strong>{returnCompleted ? 'Chave do Retorno Possível criada' : 'Revisão sem repetição obrigatória'}</strong><p>{returnCompleted ? 'O componente preserva resultado desconhecido, arquivo e não retomada.' : 'Comparar decisão e observação, reconhecer mudanças e escolher voltar ou não voltar.'}</p></div></div><Button onClick={() => navigate('/mission/return-without-condemnation')}>{returnCompleted ? 'Revisar a Chave criada' : returnProgress ? 'Continuar o retorno' : 'Iniciar a quinta missão'}</Button></Card>}
-    {returnCompleted && <Card title="Orbe da Integração Possível" eyebrow="Crafting do Espírito"><div className="spirit-mission-preview">{orbIntegrated ? <CheckCircle2/> : <Circle/>}<div><strong>{orbIntegrated ? 'Orbe integrado' : orbCreated ? 'Orbe criado e aguardando integração' : 'Cinco componentes disponíveis'}</strong><p>{orbIntegrated ? 'O item preserva as partes sem representar completude ou iluminação.' : 'Definir uma fórmula temporária, revisar, ajustar, repousar ou integrar.'}</p></div></div><Button onClick={() => navigate('/crafting/possible-integration-orb')}>{orbIntegrated ? 'Revisar o Orbe' : orbProgress ? 'Continuar a tecelagem' : 'Iniciar a tecelagem'}</Button></Card>}
+    <SpiritMissionCard title="O Fio que Reúne" eyebrow="Primeira missão" completed={Boolean(threadCompleted)} active={Boolean(thread)} route="/mission/thread-that-gathers" component="Fio da Síntese Possível"/>
+    {threadCompleted && <SpiritMissionCard title="O Centro que Não Apaga as Partes" eyebrow="Segunda missão" completed={Boolean(centerCompleted)} active={Boolean(center)} route="/mission/center-without-erasing-parts" component="Nó do Centro Provisório" icon="branch"/>}
+    {centerCompleted && <SpiritMissionCard title="O Conselho das Partes" eyebrow="Terceira missão" completed={Boolean(councilCompleted)} active={Boolean(council)} route="/mission/council-of-parts" component="Selo do Conselho Aberto"/>}
+    {councilCompleted && <SpiritMissionCard title="A Decisão que Permanece Aberta" eyebrow="Quarta missão" completed={Boolean(decisionCompleted)} active={Boolean(decision)} route="/mission/decision-that-remains-open" component="Marca da Decisão Revisável" icon="branch"/>}
+    {decisionCompleted && <SpiritMissionCard title="O Retorno que Não Condena" eyebrow="Quinta missão" completed={Boolean(returnCompleted)} active={Boolean(spiritReturn)} route="/mission/return-without-condemnation" component="Chave do Retorno Possível" icon="return"/>}
+    {returnCompleted && <Card title="Orbe da Integração Possível" eyebrow="Crafting do Espírito"><div className="spirit-mission-preview">{orbIntegrated ? <CheckCircle2/> : <Circle/>}<div><strong>{orb?.positioned ? 'Orbe integrado e posicionado' : orbIntegrated ? 'Orbe integrado' : orbCreated ? 'Orbe criado e aguardando revisão' : 'Cinco componentes disponíveis'}</strong><p>O item reúne as práticas sem representar completude, pureza ou iluminação.</p></div></div><Button onClick={() => navigate('/crafting/possible-integration-orb')}>{orbIntegrated ? 'Abrir o Orbe' : orb ? 'Continuar a tecelagem' : 'Iniciar a tecelagem'}</Button></Card>}
+    {orb?.positioned && !chapterCompleted && <Card title="Encerramento do Espírito" eyebrow="Revisão geral disponível"><div className="safety-summary"><ShieldCheck/><p>Escolha o destino das cinco práticas. Preservar, repousar e arquivar têm o mesmo valor.</p></div><Button onClick={() => navigate('/review/spirit-chapter')}>Revisar o capítulo do Espírito</Button></Card>}
+    {chapterCompleted && <Card title="Nova Obra" eyebrow="Modo contínuo"><div className="spirit-mission-preview"><Sparkles/><div><strong>Novos pontos sem apagar ciclos</strong><p>Revisite Palavra, Água, Fogo, Terra ou Espírito; somente observe ou registre repouso.</p></div></div><Button onClick={() => navigate('/temple/new-work')}>Abrir a Nova Obra</Button></Card>}
     <Card title="Cinco dimensões" eyebrow="Sem pontuação de coerência"><div className="spirit-dimension-grid">{spiritSynthesisDimensions.map((dimension) => <article key={dimension.id}><strong>{dimension.label}</strong><p>{dimension.description}</p></article>)}</div></Card>
-    {threadCompleted && <Card title="Instrumentos do Espírito" eyebrow={orbCreated ? 'Cinco componentes e um item' : returnCompleted ? 'Cinco componentes' : decisionCompleted ? 'Quatro componentes' : councilCompleted ? 'Três componentes' : centerCompleted ? 'Dois componentes' : 'Primeiro componente'}><div className="spirit-mission-preview"><Sparkles/><div><strong>Fio da Síntese Possível</strong><p>Registra a primeira prática sem interpretar identidade ou condição espiritual.</p></div></div>{centerCompleted && <div className="spirit-mission-preview"><GitBranch/><div><strong>Nó do Centro Provisório</strong><p>Registra foco temporário, alternância, ausência de centro ou recusa.</p></div></div>}{councilCompleted && <div className="spirit-mission-preview"><Circle/><div><strong>Selo do Conselho Aberto</strong><p>Registra participação, discordância e decisão provisória, adiada ou ausente.</p></div></div>}{decisionCompleted && <div className="spirit-mission-preview"><GitBranch/><div><strong>Marca da Decisão Revisável</strong><p>Registra confirmação limitada, redução, alteração, retirada ou ausência de compromisso.</p></div></div>}{returnCompleted && <div className="spirit-mission-preview"><RotateCcw/><div><strong>Chave do Retorno Possível</strong><p>Registra observação, mudança de contexto, arquivo, retorno limitado ou não retomada.</p></div></div>}{orbCreated && <div className="spirit-mission-preview"><Circle/><div><strong>Orbe da Integração Possível</strong><p>Reúne os cinco componentes em uma fórmula temporária, revisável e posicionável.</p></div></div>}</Card>}
     <Card title="Cadeia opcional" eyebrow="Proveniência por camada"><div className="spirit-chain-grid">{nodes.map((node) => <article key={node.id} className="spirit-chain-node"><span className={`provenance-badge provenance-badge--${node.provenance.class.toLowerCase()}`}>{node.provenance.class}</span><h3>{node.name}</h3><p>{node.description}</p><small>{node.provenance.label}</small></article>)}</div></Card>
-    <Card title="Limites do Santuário" eyebrow="Segurança"><div className="safety-summary"><ShieldCheck/><p>Integração não significa pureza, completude ou ausência de conflito. Criar ou posicionar o Orbe não conclui automaticamente o capítulo.</p></div><div className="spirit-actions"><Button variant="secondary" onClick={() => navigate('/temple/garden')}>Visitar o Jardim restaurado</Button><Button variant="ghost" onClick={() => navigate('/safety?source=spirit')}>Abrir apoio direto</Button></div></Card>
+    <Card title="Limites do Santuário" eyebrow="Segurança"><div className="safety-summary"><ShieldCheck/><p>Integração não significa pureza, completude ou ausência de conflito. Concluir o percurso não encerra o Templo nem cria obrigação de começar outro.</p></div><div className="spirit-actions"><Button variant="secondary" onClick={() => navigate('/temple/garden')}>Visitar o Jardim restaurado</Button><Button variant="ghost" onClick={() => navigate('/safety?source=spirit')}>Abrir apoio direto</Button></div></Card>
   </div></div>;
+}
+
+interface SpiritMissionCardProps {
+  title: string;
+  eyebrow: string;
+  completed: boolean;
+  active: boolean;
+  route: string;
+  component: string;
+  icon?: 'branch' | 'return';
+}
+
+function SpiritMissionCard({ title, eyebrow, completed, active, route, component, icon }: SpiritMissionCardProps) {
+  const navigate = useNavigate();
+  const Icon = icon === 'branch' ? GitBranch : icon === 'return' ? RotateCcw : Circle;
+  return <Card title={title} eyebrow={eyebrow}><div className="spirit-mission-preview">{completed ? <CheckCircle2/> : <Icon/>}<div><strong>{completed ? `${component} criado` : 'Prática disponível'}</strong><p>{completed ? 'O componente permanece disponível sem definir identidade ou condição espiritual.' : 'A prática pode ser iniciada, retomada, pausada ou recusada.'}</p></div></div><Button onClick={() => navigate(route)}>{completed ? 'Revisar componente' : active ? 'Continuar missão' : 'Iniciar missão'}</Button></Card>;
 }
