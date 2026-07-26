@@ -10,6 +10,7 @@ import { CodexPage } from '../pages/CodexPage';
 import { CraftingPage } from '../pages/CraftingPage';
 import { DevPage } from '../pages/DevPage';
 import { EarthBodyPage } from '../pages/EarthBodyPage';
+import { EarthChapterReviewPage } from '../pages/EarthChapterReviewPage';
 import { EarthOrderPage } from '../pages/EarthOrderPage';
 import { EarthResourcesPage } from '../pages/EarthResourcesPage';
 import { EarthRhythmPage } from '../pages/EarthRhythmPage';
@@ -33,6 +34,7 @@ import { MissionPage } from '../pages/MissionPage';
 import { PsalmsChamberPage } from '../pages/PsalmsChamberPage';
 import { ReviewPage } from '../pages/ReviewPage';
 import { SafetyPage } from '../pages/SafetyPage';
+import { SpiritSanctuaryPage } from '../pages/SpiritSanctuaryPage';
 import { TempleFoundationPage } from '../pages/TempleFoundationPage';
 import { TemplePage } from '../pages/TemplePage';
 import { WaterChalicePage } from '../pages/WaterChalicePage';
@@ -79,12 +81,14 @@ export function App() {
       <Route path="/temple/psalms-chamber" element={<PsalmsChamberPage/>}/>
       <Route path="/temple/forge" element={<ForgePage/>}/>
       <Route path="/temple/garden" element={<GardenPage/>}/>
+      <Route path="/temple/spirit-sanctuary" element={<SpiritSanctuaryPage/>}/>
       <Route path="/mission/body-arrives-first" element={<EarthBodyPage/>}/>
       <Route path="/mission/work-that-fits-today" element={<EarthWorkPage/>}/>
       <Route path="/mission/house-of-resources" element={<EarthResourcesPage/>}/>
       <Route path="/mission/sustainable-rhythm" element={<EarthRhythmPage/>}/>
       <Route path="/mission/order-that-serves" element={<EarthOrderPage/>}/>
       <Route path="/crafting/first-step-stone" element={<EarthStonePage/>}/>
+      <Route path="/review/earth-chapter" element={<EarthChapterReviewPage/>}/>
       <Route path="/mission/word-before-response" element={<MissionPage/>}/>
       <Route path="/mission/word-before-response/classification" element={<ClassificationPage/>}/>
       <Route path="/mission/word-before-response/chain" element={<ChainPage/>}/>
