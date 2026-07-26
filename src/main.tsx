@@ -29,6 +29,7 @@ import './styles/earth-order.css';
 import './styles/earth-stone.css';
 import './styles/earth-chapter.css';
 import './styles/spirit.css';
+import './styles/spirit-thread.css';
 
 validateContent();
 
