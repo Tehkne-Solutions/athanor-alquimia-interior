@@ -5,6 +5,7 @@ import { Card } from '../components/Card';
 import { PageHeader } from '../components/PageHeader';
 import { useAthanorStore } from '../state/useAthanorStore';
 import { useEarthBodyStore } from '../state/useEarthBodyStore';
+import { useEarthChapterStore } from '../state/useEarthChapterStore';
 import { useEarthOrderStore } from '../state/useEarthOrderStore';
 import { useEarthResourcesStore } from '../state/useEarthResourcesStore';
 import { useEarthRhythmStore } from '../state/useEarthRhythmStore';
@@ -44,6 +45,7 @@ export function DevPage() {
   const resetEarthRhythm = useEarthRhythmStore((state) => state.reset);
   const resetEarthOrder = useEarthOrderStore((state) => state.reset);
   const resetEarthStone = useEarthStoneStore((state) => state.reset);
+  const resetEarthChapter = useEarthChapterStore((state) => state.reset);
   const lamentProgress = useWaterLamentStore((state) => state.progress);
   const memoryProgress = useWaterMemoryStore((state) => state.progress);
   const trustProgress = useWaterTrustStore((state) => state.progress);
@@ -62,6 +64,7 @@ export function DevPage() {
   const earthRhythmProgress = useEarthRhythmStore((state) => state.progress);
   const earthOrderProgress = useEarthOrderStore((state) => state.progress);
   const earthStoneProgress = useEarthStoneStore((state) => state.progress);
+  const earthChapterProgress = useEarthChapterStore((state) => state.progress);
   const state = useAthanorStore();
 
   const reset = async () => {
@@ -84,6 +87,7 @@ export function DevPage() {
     resetEarthRhythm();
     resetEarthOrder();
     resetEarthStone();
+    resetEarthChapter();
     navigate('/welcome');
   };
 
@@ -92,7 +96,7 @@ export function DevPage() {
     character: state.character?.name,
     workLevel: state.character?.workLevel,
     temple: state.temple?.theme,
-    rooms: state.temple?.rooms.map((room) => ({ id: room.roomId, status: room.status, progress: room.restorationProgress })),
+    rooms: state.temple?.rooms.map((room) => ({ id: room.roomId, name: room.name, status: room.status, progress: room.restorationProgress })),
     mission: state.activeMission?.status,
     water: state.waterJourney?.status,
     lament: lamentProgress?.status,
@@ -113,6 +117,7 @@ export function DevPage() {
     earthRhythm: earthRhythmProgress ? { status: earthRhythmProgress.status, frequency: earthRhythmProgress.frequency, actionUnit: earthRhythmProgress.actionUnit, rest: earthRhythmProgress.rest, resourceMode: earthRhythmProgress.resourceMode, resume: earthRhythmProgress.resume, decision: earthRhythmProgress.decision, rhythmCompassCreated: earthRhythmProgress.rhythmCompassCreated } : undefined,
     earthOrder: earthOrderProgress ? { status: earthOrderProgress.status, activeLimit: earthOrderProgress.activeLimit, itemStates: earthOrderProgress.itemStates, visibleOrder: earthOrderProgress.visibleOrder, priority: earthOrderProgress.priority, reviewRule: earthOrderProgress.reviewRule, decision: earthOrderProgress.decision, possibleOrderMapCreated: earthOrderProgress.possibleOrderMapCreated } : undefined,
     earthStone: earthStoneProgress ? { status: earthStoneProgress.status, function: earthStoneProgress.function, smallStep: earthStoneProgress.smallStep, resource: earthStoneProgress.resource, rhythm: earthStoneProgress.rhythm, activeLimit: earthStoneProgress.activeLimit, reviewWindow: earthStoneProgress.reviewWindow, stoneCreated: earthStoneProgress.stoneCreated, positioned: earthStoneProgress.positioned } : undefined,
+    earthChapter: earthChapterProgress ? { status: earthChapterProgress.status, cycleId: earthChapterProgress.cycleId, destinations: earthChapterProgress.destinations } : undefined,
     inventory: state.inventory.map((item) => item.name)
   }, null, 2)}</pre></Card><Card title="Ações"><Button variant="danger" onClick={reset}><RotateCcw size={18}/> Resetar todo o estado</Button></Card></div></div>;
 }
