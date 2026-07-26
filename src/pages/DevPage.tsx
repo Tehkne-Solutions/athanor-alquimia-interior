@@ -18,6 +18,7 @@ import { useFireIntervalStore } from '../state/useFireIntervalStore';
 import { useFireMissionStore } from '../state/useFireMissionStore';
 import { useFireShieldStore } from '../state/useFireShieldStore';
 import { useFireTransformationStore } from '../state/useFireTransformationStore';
+import { useSpiritCenterStore } from '../state/useSpiritCenterStore';
 import { useSpiritThreadStore } from '../state/useSpiritThreadStore';
 import { useWaterChaliceStore } from '../state/useWaterChaliceStore';
 import { useWaterChapterStore } from '../state/useWaterChapterStore';
@@ -48,6 +49,7 @@ export function DevPage() {
   const resetEarthStone = useEarthStoneStore((state) => state.reset);
   const resetEarthChapter = useEarthChapterStore((state) => state.reset);
   const resetSpiritThread = useSpiritThreadStore((state) => state.reset);
+  const resetSpiritCenter = useSpiritCenterStore((state) => state.reset);
   const lamentProgress = useWaterLamentStore((state) => state.progress);
   const memoryProgress = useWaterMemoryStore((state) => state.progress);
   const trustProgress = useWaterTrustStore((state) => state.progress);
@@ -68,6 +70,7 @@ export function DevPage() {
   const earthStoneProgress = useEarthStoneStore((state) => state.progress);
   const earthChapterProgress = useEarthChapterStore((state) => state.progress);
   const spiritThreadProgress = useSpiritThreadStore((state) => state.progress);
+  const spiritCenterProgress = useSpiritCenterStore((state) => state.progress);
   const state = useAthanorStore();
 
   const reset = async () => {
@@ -92,6 +95,7 @@ export function DevPage() {
     resetEarthStone();
     resetEarthChapter();
     resetSpiritThread();
+    resetSpiritCenter();
     navigate('/welcome');
   };
 
@@ -123,6 +127,7 @@ export function DevPage() {
     earthStone: earthStoneProgress ? { status: earthStoneProgress.status, function: earthStoneProgress.function, smallStep: earthStoneProgress.smallStep, resource: earthStoneProgress.resource, rhythm: earthStoneProgress.rhythm, activeLimit: earthStoneProgress.activeLimit, reviewWindow: earthStoneProgress.reviewWindow, stoneCreated: earthStoneProgress.stoneCreated, positioned: earthStoneProgress.positioned } : undefined,
     earthChapter: earthChapterProgress ? { status: earthChapterProgress.status, cycleId: earthChapterProgress.cycleId, destinations: earthChapterProgress.destinations } : undefined,
     spiritThread: spiritThreadProgress ? { status: spiritThreadProgress.status, scenarioId: spiritThreadProgress.scenarioId, relation: spiritThreadProgress.relation, decision: spiritThreadProgress.decision, synthesisDeclined: spiritThreadProgress.synthesisDeclined, possibleSynthesisThreadCreated: spiritThreadProgress.possibleSynthesisThreadCreated } : undefined,
+    spiritCenter: spiritCenterProgress ? { status: spiritCenterProgress.status, scenarioId: spiritCenterProgress.scenarioId, centralDimension: spiritCenterProgress.centralDimension, noCenter: spiritCenterProgress.noCenter, focusHistory: spiritCenterProgress.focusHistory, decision: spiritCenterProgress.decision, centerDeclined: spiritCenterProgress.centerDeclined, provisionalCenterKnotCreated: spiritCenterProgress.provisionalCenterKnotCreated } : undefined,
     inventory: state.inventory.map((item) => item.name)
   }, null, 2)}</pre></Card><Card title="Ações"><Button variant="danger" onClick={reset}><RotateCcw size={18}/> Resetar todo o estado</Button></Card></div></div>;
 }
