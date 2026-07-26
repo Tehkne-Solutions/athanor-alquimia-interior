@@ -71,9 +71,13 @@ describe('spiritDecision', () => {
     expect(canCompleteSpiritDecision(progress, 8)).toBe(true);
   });
 
-  it('impede ausência de janela para decisões confirmadas', () => {
+  it('impede ausência de janela ou condição para decisões confirmadas', () => {
     let progress = readyProgress();
     progress = setSpiritDecisionReviewWindow(progress, 'none', stamp);
+    expect(canCompleteSpiritDecision(progress, 8)).toBe(false);
+
+    progress = readyProgress();
+    progress = setSpiritDecisionReviewCondition(progress, 'none', stamp);
     expect(canCompleteSpiritDecision(progress, 8)).toBe(false);
   });
 });
