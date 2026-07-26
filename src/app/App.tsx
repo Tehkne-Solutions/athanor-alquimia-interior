@@ -35,6 +35,7 @@ import { PsalmsChamberPage } from '../pages/PsalmsChamberPage';
 import { ReviewPage } from '../pages/ReviewPage';
 import { SafetyPage } from '../pages/SafetyPage';
 import { SpiritCenterPage } from '../pages/SpiritCenterPage';
+import { SpiritCouncilPage } from '../pages/SpiritCouncilPage';
 import { SpiritSanctuaryPage } from '../pages/SpiritSanctuaryPage';
 import { SpiritThreadPage } from '../pages/SpiritThreadPage';
 import { TempleFoundationPage } from '../pages/TempleFoundationPage';
@@ -86,6 +87,7 @@ export function App() {
       <Route path="/temple/spirit-sanctuary" element={<SpiritSanctuaryPage/>}/>
       <Route path="/mission/thread-that-gathers" element={<SpiritThreadPage/>}/>
       <Route path="/mission/center-without-erasing-parts" element={<SpiritCenterPage/>}/>
+      <Route path="/mission/council-of-parts" element={<SpiritCouncilPage/>}/>
       <Route path="/mission/body-arrives-first" element={<EarthBodyPage/>}/>
       <Route path="/mission/work-that-fits-today" element={<EarthWorkPage/>}/>
       <Route path="/mission/house-of-resources" element={<EarthResourcesPage/>}/>
