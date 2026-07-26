@@ -5,11 +5,20 @@ export type ContinuousTrailStage = 'orientation' | 'observation' | 'review';
 export type ContinuousTrailStageResult = 'pending' | 'completed' | 'passed' | 'paused';
 export type ContinuousTrailStatus = 'active' | 'paused' | 'completed';
 export type ContinuousTrailAdvanceResult = 'completed' | 'passed';
+export type ContinuousTrailVariantAction = 'initial' | 'kept' | 'rotated';
 
 export interface ContinuousTrailStageProgress {
   stage: ContinuousTrailStage;
   result: ContinuousTrailStageResult;
   completedAt?: string;
+}
+
+export interface ContinuousTrailVariantSelection {
+  sequence: number;
+  variantId: string;
+  action: ContinuousTrailVariantAction;
+  catalogVersion: string;
+  selectedAt: string;
 }
 
 export interface ContinuousTrailInstance {
@@ -20,6 +29,9 @@ export interface ContinuousTrailInstance {
   startPoint: NewWorkStartPoint;
   contentSeed: string;
   contentVariantId: string;
+  catalogVersion?: string;
+  variantRotationCount?: number;
+  variantHistory?: ContinuousTrailVariantSelection[];
   status: ContinuousTrailStatus;
   currentStage: ContinuousTrailStage;
   practiceId?: string;
@@ -41,6 +53,7 @@ export interface ContinuousTrailProgress {
 }
 
 const stageOrder: ContinuousTrailStage[] = ['orientation', 'observation', 'review'];
+const legacyCatalogVersion = '1.0.0';
 
 export function createContinuousTrailProgress(createdAt: string): ContinuousTrailProgress {
   return {
@@ -61,6 +74,35 @@ export function deriveContinuousTrailVariantIndex(seed: string, size: number): n
   return (hash >>> 0) % size;
 }
 
+export function selectNextContinuousTrailVariantId(
+  seed: string,
+  currentVariantId: string,
+  candidateVariantIds: string[],
+  requestCount: number,
+  catalogVersion: string
+): string {
+  if (candidateVariantIds.length === 0) return currentVariantId;
+  if (candidateVariantIds.length === 1) return candidateVariantIds[0];
+  const index = deriveContinuousTrailVariantIndex(
+    `${seed}:catalog:${catalogVersion}:request:${requestCount}`,
+    candidateVariantIds.length
+  );
+  const candidate = candidateVariantIds[index];
+  if (candidate !== currentVariantId) return candidate;
+  return candidateVariantIds[(index + 1) % candidateVariantIds.length];
+}
+
+export function getContinuousTrailVariantHistory(trail: ContinuousTrailInstance): ContinuousTrailVariantSelection[] {
+  if (trail.variantHistory?.length) return trail.variantHistory;
+  return [{
+    sequence: 0,
+    variantId: trail.contentVariantId,
+    action: 'initial',
+    catalogVersion: trail.catalogVersion ?? legacyCatalogVersion,
+    selectedAt: trail.startedAt
+  }];
+}
+
 export function findTrailByCycleInstance(
   progress: ContinuousTrailProgress,
   sourceCycleInstanceId: string
@@ -73,7 +115,8 @@ export function startContinuousTrail(
   cycle: ContinuousCycleInstance,
   trailId: string,
   contentVariantId: string,
-  startedAt: string
+  startedAt: string,
+  catalogVersion = legacyCatalogVersion
 ): ContinuousTrailProgress {
   if (findTrailByCycleInstance(progress, cycle.id)) return progress;
   if (cycle.status !== 'active') return progress;
@@ -94,6 +137,15 @@ export function startContinuousTrail(
     startPoint: cycle.startPoint,
     contentSeed: cycle.contentSeed,
     contentVariantId,
+    catalogVersion,
+    variantRotationCount: 0,
+    variantHistory: [{
+      sequence: 0,
+      variantId: contentVariantId,
+      action: 'initial',
+      catalogVersion,
+      selectedAt: startedAt
+    }],
     status: 'active',
     currentStage: 'orientation',
     noPractice: false,
@@ -123,6 +175,69 @@ function updateTrail(
     trails: progress.trails.map((trail) => trail.id === trailId ? updater(trail) : trail),
     updatedAt
   };
+}
+
+function appendVariantSelection(
+  trail: ContinuousTrailInstance,
+  variantId: string,
+  action: ContinuousTrailVariantAction,
+  catalogVersion: string,
+  selectedAt: string
+): ContinuousTrailVariantSelection[] {
+  const history = getContinuousTrailVariantHistory(trail);
+  return [...history, {
+    sequence: history.length,
+    variantId,
+    action,
+    catalogVersion,
+    selectedAt
+  }];
+}
+
+export function keepContinuousTrailVariant(
+  progress: ContinuousTrailProgress,
+  trailId: string,
+  catalogVersion: string,
+  updatedAt: string
+): ContinuousTrailProgress {
+  return updateTrail(progress, trailId, (trail) => {
+    if (trail.status !== 'active') return trail;
+    return {
+      ...trail,
+      catalogVersion,
+      variantHistory: appendVariantSelection(trail, trail.contentVariantId, 'kept', catalogVersion, updatedAt),
+      updatedAt
+    };
+  }, updatedAt);
+}
+
+export function rotateContinuousTrailVariant(
+  progress: ContinuousTrailProgress,
+  trailId: string,
+  candidateVariantIds: string[],
+  catalogVersion: string,
+  updatedAt: string
+): ContinuousTrailProgress {
+  return updateTrail(progress, trailId, (trail) => {
+    if (trail.status !== 'active' || candidateVariantIds.length < 2) return trail;
+    const requestCount = (trail.variantRotationCount ?? 0) + 1;
+    const nextVariantId = selectNextContinuousTrailVariantId(
+      trail.contentSeed,
+      trail.contentVariantId,
+      candidateVariantIds,
+      requestCount,
+      catalogVersion
+    );
+    if (nextVariantId === trail.contentVariantId) return trail;
+    return {
+      ...trail,
+      contentVariantId: nextVariantId,
+      catalogVersion,
+      variantRotationCount: requestCount,
+      variantHistory: appendVariantSelection(trail, nextVariantId, 'rotated', catalogVersion, updatedAt),
+      updatedAt
+    };
+  }, updatedAt);
 }
 
 export function selectContinuousTrailPractice(
