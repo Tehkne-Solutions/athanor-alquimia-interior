@@ -3,6 +3,7 @@ try {
   await import('../src/content/validateNewWork');
   await import('../src/content/validateContinuousCycle');
   await import('../src/content/validateContinuousTrail');
+  await import('../src/content/validateContinuousVariation');
   console.log('Conteúdo Athanor validado com sucesso.');
 } catch (error) {
   console.error('Falha na validação editorial:');
