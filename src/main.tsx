@@ -24,6 +24,7 @@ import './styles/earth.css';
 import './styles/earth-body.css';
 import './styles/earth-work.css';
 import './styles/earth-resources.css';
+import './styles/earth-rhythm.css';
 
 validateContent();
 
