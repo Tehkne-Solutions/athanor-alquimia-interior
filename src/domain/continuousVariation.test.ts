@@ -59,8 +59,9 @@ describe('continuousVariation', () => {
   it('mantém explicitamente a variante sem trocar o conteúdo', () => {
     const progress = keepContinuousTrailVariant(started(), 'trail-variation-1', catalogVersion, later);
     const trail = progress.trails[0];
+    const history = getContinuousTrailVariantHistory(trail);
     expect(trail.contentVariantId).toBe('water-trail-v1');
-    expect(getContinuousTrailVariantHistory(trail).at(-1)).toEqual(expect.objectContaining({
+    expect(history[history.length - 1]).toEqual(expect.objectContaining({
       variantId: 'water-trail-v1',
       action: 'kept'
     }));
@@ -69,9 +70,10 @@ describe('continuousVariation', () => {
   it('solicita outra variante sem repetir imediatamente a atual', () => {
     const progress = rotateContinuousTrailVariant(started(), 'trail-variation-1', candidates, catalogVersion, later);
     const trail = progress.trails[0];
+    const history = getContinuousTrailVariantHistory(trail);
     expect(trail.contentVariantId).toBe('water-trail-v2');
     expect(trail.variantRotationCount).toBe(1);
-    expect(getContinuousTrailVariantHistory(trail).at(-1)?.action).toBe('rotated');
+    expect(history[history.length - 1]?.action).toBe('rotated');
   });
 
   it('produz a mesma próxima variante para a mesma semente e contador', () => {
