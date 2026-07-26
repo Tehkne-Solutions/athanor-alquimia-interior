@@ -4,6 +4,7 @@ import { Button } from '../components/Button';
 import { Card } from '../components/Card';
 import { PageHeader } from '../components/PageHeader';
 import { useAthanorStore } from '../state/useAthanorStore';
+import { useContinuousCycleStore } from '../state/useContinuousCycleStore';
 import { useContinuousJourneyStore } from '../state/useContinuousJourneyStore';
 import { useEarthBodyStore } from '../state/useEarthBodyStore';
 import { useEarthChapterStore } from '../state/useEarthChapterStore';
@@ -62,6 +63,7 @@ export function DevPage() {
   const resetSpiritOrb = useSpiritOrbStore((state) => state.reset);
   const resetSpiritChapter = useSpiritChapterStore((state) => state.reset);
   const resetContinuousJourney = useContinuousJourneyStore((state) => state.reset);
+  const resetContinuousCycles = useContinuousCycleStore((state) => state.reset);
   const lamentProgress = useWaterLamentStore((state) => state.progress);
   const memoryProgress = useWaterMemoryStore((state) => state.progress);
   const trustProgress = useWaterTrustStore((state) => state.progress);
@@ -89,6 +91,7 @@ export function DevPage() {
   const spiritOrbProgress = useSpiritOrbStore((state) => state.progress);
   const spiritChapterProgress = useSpiritChapterStore((state) => state.progress);
   const continuousProgress = useContinuousJourneyStore((state) => state.progress);
+  const continuousCycleProgress = useContinuousCycleStore((state) => state.progress);
   const state = useAthanorStore();
 
   const reset = async () => {
@@ -120,6 +123,7 @@ export function DevPage() {
     resetSpiritOrb();
     resetSpiritChapter();
     resetContinuousJourney();
+    resetContinuousCycles();
     navigate('/welcome');
   };
 
@@ -158,6 +162,7 @@ export function DevPage() {
     spiritOrb: spiritOrbProgress ? { status: spiritOrbProgress.status, orbCreated: spiritOrbProgress.orbCreated, positioned: spiritOrbProgress.positioned } : undefined,
     spiritChapter: spiritChapterProgress ? { status: spiritChapterProgress.status, cycleId: spiritChapterProgress.cycleId, destinations: spiritChapterProgress.destinations } : undefined,
     continuousJourney: continuousProgress ? { sourceSpiritCycleId: continuousProgress.sourceSpiritCycleId, records: continuousProgress.records } : undefined,
+    continuousCycles: continuousCycleProgress.instances.map((instance) => ({ id: instance.id, sourceRecordId: instance.sourceRecordId, startPoint: instance.startPoint, status: instance.status, comparison: instance.comparison })),
     inventory: state.inventory.map((item) => item.name)
   }, null, 2)}</pre></Card><Card title="Ações"><Button variant="danger" onClick={reset}><RotateCcw size={18}/> Resetar todo o estado</Button></Card></div></div>;
 }
