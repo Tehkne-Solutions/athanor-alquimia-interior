@@ -11,6 +11,7 @@ import { CraftingPage } from '../pages/CraftingPage';
 import { DevPage } from '../pages/DevPage';
 import { EarthBodyPage } from '../pages/EarthBodyPage';
 import { EarthResourcesPage } from '../pages/EarthResourcesPage';
+import { EarthRhythmPage } from '../pages/EarthRhythmPage';
 import { EarthWorkPage } from '../pages/EarthWorkPage';
 import { FireBoundaryPage } from '../pages/FireBoundaryPage';
 import { FireChapterReviewPage } from '../pages/FireChapterReviewPage';
@@ -79,6 +80,7 @@ export function App() {
       <Route path="/mission/body-arrives-first" element={<EarthBodyPage/>}/>
       <Route path="/mission/work-that-fits-today" element={<EarthWorkPage/>}/>
       <Route path="/mission/house-of-resources" element={<EarthResourcesPage/>}/>
+      <Route path="/mission/sustainable-rhythm" element={<EarthRhythmPage/>}/>
       <Route path="/mission/word-before-response" element={<MissionPage/>}/>
       <Route path="/mission/word-before-response/classification" element={<ClassificationPage/>}/>
       <Route path="/mission/word-before-response/chain" element={<ChainPage/>}/>
