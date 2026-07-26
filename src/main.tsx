@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { App } from './app/App';
 import { validateContent } from './content/validate';
+import './content/validateContinuousCycle';
 import './content/validateNewWork';
 import './styles/global.css';
 import './styles/homologation.css';
@@ -38,6 +39,7 @@ import './styles/spirit-return.css';
 import './styles/spirit-orb.css';
 import './styles/spirit-chapter.css';
 import './styles/new-work.css';
+import './styles/continuous-cycle.css';
 
 validateContent();
 
