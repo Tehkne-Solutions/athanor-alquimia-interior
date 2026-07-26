@@ -114,7 +114,7 @@ export function validateContent(): void {
   z.array(fireTransformationStatementSchema).length(10).parse(fireTransformationStatements);
   z.array(earthBodyEntrySchema).length(8).parse(earthBodyEntries);
   z.array(earthWorkEntrySchema).length(8).parse(earthWorkEntries);
-  z.array(earthResourceEntrySchema).length(8).parse(earthResourcesEntries);
+  z.array(earthResourceEntrySchema).length(8).parse(earthResourceEntries);
   z.array(earthRhythmEntrySchema).length(8).parse(earthRhythmEntries);
   z.array(earthOrderEntrySchema).length(8).parse(earthOrderEntries);
   z.array(spiritDimensionSchema).length(5).parse(spiritSynthesisDimensions);
