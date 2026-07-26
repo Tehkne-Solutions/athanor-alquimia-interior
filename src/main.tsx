@@ -5,6 +5,7 @@ import { App } from './app/App';
 import { validateContent } from './content/validate';
 import './content/validateContinuousCycle';
 import './content/validateContinuousTrail';
+import './content/validateContinuousVariation';
 import './content/validateNewWork';
 import './styles/global.css';
 import './styles/homologation.css';
