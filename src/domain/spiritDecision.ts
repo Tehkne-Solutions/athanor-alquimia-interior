@@ -159,6 +159,7 @@ export function canCompleteSpiritDecision(progress: SpiritDecisionProgress, entr
   }
   if (progress.revision === 'no_commitment' && progress.choice !== 'none') return false;
   if (progress.reviewWindow === 'none' && !['withdraw', 'no_commitment'].includes(progress.revision)) return false;
+  if (progress.reviewCondition === 'none' && !['withdraw', 'no_commitment'].includes(progress.revision)) return false;
   return true;
 }
 
