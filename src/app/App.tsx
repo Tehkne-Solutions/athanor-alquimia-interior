@@ -37,6 +37,7 @@ import { SafetyPage } from '../pages/SafetyPage';
 import { SpiritCenterPage } from '../pages/SpiritCenterPage';
 import { SpiritCouncilPage } from '../pages/SpiritCouncilPage';
 import { SpiritDecisionPage } from '../pages/SpiritDecisionPage';
+import { SpiritOrbPage } from '../pages/SpiritOrbPage';
 import { SpiritReturnPage } from '../pages/SpiritReturnPage';
 import { SpiritSanctuaryPage } from '../pages/SpiritSanctuaryPage';
 import { SpiritThreadPage } from '../pages/SpiritThreadPage';
@@ -94,6 +95,7 @@ export function App() {
       <Route path="/mission/decision-that-remains-open" element={<SpiritDecisionPage/>}/>
       <Route path="/mission/decision-remains-open" element={<SpiritDecisionPage/>}/>
       <Route path="/mission/return-without-condemnation" element={<SpiritReturnPage/>}/>
+      <Route path="/crafting/possible-integration-orb" element={<SpiritOrbPage/>}/>
       <Route path="/mission/body-arrives-first" element={<EarthBodyPage/>}/>
       <Route path="/mission/work-that-fits-today" element={<EarthWorkPage/>}/>
       <Route path="/mission/house-of-resources" element={<EarthResourcesPage/>}/>
