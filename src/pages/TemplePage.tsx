@@ -27,6 +27,7 @@ import { biblicalUnits } from '../content/seed';
 import { useAthanorStore } from '../state/useAthanorStore';
 import { useEarthBodyStore } from '../state/useEarthBodyStore';
 import { useEarthResourcesStore } from '../state/useEarthResourcesStore';
+import { useEarthRhythmStore } from '../state/useEarthRhythmStore';
 import { useEarthWorkStore } from '../state/useEarthWorkStore';
 import { useFireBoundaryStore } from '../state/useFireBoundaryStore';
 import { useFireChapterStore } from '../state/useFireChapterStore';
@@ -67,6 +68,7 @@ export function TemplePage() {
   const rawEarthBody = useEarthBodyStore((state) => state.progress);
   const rawEarthWork = useEarthWorkStore((state) => state.progress);
   const rawEarthResources = useEarthResourcesStore((state) => state.progress);
+  const rawEarthRhythm = useEarthRhythmStore((state) => state.progress);
   const passage = biblicalUnits[0];
 
   if (!character || !temple) return null;
@@ -85,19 +87,19 @@ export function TemplePage() {
   const sourceWaterCycleId = waterChapter?.cycleId ?? waterChapter?.completedAt;
   const fireProgress = sourceWaterCycleId && rawFireProgress?.sourceWaterCycleId === sourceWaterCycleId ? rawFireProgress : undefined;
   const namedFlameCreated = fireProgress?.status === 'completed' && fireProgress.namedFlameCreated;
-  const sourceNamedFlameId = namedFlameCreated ? fireProgress.completedAt ?? fireProgress.updatedAt : undefined;
+  const sourceNamedFlameId = namedFlameCreated && fireProgress ? fireProgress.completedAt ?? fireProgress.updatedAt : undefined;
   const intervalProgress = sourceNamedFlameId && rawIntervalProgress?.sourceNamedFlameId === sourceNamedFlameId ? rawIntervalProgress : undefined;
   const intervalEmberCreated = intervalProgress?.status === 'completed' && intervalProgress.intervalEmberCreated;
-  const sourceIntervalEmberId = intervalEmberCreated ? intervalProgress.completedAt ?? `${intervalProgress.sourceNamedFlameId}:interval-ember` : undefined;
+  const sourceIntervalEmberId = intervalEmberCreated && intervalProgress ? intervalProgress.completedAt ?? `${intervalProgress.sourceNamedFlameId}:interval-ember` : undefined;
   const boundaryProgress = sourceIntervalEmberId && rawBoundaryProgress?.sourceIntervalEmberId === sourceIntervalEmberId ? rawBoundaryProgress : undefined;
   const boundaryPlateCreated = boundaryProgress?.status === 'completed' && boundaryProgress.boundaryPlateCreated;
-  const sourceBoundaryPlateId = boundaryPlateCreated ? boundaryProgress.completedAt ?? `${boundaryProgress.sourceIntervalEmberId}:boundary-plate` : undefined;
+  const sourceBoundaryPlateId = boundaryPlateCreated && boundaryProgress ? boundaryProgress.completedAt ?? `${boundaryProgress.sourceIntervalEmberId}:boundary-plate` : undefined;
   const courageProgress = sourceBoundaryPlateId && rawCourageProgress?.sourceBoundaryPlateId === sourceBoundaryPlateId ? rawCourageProgress : undefined;
   const courageMarkCreated = courageProgress?.status === 'completed' && courageProgress.proportionalCourageMarkCreated;
-  const sourceCourageMarkId = courageMarkCreated ? courageProgress.completedAt ?? `${courageProgress.sourceBoundaryPlateId}:courage-mark` : undefined;
+  const sourceCourageMarkId = courageMarkCreated && courageProgress ? courageProgress.completedAt ?? `${courageProgress.sourceBoundaryPlateId}:courage-mark` : undefined;
   const transformationProgress = sourceCourageMarkId && rawTransformationProgress?.sourceCourageMarkId === sourceCourageMarkId ? rawTransformationProgress : undefined;
   const transformedMetalCreated = transformationProgress?.status === 'completed' && transformationProgress.transformedMetalCreated;
-  const sourceTransformedMetalId = transformedMetalCreated ? transformationProgress.completedAt ?? `${transformationProgress.sourceCourageMarkId}:transformed-metal` : undefined;
+  const sourceTransformedMetalId = transformedMetalCreated && transformationProgress ? transformationProgress.completedAt ?? `${transformationProgress.sourceCourageMarkId}:transformed-metal` : undefined;
   const shieldProgress = sourceTransformedMetalId && rawShieldProgress?.sourceTransformedMetalId === sourceTransformedMetalId ? rawShieldProgress : undefined;
   const shieldCreated = Boolean(shieldProgress?.shieldCreated);
   const sourceShieldId = shieldProgress?.craftedAt ?? (shieldProgress ? `${shieldProgress.sourceTransformedMetalId}:shield` : undefined);
@@ -107,12 +109,15 @@ export function TemplePage() {
   const sourceFireCycleId = fireChapter?.cycleId ?? fireChapter?.completedAt;
   const earthBody = sourceFireCycleId && rawEarthBody?.sourceFireCycleId === sourceFireCycleId ? rawEarthBody : undefined;
   const bodyMarkCreated = earthBody?.status === 'completed' && earthBody.bodyPresenceMarkCreated;
-  const sourceBodyPresenceMarkId = bodyMarkCreated ? earthBody.completedAt ?? `${earthBody.sourceFireCycleId}:body-presence-mark` : undefined;
+  const sourceBodyPresenceMarkId = bodyMarkCreated && earthBody ? earthBody.completedAt ?? `${earthBody.sourceFireCycleId}:body-presence-mark` : undefined;
   const earthWork = sourceBodyPresenceMarkId && rawEarthWork?.sourceBodyPresenceMarkId === sourceBodyPresenceMarkId ? rawEarthWork : undefined;
   const firstStepSeedCreated = earthWork?.status === 'completed' && earthWork.firstStepSeedCreated;
-  const sourceFirstStepSeedId = firstStepSeedCreated ? earthWork.completedAt ?? `${earthWork.sourceBodyPresenceMarkId}:first-step-seed` : undefined;
+  const sourceFirstStepSeedId = firstStepSeedCreated && earthWork ? earthWork.completedAt ?? `${earthWork.sourceBodyPresenceMarkId}:first-step-seed` : undefined;
   const earthResources = sourceFirstStepSeedId && rawEarthResources?.sourceFirstStepSeedId === sourceFirstStepSeedId ? rawEarthResources : undefined;
   const resourcesBasketCreated = earthResources?.status === 'completed' && earthResources.possibleResourcesBasketCreated;
+  const sourceResourceBasketId = resourcesBasketCreated && earthResources ? earthResources.completedAt ?? `${earthResources.sourceFirstStepSeedId}:resource-basket` : undefined;
+  const earthRhythm = sourceResourceBasketId && rawEarthRhythm?.sourceResourceBasketId === sourceResourceBasketId ? rawEarthRhythm : undefined;
+  const rhythmCompassCreated = earthRhythm?.status === 'completed' && earthRhythm.rhythmCompassCreated;
   const gardenAvailable = Boolean(fireCompleted || (garden && garden.status !== 'dormant' && garden.status !== 'hidden'));
 
   const roomSelect = (roomId: string) => {
@@ -131,20 +136,32 @@ export function TemplePage() {
   const waterAction = waterCompleted ? 'Visitar a Câmara restaurada' : chaliceProgress?.positioned ? 'Concluir o capítulo da Água' : waterJourney?.status === 'named' ? 'Continuar a jornada da Água' : waterJourney ? 'Continuar missão da Água' : 'Entrar na Câmara dos Salmos';
   const fireAction = fireCompleted ? 'Visitar a Forja restaurada' : shieldProgress?.positioned ? 'Concluir o capítulo do Fogo' : shieldCreated ? 'Continuar o ciclo do Escudo' : shieldProgress ? 'Continuar a Forja do Escudo' : transformedMetalCreated ? 'Forjar o Escudo do Limite Justo' : transformationProgress ? 'Continuar O que Precisa Ser Transformado' : courageMarkCreated ? 'Iniciar O que Precisa Ser Transformado' : courageProgress ? 'Continuar A Coragem Proporcional' : boundaryPlateCreated ? 'Iniciar A Coragem Proporcional' : boundaryProgress ? 'Continuar O Limite que Protege' : intervalEmberCreated ? 'Iniciar O Limite que Protege' : intervalProgress ? 'Continuar O Instante Antes do Gesto' : namedFlameCreated ? 'Iniciar O Instante Antes do Gesto' : fireProgress ? 'Continuar O Nome da Chama' : 'Iniciar O Nome da Chama';
   const fireRoute = fireCompleted ? '/temple/forge' : shieldProgress?.positioned ? '/review/fire-chapter' : transformedMetalCreated || shieldProgress ? '/crafting/just-boundary-shield' : courageMarkCreated ? '/mission/what-needs-transformation' : boundaryPlateCreated ? '/mission/proportional-courage' : intervalEmberCreated ? '/mission/limit-that-protects' : namedFlameCreated ? '/mission/before-the-gesture' : '/mission/name-the-flame';
-  const earthAction = resourcesBasketCreated
-    ? 'Revisar o Cesto dos Recursos'
-    : earthResources
-      ? 'Continuar A Casa dos Recursos'
-      : firstStepSeedCreated
-        ? 'Iniciar A Casa dos Recursos'
-        : earthWork
-          ? 'Continuar O Trabalho que Cabe Hoje'
-          : bodyMarkCreated
-            ? 'Iniciar O Trabalho que Cabe Hoje'
-            : earthBody
-              ? 'Continuar O Corpo Chega Primeiro'
-              : 'Iniciar O Corpo Chega Primeiro';
-  const earthRoute = firstStepSeedCreated ? '/mission/house-of-resources' : bodyMarkCreated ? '/mission/work-that-fits-today' : '/mission/body-arrives-first';
+
+  const earthAction = rhythmCompassCreated
+    ? 'Revisar o Compasso do Ritmo'
+    : earthRhythm
+      ? 'Continuar O Ritmo que Pode Ser Mantido'
+      : resourcesBasketCreated
+        ? 'Iniciar O Ritmo que Pode Ser Mantido'
+        : earthResources
+          ? 'Continuar A Casa dos Recursos'
+          : firstStepSeedCreated
+            ? 'Iniciar A Casa dos Recursos'
+            : earthWork
+              ? 'Continuar O Trabalho que Cabe Hoje'
+              : bodyMarkCreated
+                ? 'Iniciar O Trabalho que Cabe Hoje'
+                : earthBody
+                  ? 'Continuar O Corpo Chega Primeiro'
+                  : 'Iniciar O Corpo Chega Primeiro';
+  const earthRoute = resourcesBasketCreated
+    ? '/mission/sustainable-rhythm'
+    : firstStepSeedCreated
+      ? '/mission/house-of-resources'
+      : bodyMarkCreated
+        ? '/mission/work-that-fits-today'
+        : '/mission/body-arrives-first';
+
   const activeRoomCount = temple.rooms.filter((room) => ['active', 'restored', 'available'].includes(room.status)).length;
   const componentCount = inventory.length
     + Number(waterJourney?.namedDropCreated)
@@ -157,18 +174,37 @@ export function TemplePage() {
     + Number(shieldCreated)
     + Number(bodyMarkCreated)
     + Number(firstStepSeedCreated)
-    + Number(resourcesBasketCreated);
+    + Number(resourcesBasketCreated)
+    + Number(rhythmCompassCreated);
   const cycleCount = reviews.length + Number(waterCompleted) + Number(fireCompleted);
+
+  const heroMessage = rhythmCompassCreated
+    ? 'A quarta prática da Terra registrou uma cadência pausável sem criar sequência obrigatória.'
+    : resourcesBasketCreated
+      ? 'A terceira prática da Terra registrou recursos possíveis sem prometer disponibilidade.'
+      : firstStepSeedCreated
+        ? 'A segunda prática da Terra registrou uma unidade pequena sem obrigação de execução.'
+        : bodyMarkCreated
+          ? 'A primeira prática da Terra registrou presença sem diagnóstico.'
+          : fireCompleted
+            ? 'O ciclo do Fogo foi registrado e o Jardim Interior foi aberto.'
+            : shieldProgress?.positioned
+              ? 'O Escudo está posicionado e aguarda a revisão geral do Fogo.'
+              : waterCompleted
+                ? 'O ciclo da Água foi registrado e a Forja foi aberta.'
+                : integrated
+                  ? 'A primeira Obra foi revisada.'
+                  : 'A Biblioteca aguarda sua primeira restauração.';
 
   return <div className="page page--temple">
     <PageHeader eyebrow="Átrio da Presença" title={`Bem-vindo ao Templo, ${character.name}.`} description="Seu Templo registra ciclos de gameplay, itens e revisões. Ele não mede sua condição espiritual." action={<span className="local-badge"><Database size={16}/> Dados locais</span>}/>
     <div className="temple-dashboard">
-      <Card className="hero-card"><div className="hero-card__scene"><div className={`temple-backdrop temple-backdrop--${temple.theme}`} aria-hidden="true"/><CharacterAvatar character={character}/></div><div className="hero-card__content"><p className="eyebrow">Nível da Obra</p><h2>{workLevelLabels[character.workLevel]}</h2><p>{resourcesBasketCreated ? 'A terceira prática da Terra registrou recursos possíveis sem prometer disponibilidade.' : firstStepSeedCreated ? 'A segunda prática da Terra registrou uma unidade pequena sem obrigação de execução.' : bodyMarkCreated ? 'A primeira prática da Terra registrou presença sem diagnóstico.' : fireCompleted ? 'O ciclo do Fogo foi registrado e o Jardim Interior foi aberto.' : shieldProgress?.positioned ? 'O Escudo está posicionado e aguarda a revisão geral do Fogo.' : waterCompleted ? 'O ciclo da Água foi registrado e a Forja foi aberta.' : integrated ? 'A primeira Obra foi revisada.' : 'A Biblioteca aguarda sua primeira restauração.'}</p><div className="status-row"><span><strong>{activeRoomCount}</strong> salas acessíveis</span><span><strong>{componentCount}</strong> componentes e itens</span><span><strong>{cycleCount}</strong> ciclos e revisões</span><span><strong>{temple.restorationLevel}</strong> nível do Templo</span></div></div></Card>
+      <Card className="hero-card"><div className="hero-card__scene"><div className={`temple-backdrop temple-backdrop--${temple.theme}`} aria-hidden="true"/><CharacterAvatar character={character}/></div><div className="hero-card__content"><p className="eyebrow">Nível da Obra</p><h2>{workLevelLabels[character.workLevel]}</h2><p>{heroMessage}</p><div className="status-row"><span><strong>{activeRoomCount}</strong> salas acessíveis</span><span><strong>{componentCount}</strong> componentes e itens</span><span><strong>{cycleCount}</strong> ciclos e revisões</span><span><strong>{temple.restorationLevel}</strong> nível do Templo</span></div></div></Card>
       <Card eyebrow="Princípio do ciclo" title={passage.title} className="principle-card"><blockquote>{passage.principle}</blockquote><p>{passage.application}</p><Button onClick={() => navigate('/temple/proverbs-library')}>Entrar na Biblioteca <ArrowRight size={18}/></Button></Card>
       <Card eyebrow={integrated ? 'Ciclo integrado' : awaitingReview ? 'Retorno pendente' : 'Missão principal'} title="A Palavra Antes da Resposta" className="mission-card"><div className="mission-card__icon">{integrated ? <CheckCircle2/> : awaitingReview ? <Clock3/> : <BookOpenText/>}</div><p>{integrated ? 'A Lâmpada integra a Primeira Obra.' : awaitingReview ? 'O ciclo aguarda revisão.' : 'Organize fato, interpretação, previsão e intenção.'}</p><Button variant="secondary" onClick={() => navigate(missionAction.route)}>{missionAction.label} <MissionActionIcon size={18}/></Button></Card>
       {waterAvailable && <Card eyebrow={waterCompleted ? 'Capítulo concluído' : 'Capítulo disponível'} title="A Câmara dos Salmos" className="mission-card mission-card--water"><div className="mission-card__icon">{waterCompleted ? <CupSoda/> : <Droplets/>}</div><p>{waterCompleted ? 'O ciclo da Água foi registrado.' : 'Reconheça emoção, lamento, memória e apoio sem diagnóstico.'}</p><Button variant="secondary" onClick={() => navigate(waterCompleted ? '/temple/psalms-chamber' : chaliceProgress?.positioned ? '/review/water-chapter' : '/temple/psalms-chamber')}>{waterAction} <ArrowRight size={18}/></Button></Card>}
       {forgeAvailable && <Card eyebrow={fireCompleted ? 'Capítulo concluído' : shieldProgress?.positioned ? 'Revisão geral disponível' : shieldCreated ? 'Escudo criado' : 'Capítulo disponível'} title="A Forja dos Elementos" className="mission-card mission-card--fire"><div className="mission-card__icon">{fireCompleted ? <CheckCircle2/> : shieldCreated ? <Shield/> : transformedMetalCreated ? <Hammer/> : <Flame/>}</div><p>{fireCompleted ? 'O primeiro ciclo do Fogo foi registrado.' : shieldProgress?.positioned ? 'O Escudo está pronto para o encerramento do capítulo.' : 'O Fogo avança por componentes separados e recusáveis.'}</p><Button variant="secondary" onClick={() => navigate(fireRoute)}>{fireAction} <ArrowRight size={18}/></Button></Card>}
-      {gardenAvailable && <Card eyebrow={resourcesBasketCreated ? 'Terceiro componente criado' : firstStepSeedCreated ? 'Segundo componente criado' : bodyMarkCreated ? 'Primeiro componente criado' : earthBody ? 'Missão em andamento' : 'Novo capítulo disponível'} title="O Jardim Interior" className="mission-card mission-card--earth"><div className="mission-card__icon">{resourcesBasketCreated ? <ListChecks/> : firstStepSeedCreated ? <Sprout/> : bodyMarkCreated ? <Footprints/> : <Sprout/>}</div><p>{resourcesBasketCreated ? 'O Cesto registra disponibilidade e limite sem prometer abundância.' : firstStepSeedCreated ? 'A Semente registra uma unidade pequena sem medir produtividade.' : bodyMarkCreated ? 'A Marca registra presença percebida sem avaliar saúde ou produtividade.' : 'A Terra começa por corpo percebido, descanso, estrutura e uma ação pequena.'}</p><Button variant="secondary" onClick={() => navigate(earthRoute)}>{earthAction} <ArrowRight size={18}/></Button></Card>}
+      {gardenAvailable && <Card eyebrow={rhythmCompassCreated ? 'Quarto componente criado' : resourcesBasketCreated ? 'Terceiro componente criado' : firstStepSeedCreated ? 'Segundo componente criado' : bodyMarkCreated ? 'Primeiro componente criado' : earthBody ? 'Missão em andamento' : 'Novo capítulo disponível'} title="O Jardim Interior" className="mission-card mission-card--earth"><div className="mission-card__icon">{rhythmCompassCreated ? <Clock3/> : resourcesBasketCreated ? <ListChecks/> : firstStepSeedCreated ? <Sprout/> : bodyMarkCreated ? <Footprints/> : <Sprout/>}</div><p>{rhythmCompassCreated ? 'O Compasso registra uma cadência interrompível sem streak.' : resourcesBasketCreated ? 'O Cesto registra disponibilidade e limite sem prometer abundância.' : firstStepSeedCreated ? 'A Semente registra uma unidade pequena sem medir produtividade.' : bodyMarkCreated ? 'A Marca registra presença percebida sem avaliar saúde ou produtividade.' : 'A Terra começa por corpo percebido, descanso, estrutura e uma ação pequena.'}</p><Button variant="secondary" onClick={() => navigate(earthRoute)}>{earthAction} <ArrowRight size={18}/></Button></Card>}
       <Card title="Mapa do Templo" eyebrow="Ambientes"><TempleMap temple={temple} onRoomSelect={roomSelect} unlockedRoomIds={[...(integrated ? ['psalms-chamber'] : []), ...(waterCompleted ? ['forge'] : []), ...(fireCompleted ? ['garden'] : [])]}/></Card>
       <Card title="Instrumentos da Obra" eyebrow={fireCompleted ? 'Ar, Água, Fogo e Terra' : namedFlameCreated ? 'Ar, Água e Fogo' : chaliceAvailable ? 'Água e Ar' : 'Instrumentos'}>
         {lamp ? <div className="item-mini"><div className="lamp-icon"><LampDesk/></div><div><strong>{lamp.name}</strong><p>{lamp.action}</p></div></div> : <div className="empty-state"><LampDesk/><p>Sua primeira receita será desbloqueada na Biblioteca.</p></div>}
@@ -182,6 +218,7 @@ export function TemplePage() {
         {bodyMarkCreated && <div className="item-mini"><div className="lamp-icon"><Footprints/></div><div><strong>Marca da Presença Corporal</strong><p>Primeiro componente da Terra</p></div></div>}
         {firstStepSeedCreated && <div className="item-mini"><div className="lamp-icon"><Sprout/></div><div><strong>Semente do Primeiro Passo</strong><p>Segundo componente da Terra</p></div></div>}
         {resourcesBasketCreated && <div className="item-mini"><div className="lamp-icon"><ListChecks/></div><div><strong>Cesto dos Recursos Possíveis</strong><p>Terceiro componente da Terra</p></div></div>}
+        {rhythmCompassCreated && <div className="item-mini"><div className="lamp-icon"><Clock3/></div><div><strong>Compasso do Ritmo Sustentável</strong><p>Quarto componente da Terra</p></div></div>}
       </Card>
       <Card title="Limites do sistema" eyebrow="Segurança"><div className="safety-summary"><ShieldCheck/><p>Nenhum status é diagnóstico. Símbolos não determinam o futuro, e toda ação pode ser recusada.</p></div></Card>
     </div>
