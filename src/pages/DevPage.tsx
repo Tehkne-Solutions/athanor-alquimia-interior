@@ -6,6 +6,7 @@ import { PageHeader } from '../components/PageHeader';
 import { useAthanorStore } from '../state/useAthanorStore';
 import { useContinuousCycleStore } from '../state/useContinuousCycleStore';
 import { useContinuousJourneyStore } from '../state/useContinuousJourneyStore';
+import { useContinuousTrailStore } from '../state/useContinuousTrailStore';
 import { useEarthBodyStore } from '../state/useEarthBodyStore';
 import { useEarthChapterStore } from '../state/useEarthChapterStore';
 import { useEarthOrderStore } from '../state/useEarthOrderStore';
@@ -64,6 +65,7 @@ export function DevPage() {
   const resetSpiritChapter = useSpiritChapterStore((state) => state.reset);
   const resetContinuousJourney = useContinuousJourneyStore((state) => state.reset);
   const resetContinuousCycles = useContinuousCycleStore((state) => state.reset);
+  const resetContinuousTrails = useContinuousTrailStore((state) => state.reset);
   const lamentProgress = useWaterLamentStore((state) => state.progress);
   const memoryProgress = useWaterMemoryStore((state) => state.progress);
   const trustProgress = useWaterTrustStore((state) => state.progress);
@@ -92,6 +94,7 @@ export function DevPage() {
   const spiritChapterProgress = useSpiritChapterStore((state) => state.progress);
   const continuousProgress = useContinuousJourneyStore((state) => state.progress);
   const continuousCycleProgress = useContinuousCycleStore((state) => state.progress);
+  const continuousTrailProgress = useContinuousTrailStore((state) => state.progress);
   const state = useAthanorStore();
 
   const reset = async () => {
@@ -124,6 +127,7 @@ export function DevPage() {
     resetSpiritChapter();
     resetContinuousJourney();
     resetContinuousCycles();
+    resetContinuousTrails();
     navigate('/welcome');
   };
 
@@ -163,6 +167,7 @@ export function DevPage() {
     spiritChapter: spiritChapterProgress ? { status: spiritChapterProgress.status, cycleId: spiritChapterProgress.cycleId, destinations: spiritChapterProgress.destinations } : undefined,
     continuousJourney: continuousProgress ? { sourceSpiritCycleId: continuousProgress.sourceSpiritCycleId, records: continuousProgress.records } : undefined,
     continuousCycles: continuousCycleProgress.instances.map((instance) => ({ id: instance.id, sourceRecordId: instance.sourceRecordId, startPoint: instance.startPoint, status: instance.status, comparison: instance.comparison })),
+    continuousTrails: continuousTrailProgress.trails.map((trail) => ({ id: trail.id, sourceCycleInstanceId: trail.sourceCycleInstanceId, startPoint: trail.startPoint, status: trail.status, currentStage: trail.currentStage, practiceId: trail.practiceId, noPractice: trail.noPractice, traceCreated: trail.continuousTrailTraceCreated })),
     inventory: state.inventory.map((item) => item.name)
   }, null, 2)}</pre></Card><Card title="Ações"><Button variant="danger" onClick={reset}><RotateCcw size={18}/> Resetar todo o estado</Button></Card></div></div>;
 }
