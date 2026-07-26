@@ -1,16 +1,18 @@
-import { BookOpenText, CheckCircle2, Circle, LockKeyhole, ShieldCheck, Sparkles } from 'lucide-react';
+import { BookOpenText, CheckCircle2, Circle, GitBranch, LockKeyhole, ShieldCheck, Sparkles } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/Button';
 import { Card } from '../components/Card';
 import { PageHeader } from '../components/PageHeader';
+import { spiritCenterNodes } from '../content/spiritCenter';
 import { spiritFoundationBiblicalUnit, spiritFoundationNodes, spiritSynthesisDimensions } from '../content/spiritFoundation';
 import { spiritThreadNodes } from '../content/spiritThread';
 import type { SymbolicNode } from '../domain/types';
 import { useAthanorStore } from '../state/useAthanorStore';
 import { useEarthChapterStore } from '../state/useEarthChapterStore';
+import { useSpiritCenterStore } from '../state/useSpiritCenterStore';
 import { useSpiritThreadStore } from '../state/useSpiritThreadStore';
 
-const allSpiritNodes = [...spiritFoundationNodes, ...spiritThreadNodes];
+const allSpiritNodes = [...spiritFoundationNodes, ...spiritThreadNodes, ...spiritCenterNodes];
 const chainNodeIds = ['spirit_keter_v1', 'spirit_ruach_v1', 'spirit_qian_v1', 'spirit_world_v1'];
 
 function resolveNode(node: SymbolicNode, enabledLayers: string[]): SymbolicNode {
@@ -24,8 +26,14 @@ export function SpiritSanctuaryPage() {
   const enabledLayers = useAthanorStore((state) => state.preferences.enabledLayers);
   const earthChapter = useEarthChapterStore((state) => state.progress);
   const rawThreadProgress = useSpiritThreadStore((state) => state.progress);
+  const rawCenterProgress = useSpiritCenterStore((state) => state.progress);
   const sourceEarthCycleId = earthChapter?.cycleId ?? earthChapter?.completedAt;
   const threadProgress = sourceEarthCycleId && rawThreadProgress?.sourceEarthCycleId === sourceEarthCycleId ? rawThreadProgress : undefined;
+  const threadCompleted = threadProgress?.status === 'completed' && threadProgress.possibleSynthesisThreadCreated;
+  const sourceThreadId = threadCompleted && threadProgress
+    ? threadProgress.completedAt ?? `${threadProgress.sourceEarthCycleId}:possible-synthesis-thread`
+    : undefined;
+  const centerProgress = sourceThreadId && rawCenterProgress?.sourceThreadId === sourceThreadId ? rawCenterProgress : undefined;
   const available = Boolean(earthChapter?.status === 'completed' || (sanctuary && sanctuary.status !== 'dormant' && sanctuary.status !== 'hidden'));
 
   if (!available) {
@@ -36,19 +44,25 @@ export function SpiritSanctuaryPage() {
     .map((id) => allSpiritNodes.find((node) => node.id === id))
     .filter((node): node is SymbolicNode => Boolean(node))
     .map((node) => resolveNode(node, enabledLayers));
-  const missionLabel = threadProgress?.status === 'completed'
-    ? 'Revisar o Fio criado'
-    : threadProgress
-      ? 'Continuar O Fio que Reúne'
-      : 'Iniciar O Fio que Reúne';
+  const centerCompleted = centerProgress?.status === 'completed' && centerProgress.provisionalCenterKnotCreated;
+  const heroState = centerCompleted
+    ? { title: 'Segundo componente criado', description: 'O Nó preserva uma centralidade temporária, vazia ou recusada sem estabelecer hierarquia.' }
+    : centerProgress
+      ? { title: 'Segunda missão em andamento', description: 'O centro provisório pode ser alternado, removido ou recusado sem perder o Fio.' }
+      : threadCompleted
+        ? { title: 'Primeiro componente criado', description: 'O Fio está disponível e a segunda missão pode começar sem exigir coerência entre as partes.' }
+        : threadProgress
+          ? { title: 'Primeira missão em andamento', description: 'A missão pode ser retomada sem streak, prazo ou perda de progresso.' }
+          : { title: 'Fundação disponível', description: 'O primeiro ciclo da Terra foi registrado e a primeira missão do Espírito está disponível.' };
 
-  return <div className="page page--spirit"><PageHeader eyebrow="Santuário do Espírito" title={threadProgress?.status === 'completed' ? 'O primeiro Fio ocupa o Santuário sem medir coerência.' : 'As partes podem ser vistas juntas sem perder suas diferenças.'} description="O quinto elemento trabalha síntese entre palavra, emoção, impulso, corpo e ação. Não produz diagnóstico, leitura oculta ou previsão."/><div className="spirit-foundation-grid">
-    <Card className="spirit-hero-card"><div className="spirit-hero-symbol" aria-hidden="true"><Sparkles/></div><div><p className="eyebrow">Estado do Santuário</p><h2>{threadProgress?.status === 'completed' ? 'Primeiro componente criado' : threadProgress ? 'Missão em andamento' : 'Fundação disponível'}</h2><p>{threadProgress?.status === 'completed' ? 'O Fio registra uma prática concluída, inclusive por pausa ou recusa, sem afirmar completude espiritual.' : threadProgress ? 'A primeira missão pode ser retomada sem streak, prazo ou perda de progresso.' : 'O primeiro ciclo da Terra foi registrado e a missão funcional do Espírito está disponível.'}</p></div></Card>
+  return <div className="page page--spirit"><PageHeader eyebrow="Santuário do Espírito" title={centerCompleted ? 'O centro mudou sem apagar as partes.' : threadCompleted ? 'O Fio pode receber um centro provisório.' : 'As partes podem ser vistas juntas sem perder suas diferenças.'} description="O quinto elemento trabalha síntese entre palavra, emoção, impulso, corpo e ação. Não produz diagnóstico, leitura oculta ou previsão."/><div className="spirit-foundation-grid">
+    <Card className="spirit-hero-card"><div className="spirit-hero-symbol" aria-hidden="true"><Sparkles/></div><div><p className="eyebrow">Estado do Santuário</p><h2>{heroState.title}</h2><p>{heroState.description}</p></div></Card>
     <Card title={spiritFoundationBiblicalUnit.title} eyebrow={spiritFoundationBiblicalUnit.reference}><blockquote>{spiritFoundationBiblicalUnit.principle}</blockquote><p>{spiritFoundationBiblicalUnit.context}</p><div className="provenance-inline"><BookOpenText size={17}/><span>A Bíblia permanece como núcleo. Sefer, Cabala, I Ching e Tarot aparecem apenas como camadas opcionais e identificadas.</span></div></Card>
-    <Card title="O Fio que Reúne" eyebrow="Primeira missão do Espírito"><div className="spirit-mission-preview">{threadProgress?.status === 'completed' ? <CheckCircle2/> : <Circle/>}<div><strong>{threadProgress?.status === 'completed' ? 'Fio da Síntese Possível criado' : 'Síntese sem apagamento'}</strong><p>{threadProgress?.status === 'completed' ? 'O componente não representa coerência, iluminação ou ausência de conflito.' : 'Distinguir e reunir cinco dimensões, mantendo desconhecimento, pausa, recusa e não agir.'}</p></div></div><Button onClick={() => navigate('/mission/thread-that-gathers')}>{missionLabel}</Button></Card>
+    <Card title="O Fio que Reúne" eyebrow="Primeira missão do Espírito"><div className="spirit-mission-preview">{threadCompleted ? <CheckCircle2/> : <Circle/>}<div><strong>{threadCompleted ? 'Fio da Síntese Possível criado' : 'Síntese sem apagamento'}</strong><p>{threadCompleted ? 'O componente não representa coerência, iluminação ou ausência de conflito.' : 'Distinguir e reunir cinco dimensões, mantendo desconhecimento, pausa, recusa e não agir.'}</p></div></div><Button onClick={() => navigate('/mission/thread-that-gathers')}>{threadCompleted ? 'Revisar o Fio criado' : threadProgress ? 'Continuar O Fio que Reúne' : 'Iniciar O Fio que Reúne'}</Button></Card>
+    {threadCompleted && <Card title="O Centro que Não Apaga as Partes" eyebrow="Segunda missão do Espírito"><div className="spirit-mission-preview">{centerCompleted ? <CheckCircle2/> : <GitBranch/>}<div><strong>{centerCompleted ? 'Nó do Centro Provisório criado' : 'Centralidade temporária e revisável'}</strong><p>{centerCompleted ? 'O componente preserva o histórico sem tornar uma dimensão superior.' : 'Escolher, alternar ou recusar um centro sem apagar o conjunto.'}</p></div></div><Button onClick={() => navigate('/mission/center-without-erasing-parts')}>{centerCompleted ? 'Revisar o Nó criado' : centerProgress ? 'Continuar a missão' : 'Iniciar a segunda missão'}</Button></Card>}
     <Card title="Cinco dimensões" eyebrow="Sem pontuação de coerência"><div className="spirit-dimension-grid">{spiritSynthesisDimensions.map((dimension) => <article key={dimension.id}><strong>{dimension.label}</strong><p>{dimension.description}</p></article>)}</div></Card>
-    {threadProgress?.status === 'completed' && <Card title="Fio da Síntese Possível" eyebrow="Primeiro componente"><div className="spirit-mission-preview"><Sparkles/><div><strong>Componente local criado</strong><p>Registra somente a conclusão desta prática e não interpreta identidade, saúde ou condição espiritual.</p></div></div></Card>}
+    {threadCompleted && <Card title="Instrumentos do Espírito" eyebrow={centerCompleted ? 'Dois componentes' : 'Primeiro componente'}><div className="spirit-mission-preview"><Sparkles/><div><strong>Fio da Síntese Possível</strong><p>Registra a conclusão da primeira prática sem interpretar identidade ou condição espiritual.</p></div></div>{centerCompleted && <div className="spirit-mission-preview"><GitBranch/><div><strong>Nó do Centro Provisório</strong><p>Registra foco temporário, alternância, ausência de centro ou recusa.</p></div></div>}</Card>}
     <Card title="Cadeia opcional" eyebrow="Proveniência por camada"><div className="spirit-chain-grid">{nodes.map((node) => <article key={node.id} className="spirit-chain-node"><span className={`provenance-badge provenance-badge--${node.provenance.class.toLowerCase()}`}>{node.provenance.class}</span><h3>{node.name}</h3><p>{node.description}</p><small>{node.provenance.label}</small></article>)}</div></Card>
-    <Card title="Limites do Santuário" eyebrow="Segurança"><div className="safety-summary"><ShieldCheck/><p>Integração não significa pureza, completude, iluminação ou ausência de conflito. Toda dimensão pode ser recusada, pausada ou marcada como desconhecida.</p></div><div className="spirit-actions"><Button variant="secondary" onClick={() => navigate('/temple/garden')}>Visitar o Jardim restaurado</Button><Button variant="ghost" onClick={() => navigate('/safety?source=spirit')}>Abrir apoio direto</Button></div></Card>
+    <Card title="Limites do Santuário" eyebrow="Segurança"><div className="safety-summary"><ShieldCheck/><p>Integração não significa pureza, completude, iluminação ou ausência de conflito. Nenhuma dimensão central se torna superior ou permanente.</p></div><div className="spirit-actions"><Button variant="secondary" onClick={() => navigate('/temple/garden')}>Visitar o Jardim restaurado</Button><Button variant="ghost" onClick={() => navigate('/safety?source=spirit')}>Abrir apoio direto</Button></div></Card>
   </div></div>;
 }
