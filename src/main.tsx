@@ -35,6 +35,8 @@ import './styles/spirit-council.css';
 import './styles/spirit-decision.css';
 import './styles/spirit-return.css';
 import './styles/spirit-orb.css';
+import './styles/spirit-chapter.css';
+import './styles/new-work.css';
 
 validateContent();
 
