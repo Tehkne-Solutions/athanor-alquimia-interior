@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { provenanceClassSchema } from '../domain/types';
+import { earthFoundationBiblicalUnit, earthFoundationNodes } from './earthFoundation';
 import { fireBoundaryBiblicalUnit, fireBoundaryNodes, fireBoundaryStatements } from './fireBoundary';
 import { fireCourageBiblicalUnit, fireCourageNodes, fireCourageStatements } from './fireCourage';
 import { fireIntervalBiblicalUnit, fireIntervalNodes, fireTimelineEntries, fireUrgencyEntries } from './fireInterval';
@@ -38,7 +39,8 @@ export function validateContent(): void {
     fireBoundaryBiblicalUnit,
     fireCourageBiblicalUnit,
     fireTransformationBiblicalUnit,
-    fireShieldBiblicalUnit
+    fireShieldBiblicalUnit,
+    earthFoundationBiblicalUnit
   ]);
 
   const allNodes = [
@@ -51,7 +53,8 @@ export function validateContent(): void {
     ...fireBoundaryNodes,
     ...fireCourageNodes,
     ...fireTransformationNodes,
-    ...fireShieldNodes
+    ...fireShieldNodes,
+    ...earthFoundationNodes
   ];
 
   z.array(nodeSchema).parse(allNodes);

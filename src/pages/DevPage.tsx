@@ -5,6 +5,7 @@ import { Card } from '../components/Card';
 import { PageHeader } from '../components/PageHeader';
 import { useAthanorStore } from '../state/useAthanorStore';
 import { useFireBoundaryStore } from '../state/useFireBoundaryStore';
+import { useFireChapterStore } from '../state/useFireChapterStore';
 import { useFireCourageStore } from '../state/useFireCourageStore';
 import { useFireIntervalStore } from '../state/useFireIntervalStore';
 import { useFireMissionStore } from '../state/useFireMissionStore';
@@ -30,6 +31,7 @@ export function DevPage() {
   const resetFireCourage = useFireCourageStore((state) => state.reset);
   const resetFireTransformation = useFireTransformationStore((state) => state.reset);
   const resetFireShield = useFireShieldStore((state) => state.reset);
+  const resetFireChapter = useFireChapterStore((state) => state.reset);
   const lamentProgress = useWaterLamentStore((state) => state.progress);
   const memoryProgress = useWaterMemoryStore((state) => state.progress);
   const trustProgress = useWaterTrustStore((state) => state.progress);
@@ -41,6 +43,7 @@ export function DevPage() {
   const fireCourageProgress = useFireCourageStore((state) => state.progress);
   const fireTransformationProgress = useFireTransformationStore((state) => state.progress);
   const fireShieldProgress = useFireShieldStore((state) => state.progress);
+  const fireChapterProgress = useFireChapterStore((state) => state.progress);
   const state = useAthanorStore();
 
   const reset = async () => {
@@ -56,38 +59,30 @@ export function DevPage() {
     resetFireCourage();
     resetFireTransformation();
     resetFireShield();
+    resetFireChapter();
     navigate('/welcome');
   };
 
-  return (
-    <div className="page">
-      <PageHeader eyebrow="Somente desenvolvimento" title="Painel de QA" description="Ferramentas para fixtures, reset e inspeção do vertical slice." action={<TestTube2/>}/>
-      <div className="content-grid">
-        <Card title="Estado atual">
-          <pre className="state-preview">{JSON.stringify({
-            onboardingCompleted: state.onboardingCompleted,
-            character: state.character?.name,
-            workLevel: state.character?.workLevel,
-            temple: state.temple?.theme,
-            rooms: state.temple?.rooms.map((room) => ({ id: room.roomId, status: room.status, progress: room.restorationProgress })),
-            mission: state.activeMission?.status,
-            water: state.waterJourney?.status,
-            lament: lamentProgress?.status,
-            memory: memoryProgress?.status,
-            trust: trustProgress?.status,
-            chalice: chaliceProgress ? { status: chaliceProgress.status, created: chaliceProgress.chaliceCreated, positioned: chaliceProgress.positioned } : undefined,
-            waterChapter: waterChapterProgress ? { status: waterChapterProgress.status, cycleId: waterChapterProgress.cycleId, destinations: waterChapterProgress.destinations } : undefined,
-            fireMission: fireProgress ? { status: fireProgress.status, emotions: fireProgress.emotions, intensity: fireProgress.intensity, namedFlameCreated: fireProgress.namedFlameCreated, action: fireProgress.action } : undefined,
-            fireInterval: fireIntervalProgress ? { status: fireIntervalProgress.status, interval: fireIntervalProgress.interval, exit: fireIntervalProgress.exit, intervalEmberCreated: fireIntervalProgress.intervalEmberCreated } : undefined,
-            fireBoundary: fireBoundaryProgress ? { status: fireBoundaryProgress.status, scope: fireBoundaryProgress.scope, action: fireBoundaryProgress.action, duration: fireBoundaryProgress.duration, boundaryPlateCreated: fireBoundaryProgress.boundaryPlateCreated } : undefined,
-            fireCourage: fireCourageProgress ? { status: fireCourageProgress.status, context: fireCourageProgress.context, action: fireCourageProgress.action, resources: fireCourageProgress.resources, readiness: fireCourageProgress.readiness, proportionalCourageMarkCreated: fireCourageProgress.proportionalCourageMarkCreated } : undefined,
-            fireTransformation: fireTransformationProgress ? { status: fireTransformationProgress.status, object: fireTransformationProgress.object, decision: fireTransformationProgress.decision, action: fireTransformationProgress.action, safeguard: fireTransformationProgress.safeguard, review: fireTransformationProgress.review, transformedMetalCreated: fireTransformationProgress.transformedMetalCreated } : undefined,
-            fireShield: fireShieldProgress ? { status: fireShieldProgress.status, function: fireShieldProgress.function, intensity: fireShieldProgress.intensity, support: fireShieldProgress.support, duration: fireShieldProgress.duration, reviewWindow: fireShieldProgress.reviewWindow, shieldCreated: fireShieldProgress.shieldCreated, positioned: fireShieldProgress.positioned } : undefined,
-            inventory: state.inventory.map((item) => item.name)
-          }, null, 2)}</pre>
-        </Card>
-        <Card title="Ações"><Button variant="danger" onClick={reset}><RotateCcw size={18}/> Resetar todo o estado</Button></Card>
-      </div>
-    </div>
-  );
+  return <div className="page"><PageHeader eyebrow="Somente desenvolvimento" title="Painel de QA" description="Ferramentas para fixtures, reset e inspeção do vertical slice." action={<TestTube2/>}/><div className="content-grid"><Card title="Estado atual"><pre className="state-preview">{JSON.stringify({
+    onboardingCompleted: state.onboardingCompleted,
+    character: state.character?.name,
+    workLevel: state.character?.workLevel,
+    temple: state.temple?.theme,
+    rooms: state.temple?.rooms.map((room) => ({ id: room.roomId, status: room.status, progress: room.restorationProgress })),
+    mission: state.activeMission?.status,
+    water: state.waterJourney?.status,
+    lament: lamentProgress?.status,
+    memory: memoryProgress?.status,
+    trust: trustProgress?.status,
+    chalice: chaliceProgress ? { status: chaliceProgress.status, created: chaliceProgress.chaliceCreated, positioned: chaliceProgress.positioned } : undefined,
+    waterChapter: waterChapterProgress ? { status: waterChapterProgress.status, cycleId: waterChapterProgress.cycleId, destinations: waterChapterProgress.destinations } : undefined,
+    fireMission: fireProgress ? { status: fireProgress.status, namedFlameCreated: fireProgress.namedFlameCreated } : undefined,
+    fireInterval: fireIntervalProgress ? { status: fireIntervalProgress.status, intervalEmberCreated: fireIntervalProgress.intervalEmberCreated } : undefined,
+    fireBoundary: fireBoundaryProgress ? { status: fireBoundaryProgress.status, boundaryPlateCreated: fireBoundaryProgress.boundaryPlateCreated } : undefined,
+    fireCourage: fireCourageProgress ? { status: fireCourageProgress.status, proportionalCourageMarkCreated: fireCourageProgress.proportionalCourageMarkCreated } : undefined,
+    fireTransformation: fireTransformationProgress ? { status: fireTransformationProgress.status, transformedMetalCreated: fireTransformationProgress.transformedMetalCreated } : undefined,
+    fireShield: fireShieldProgress ? { status: fireShieldProgress.status, shieldCreated: fireShieldProgress.shieldCreated, positioned: fireShieldProgress.positioned } : undefined,
+    fireChapter: fireChapterProgress ? { status: fireChapterProgress.status, cycleId: fireChapterProgress.cycleId, destinations: fireChapterProgress.destinations } : undefined,
+    inventory: state.inventory.map((item) => item.name)
+  }, null, 2)}</pre></Card><Card title="Ações"><Button variant="danger" onClick={reset}><RotateCcw size={18}/> Resetar todo o estado</Button></Card></div></div>;
 }

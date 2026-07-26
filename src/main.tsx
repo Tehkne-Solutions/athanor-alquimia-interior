@@ -19,6 +19,8 @@ import './styles/fire-boundary.css';
 import './styles/fire-courage.css';
 import './styles/fire-transformation.css';
 import './styles/fire-shield.css';
+import './styles/fire-chapter.css';
+import './styles/earth.css';
 
 validateContent();
 
