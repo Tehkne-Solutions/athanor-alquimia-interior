@@ -5,6 +5,7 @@ import { earthFoundationBiblicalUnit, earthFoundationNodes } from './earthFounda
 import { earthOrderBiblicalUnit, earthOrderEntries, earthOrderNodes } from './earthOrder';
 import { earthResourceEntries, earthResourcesBiblicalUnit, earthResourcesNodes } from './earthResources';
 import { earthRhythmBiblicalUnit, earthRhythmEntries, earthRhythmNodes } from './earthRhythm';
+import { earthStoneBiblicalUnit, earthStoneNodes, earthStoneRecipe } from './earthStone';
 import { earthWorkBiblicalUnit, earthWorkEntries, earthWorkNodes } from './earthWork';
 import { fireBoundaryBiblicalUnit, fireBoundaryNodes, fireBoundaryStatements } from './fireBoundary';
 import { fireCourageBiblicalUnit, fireCourageNodes, fireCourageStatements } from './fireCourage';
@@ -36,6 +37,7 @@ const earthRhythmEntrySchema = z.object({ id: z.string().min(1), text: z.string(
 const earthOrderEntrySchema = z.object({ id: z.string().min(1), text: z.string().min(1), suggestedCategory: z.enum(['order', 'priority', 'rigidity', 'accumulation']), explanation: z.string().min(1) });
 const waterChaliceRecipeSchema = z.object({ id: z.literal('recipe_memory_serene_chalice_v1'), name: z.string().min(1), componentIds: z.array(z.string().min(1)).length(4), principle: z.string().min(1), restrictions: z.array(z.string().min(1)).min(4), version: z.string().min(1) });
 const fireShieldRecipeSchema = z.object({ id: z.literal('recipe_just_boundary_shield_v1'), name: z.string().min(1), componentIds: z.array(z.string().min(1)).length(5), principle: z.string().min(1), restrictions: z.array(z.string().min(1)).min(5), version: z.string().min(1) });
+const earthStoneRecipeSchema = z.object({ id: z.literal('recipe_first_step_stone_v1'), name: z.string().min(1), componentIds: z.array(z.string().min(1)).length(5), principle: z.string().min(1), restrictions: z.array(z.string().min(1)).min(5), version: z.string().min(1) });
 
 export function validateContent(): void {
   z.array(biblicalUnitSchema).parse([
@@ -54,7 +56,8 @@ export function validateContent(): void {
     earthWorkBiblicalUnit,
     earthResourcesBiblicalUnit,
     earthRhythmBiblicalUnit,
-    earthOrderBiblicalUnit
+    earthOrderBiblicalUnit,
+    earthStoneBiblicalUnit
   ]);
 
   const allNodes = [
@@ -73,7 +76,8 @@ export function validateContent(): void {
     ...earthWorkNodes,
     ...earthResourcesNodes,
     ...earthRhythmNodes,
-    ...earthOrderNodes
+    ...earthOrderNodes,
+    ...earthStoneNodes
   ];
 
   z.array(nodeSchema).parse(allNodes);
@@ -92,6 +96,7 @@ export function validateContent(): void {
   z.array(earthOrderEntrySchema).length(8).parse(earthOrderEntries);
   waterChaliceRecipeSchema.parse(waterChaliceRecipe);
   fireShieldRecipeSchema.parse(fireShieldRecipe);
+  earthStoneRecipeSchema.parse(earthStoneRecipe);
   z.array(z.object({ id: z.string(), text: z.string(), correctCategory: z.enum(['fact', 'interpretation', 'prediction', 'intention']) })).parse(classificationEntries);
 
   const nodeIds = new Set(allNodes.map((node) => node.id));
