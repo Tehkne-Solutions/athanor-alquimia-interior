@@ -30,7 +30,8 @@ export const useContinuousJourneyStore = create<ContinuousJourneyStoreState>()(
       start: (sourceSpiritCycleId) => {
         const current = get().progress;
         if (current?.sourceSpiritCycleId === sourceSpiritCycleId) return;
-        set({ progress: createContinuousJourneyProgress(sourceSpiritCycleId, now()) });
+        const next = createContinuousJourneyProgress(sourceSpiritCycleId, now());
+        set({ progress: { ...next, records: current?.records ?? [] } });
       },
       selectStartPoint: (value) => set((state) => state.progress
         ? { progress: selectContinuousStartPoint(state.progress, value, now()) }
