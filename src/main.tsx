@@ -31,6 +31,7 @@ import './styles/earth-chapter.css';
 import './styles/spirit.css';
 import './styles/spirit-thread.css';
 import './styles/spirit-center.css';
+import './styles/spirit-council.css';
 
 validateContent();
 
