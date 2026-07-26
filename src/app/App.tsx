@@ -37,6 +37,7 @@ import { SafetyPage } from '../pages/SafetyPage';
 import { SpiritCenterPage } from '../pages/SpiritCenterPage';
 import { SpiritCouncilPage } from '../pages/SpiritCouncilPage';
 import { SpiritDecisionPage } from '../pages/SpiritDecisionPage';
+import { SpiritReturnPage } from '../pages/SpiritReturnPage';
 import { SpiritSanctuaryPage } from '../pages/SpiritSanctuaryPage';
 import { SpiritThreadPage } from '../pages/SpiritThreadPage';
 import { TempleFoundationPage } from '../pages/TempleFoundationPage';
@@ -91,6 +92,8 @@ export function App() {
       <Route path="/mission/center-without-erasing" element={<SpiritCenterPage/>}/>
       <Route path="/mission/council-of-parts" element={<SpiritCouncilPage/>}/>
       <Route path="/mission/decision-that-remains-open" element={<SpiritDecisionPage/>}/>
+      <Route path="/mission/decision-remains-open" element={<SpiritDecisionPage/>}/>
+      <Route path="/mission/return-without-condemnation" element={<SpiritReturnPage/>}/>
       <Route path="/mission/body-arrives-first" element={<EarthBodyPage/>}/>
       <Route path="/mission/work-that-fits-today" element={<EarthWorkPage/>}/>
       <Route path="/mission/house-of-resources" element={<EarthResourcesPage/>}/>
