@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { App } from './app/App';
 import { validateContent } from './content/validate';
+import './content/validateNewWork';
 import './styles/global.css';
 import './styles/homologation.css';
 import './styles/research.css';
