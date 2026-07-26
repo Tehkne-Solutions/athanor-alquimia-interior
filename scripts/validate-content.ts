@@ -4,5 +4,5 @@ try {
 } catch (error) {
   console.error('Falha na validação editorial:');
   console.error(error instanceof Error ? error.message : error);
-  process.exitCode = 1;
+  throw error;
 }
