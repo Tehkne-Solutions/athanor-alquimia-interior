@@ -21,6 +21,7 @@ import { useFireTransformationStore } from '../state/useFireTransformationStore'
 import { useSpiritCenterStore } from '../state/useSpiritCenterStore';
 import { useSpiritCouncilStore } from '../state/useSpiritCouncilStore';
 import { useSpiritDecisionStore } from '../state/useSpiritDecisionStore';
+import { useSpiritOrbStore } from '../state/useSpiritOrbStore';
 import { useSpiritReturnStore } from '../state/useSpiritReturnStore';
 import { useSpiritThreadStore } from '../state/useSpiritThreadStore';
 import { useWaterChaliceStore } from '../state/useWaterChaliceStore';
@@ -56,6 +57,7 @@ export function DevPage() {
   const resetSpiritCouncil = useSpiritCouncilStore((state) => state.reset);
   const resetSpiritDecision = useSpiritDecisionStore((state) => state.reset);
   const resetSpiritReturn = useSpiritReturnStore((state) => state.reset);
+  const resetSpiritOrb = useSpiritOrbStore((state) => state.reset);
   const lamentProgress = useWaterLamentStore((state) => state.progress);
   const memoryProgress = useWaterMemoryStore((state) => state.progress);
   const trustProgress = useWaterTrustStore((state) => state.progress);
@@ -80,6 +82,7 @@ export function DevPage() {
   const spiritCouncilProgress = useSpiritCouncilStore((state) => state.progress);
   const spiritDecisionProgress = useSpiritDecisionStore((state) => state.progress);
   const spiritReturnProgress = useSpiritReturnStore((state) => state.progress);
+  const spiritOrbProgress = useSpiritOrbStore((state) => state.progress);
   const state = useAthanorStore();
 
   const reset = async () => {
@@ -108,6 +111,7 @@ export function DevPage() {
     resetSpiritCouncil();
     resetSpiritDecision();
     resetSpiritReturn();
+    resetSpiritOrb();
     navigate('/welcome');
   };
 
@@ -143,6 +147,7 @@ export function DevPage() {
     spiritCouncil: spiritCouncilProgress ? { status: spiritCouncilProgress.status, scenarioId: spiritCouncilProgress.scenarioId, voiceStates: spiritCouncilProgress.voiceStates, disagreement: spiritCouncilProgress.disagreement, basis: spiritCouncilProgress.basis, decision: spiritCouncilProgress.decision, councilDeclined: spiritCouncilProgress.councilDeclined, openCouncilSealCreated: spiritCouncilProgress.openCouncilSealCreated } : undefined,
     spiritDecision: spiritDecisionProgress ? { status: spiritDecisionProgress.status, scenarioId: spiritDecisionProgress.scenarioId, positions: spiritDecisionProgress.positions, choice: spiritDecisionProgress.choice, revision: spiritDecisionProgress.revision, reviewWindow: spiritDecisionProgress.reviewWindow, reviewCondition: spiritDecisionProgress.reviewCondition, decisionDeclined: spiritDecisionProgress.decisionDeclined, revisableDecisionMarkCreated: spiritDecisionProgress.revisableDecisionMarkCreated } : undefined,
     spiritReturn: spiritReturnProgress ? { status: spiritReturnProgress.status, scenarioId: spiritReturnProgress.scenarioId, observation: spiritReturnProgress.observation, context: spiritReturnProgress.context, resources: spiritReturnProgress.resources, basis: spiritReturnProgress.basis, disposition: spiritReturnProgress.disposition, returnDeclined: spiritReturnProgress.returnDeclined, possibleReturnKeyCreated: spiritReturnProgress.possibleReturnKeyCreated } : undefined,
+    spiritOrb: spiritOrbProgress ? { status: spiritOrbProgress.status, function: spiritOrbProgress.function, visibleDimension: spiritOrbProgress.visibleDimension, disagreement: spiritOrbProgress.disagreement, decision: spiritOrbProgress.decision, returnMode: spiritOrbProgress.returnMode, reviewWindow: spiritOrbProgress.reviewWindow, orbCreated: spiritOrbProgress.orbCreated, positioned: spiritOrbProgress.positioned } : undefined,
     inventory: state.inventory.map((item) => item.name)
   }, null, 2)}</pre></Card><Card title="Ações"><Button variant="danger" onClick={reset}><RotateCcw size={18}/> Resetar todo o estado</Button></Card></div></div>;
 }
