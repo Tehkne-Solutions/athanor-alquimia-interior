@@ -15,6 +15,7 @@ import { fireClassificationEntries, fireMissionNodes } from './fireMission';
 import { fireShieldBiblicalUnit, fireShieldNodes, fireShieldRecipe } from './fireShield';
 import { fireTransformationBiblicalUnit, fireTransformationNodes, fireTransformationStatements } from './fireTransformation';
 import { biblicalUnits, chainNodes, classificationEntries } from './seed';
+import { spiritCenterBiblicalUnit, spiritCenterEntries, spiritCenterNodes, spiritCenterScenarios } from './spiritCenter';
 import { spiritFoundationBiblicalUnit, spiritFoundationNodes, spiritSynthesisDimensions } from './spiritFoundation';
 import { spiritScenarios, spiritThreadEntries, spiritThreadNodes } from './spiritThread';
 import { waterBiblicalUnit, waterLamentBiblicalUnit, waterMemoryBiblicalUnit, waterMemoryEntries, waterMemoryNodes } from './water';
@@ -39,12 +40,9 @@ const earthRhythmEntrySchema = z.object({ id: z.string().min(1), text: z.string(
 const earthOrderEntrySchema = z.object({ id: z.string().min(1), text: z.string().min(1), suggestedCategory: z.enum(['order', 'priority', 'rigidity', 'accumulation']), explanation: z.string().min(1) });
 const spiritDimensionSchema = z.object({ id: z.enum(['word', 'emotion', 'impulse', 'body', 'action']), label: z.string().min(1), description: z.string().min(1) });
 const spiritThreadEntrySchema = z.object({ id: z.string().min(1), text: z.string().min(1), suggestedCategory: z.enum(['word', 'emotion', 'impulse', 'body', 'action', 'unknown']), explanation: z.string().min(1) });
-const spiritScenarioSchema = z.object({
-  id: z.string().min(1),
-  title: z.string().min(1),
-  context: z.string().min(1),
-  dimensions: z.object({ word: z.string().min(1), emotion: z.string().min(1), impulse: z.string().min(1), body: z.string().min(1), action: z.string().min(1) })
-});
+const spiritScenarioSchema = z.object({ id: z.string().min(1), title: z.string().min(1), context: z.string().min(1), dimensions: z.object({ word: z.string().min(1), emotion: z.string().min(1), impulse: z.string().min(1), body: z.string().min(1), action: z.string().min(1) }) });
+const spiritCenterEntrySchema = z.object({ id: z.string().min(1), text: z.string().min(1), suggestedCategory: z.enum(['centrality', 'superiority', 'exclusion', 'integration']), explanation: z.string().min(1) });
+const spiritCenterScenarioSchema = z.object({ id: z.string().min(1), title: z.string().min(1), description: z.string().min(1), competingParts: z.array(z.string().min(1)).min(2) });
 const waterChaliceRecipeSchema = z.object({ id: z.literal('recipe_memory_serene_chalice_v1'), name: z.string().min(1), componentIds: z.array(z.string().min(1)).length(4), principle: z.string().min(1), restrictions: z.array(z.string().min(1)).min(4), version: z.string().min(1) });
 const fireShieldRecipeSchema = z.object({ id: z.literal('recipe_just_boundary_shield_v1'), name: z.string().min(1), componentIds: z.array(z.string().min(1)).length(5), principle: z.string().min(1), restrictions: z.array(z.string().min(1)).min(5), version: z.string().min(1) });
 const earthStoneRecipeSchema = z.object({ id: z.literal('recipe_first_step_stone_v1'), name: z.string().min(1), componentIds: z.array(z.string().min(1)).length(5), principle: z.string().min(1), restrictions: z.array(z.string().min(1)).min(5), version: z.string().min(1) });
@@ -68,7 +66,8 @@ export function validateContent(): void {
     earthRhythmBiblicalUnit,
     earthOrderBiblicalUnit,
     earthStoneBiblicalUnit,
-    spiritFoundationBiblicalUnit
+    spiritFoundationBiblicalUnit,
+    spiritCenterBiblicalUnit
   ]);
 
   const allNodes = [
@@ -90,7 +89,8 @@ export function validateContent(): void {
     ...earthOrderNodes,
     ...earthStoneNodes,
     ...spiritFoundationNodes,
-    ...spiritThreadNodes
+    ...spiritThreadNodes,
+    ...spiritCenterNodes
   ];
 
   z.array(nodeSchema).parse(allNodes);
@@ -110,6 +110,8 @@ export function validateContent(): void {
   z.array(spiritDimensionSchema).length(5).parse(spiritSynthesisDimensions);
   z.array(spiritThreadEntrySchema).length(10).parse(spiritThreadEntries);
   z.array(spiritScenarioSchema).length(4).parse(spiritScenarios);
+  z.array(spiritCenterEntrySchema).length(8).parse(spiritCenterEntries);
+  z.array(spiritCenterScenarioSchema).length(4).parse(spiritCenterScenarios);
   waterChaliceRecipeSchema.parse(waterChaliceRecipe);
   fireShieldRecipeSchema.parse(fireShieldRecipe);
   earthStoneRecipeSchema.parse(earthStoneRecipe);
