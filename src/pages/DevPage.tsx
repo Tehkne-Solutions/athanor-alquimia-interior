@@ -8,6 +8,7 @@ import { useEarthBodyStore } from '../state/useEarthBodyStore';
 import { useEarthOrderStore } from '../state/useEarthOrderStore';
 import { useEarthResourcesStore } from '../state/useEarthResourcesStore';
 import { useEarthRhythmStore } from '../state/useEarthRhythmStore';
+import { useEarthStoneStore } from '../state/useEarthStoneStore';
 import { useEarthWorkStore } from '../state/useEarthWorkStore';
 import { useFireBoundaryStore } from '../state/useFireBoundaryStore';
 import { useFireChapterStore } from '../state/useFireChapterStore';
@@ -42,6 +43,7 @@ export function DevPage() {
   const resetEarthResources = useEarthResourcesStore((state) => state.reset);
   const resetEarthRhythm = useEarthRhythmStore((state) => state.reset);
   const resetEarthOrder = useEarthOrderStore((state) => state.reset);
+  const resetEarthStone = useEarthStoneStore((state) => state.reset);
   const lamentProgress = useWaterLamentStore((state) => state.progress);
   const memoryProgress = useWaterMemoryStore((state) => state.progress);
   const trustProgress = useWaterTrustStore((state) => state.progress);
@@ -59,6 +61,7 @@ export function DevPage() {
   const earthResourcesProgress = useEarthResourcesStore((state) => state.progress);
   const earthRhythmProgress = useEarthRhythmStore((state) => state.progress);
   const earthOrderProgress = useEarthOrderStore((state) => state.progress);
+  const earthStoneProgress = useEarthStoneStore((state) => state.progress);
   const state = useAthanorStore();
 
   const reset = async () => {
@@ -80,6 +83,7 @@ export function DevPage() {
     resetEarthResources();
     resetEarthRhythm();
     resetEarthOrder();
+    resetEarthStone();
     navigate('/welcome');
   };
 
@@ -108,6 +112,7 @@ export function DevPage() {
     earthResources: earthResourcesProgress ? { status: earthResourcesProgress.status, availability: earthResourcesProgress.availability, substitution: earthResourcesProgress.substitution, scope: earthResourcesProgress.scope, decision: earthResourcesProgress.decision, possibleResourcesBasketCreated: earthResourcesProgress.possibleResourcesBasketCreated } : undefined,
     earthRhythm: earthRhythmProgress ? { status: earthRhythmProgress.status, frequency: earthRhythmProgress.frequency, actionUnit: earthRhythmProgress.actionUnit, rest: earthRhythmProgress.rest, resourceMode: earthRhythmProgress.resourceMode, resume: earthRhythmProgress.resume, decision: earthRhythmProgress.decision, rhythmCompassCreated: earthRhythmProgress.rhythmCompassCreated } : undefined,
     earthOrder: earthOrderProgress ? { status: earthOrderProgress.status, activeLimit: earthOrderProgress.activeLimit, itemStates: earthOrderProgress.itemStates, visibleOrder: earthOrderProgress.visibleOrder, priority: earthOrderProgress.priority, reviewRule: earthOrderProgress.reviewRule, decision: earthOrderProgress.decision, possibleOrderMapCreated: earthOrderProgress.possibleOrderMapCreated } : undefined,
+    earthStone: earthStoneProgress ? { status: earthStoneProgress.status, function: earthStoneProgress.function, smallStep: earthStoneProgress.smallStep, resource: earthStoneProgress.resource, rhythm: earthStoneProgress.rhythm, activeLimit: earthStoneProgress.activeLimit, reviewWindow: earthStoneProgress.reviewWindow, stoneCreated: earthStoneProgress.stoneCreated, positioned: earthStoneProgress.positioned } : undefined,
     inventory: state.inventory.map((item) => item.name)
   }, null, 2)}</pre></Card><Card title="Ações"><Button variant="danger" onClick={reset}><RotateCcw size={18}/> Resetar todo o estado</Button></Card></div></div>;
 }
