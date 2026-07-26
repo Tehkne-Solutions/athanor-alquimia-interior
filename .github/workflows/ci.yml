@@ -30,7 +30,23 @@ jobs:
         run: npm ci --no-audit --no-fund
 
       - name: Validate content
-        run: npm run validate:content
+        id: content_validation
+        shell: bash
+        run: |
+          set +e
+          npm run validate:content > content-validation.log 2>&1
+          status=$?
+          tail -n 80 content-validation.log
+          exit $status
+
+      - name: Upload content diagnostics
+        if: failure() && steps.content_validation.outcome == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          name: athanor-content-diagnostics
+          path: content-validation.log
+          if-no-files-found: error
+          retention-days: 1
 
       - name: Run tests
         run: npm test
