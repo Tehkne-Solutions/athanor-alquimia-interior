@@ -2,6 +2,7 @@ import { z } from 'zod';
 import { provenanceClassSchema } from '../domain/types';
 import { earthBodyEntries, earthBodyNodes } from './earthBody';
 import { earthFoundationBiblicalUnit, earthFoundationNodes } from './earthFoundation';
+import { earthOrderBiblicalUnit, earthOrderEntries, earthOrderNodes } from './earthOrder';
 import { earthResourceEntries, earthResourcesBiblicalUnit, earthResourcesNodes } from './earthResources';
 import { earthRhythmBiblicalUnit, earthRhythmEntries, earthRhythmNodes } from './earthRhythm';
 import { earthWorkBiblicalUnit, earthWorkEntries, earthWorkNodes } from './earthWork';
@@ -32,6 +33,7 @@ const earthBodyEntrySchema = z.object({ id: z.string().min(1), text: z.string().
 const earthWorkEntrySchema = z.object({ id: z.string().min(1), text: z.string().min(1), suggestedCategory: z.enum(['intention', 'project', 'task', 'first_step']), explanation: z.string().min(1) });
 const earthResourceEntrySchema = z.object({ id: z.string().min(1), text: z.string().min(1), suggestedCategory: z.enum(['resource', 'desire', 'dependency', 'guarantee']), explanation: z.string().min(1) });
 const earthRhythmEntrySchema = z.object({ id: z.string().min(1), text: z.string().min(1), suggestedCategory: z.enum(['rhythm', 'rush', 'repetition', 'pressure']), explanation: z.string().min(1) });
+const earthOrderEntrySchema = z.object({ id: z.string().min(1), text: z.string().min(1), suggestedCategory: z.enum(['order', 'priority', 'rigidity', 'accumulation']), explanation: z.string().min(1) });
 const waterChaliceRecipeSchema = z.object({ id: z.literal('recipe_memory_serene_chalice_v1'), name: z.string().min(1), componentIds: z.array(z.string().min(1)).length(4), principle: z.string().min(1), restrictions: z.array(z.string().min(1)).min(4), version: z.string().min(1) });
 const fireShieldRecipeSchema = z.object({ id: z.literal('recipe_just_boundary_shield_v1'), name: z.string().min(1), componentIds: z.array(z.string().min(1)).length(5), principle: z.string().min(1), restrictions: z.array(z.string().min(1)).min(5), version: z.string().min(1) });
 
@@ -51,7 +53,8 @@ export function validateContent(): void {
     earthFoundationBiblicalUnit,
     earthWorkBiblicalUnit,
     earthResourcesBiblicalUnit,
-    earthRhythmBiblicalUnit
+    earthRhythmBiblicalUnit,
+    earthOrderBiblicalUnit
   ]);
 
   const allNodes = [
@@ -69,7 +72,8 @@ export function validateContent(): void {
     ...earthBodyNodes,
     ...earthWorkNodes,
     ...earthResourcesNodes,
-    ...earthRhythmNodes
+    ...earthRhythmNodes,
+    ...earthOrderNodes
   ];
 
   z.array(nodeSchema).parse(allNodes);
@@ -85,6 +89,7 @@ export function validateContent(): void {
   z.array(earthWorkEntrySchema).length(8).parse(earthWorkEntries);
   z.array(earthResourceEntrySchema).length(8).parse(earthResourceEntries);
   z.array(earthRhythmEntrySchema).length(8).parse(earthRhythmEntries);
+  z.array(earthOrderEntrySchema).length(8).parse(earthOrderEntries);
   waterChaliceRecipeSchema.parse(waterChaliceRecipe);
   fireShieldRecipeSchema.parse(fireShieldRecipe);
   z.array(z.object({ id: z.string(), text: z.string(), correctCategory: z.enum(['fact', 'interpretation', 'prediction', 'intention']) })).parse(classificationEntries);
