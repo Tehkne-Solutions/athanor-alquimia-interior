@@ -1,4 +1,4 @@
-import { Archive, CupSoda, Gem, LampDesk, Shield } from 'lucide-react';
+import { Archive, Circle, CupSoda, Gem, LampDesk, Shield } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/Button';
 import { Card } from '../components/Card';
@@ -6,6 +6,7 @@ import { PageHeader } from '../components/PageHeader';
 import { useAthanorStore } from '../state/useAthanorStore';
 import { useEarthStoneStore } from '../state/useEarthStoneStore';
 import { useFireShieldStore } from '../state/useFireShieldStore';
+import { useSpiritOrbStore } from '../state/useSpiritOrbStore';
 import { useWaterChaliceStore } from '../state/useWaterChaliceStore';
 
 const lifecycleLabel = (lifecycle: string) => {
@@ -23,10 +24,12 @@ export function InventoryPage() {
   const chalice = useWaterChaliceStore((state) => state.progress);
   const shield = useFireShieldStore((state) => state.progress);
   const stone = useEarthStoneStore((state) => state.progress);
+  const orb = useSpiritOrbStore((state) => state.progress);
   const hasChalice = Boolean(chalice?.chaliceCreated);
   const hasShield = Boolean(shield?.shieldCreated);
   const hasStone = Boolean(stone?.stoneCreated);
-  const empty = inventory.length === 0 && !hasChalice && !hasShield && !hasStone;
+  const hasOrb = Boolean(orb?.orbCreated);
+  const empty = inventory.length === 0 && !hasChalice && !hasShield && !hasStone && !hasOrb;
 
   return (
     <div className="page">
@@ -65,6 +68,14 @@ export function InventoryPage() {
               <span className={`item-status item-status--${stone.status}`}>{lifecycleLabel(stone.status)}</span>
               <strong>Pedra do Primeiro Passo</strong>
               <small>{stone.positioned ? 'Posicionada no Jardim' : 'Ciclo da Terra em andamento'}</small>
+            </button>
+          )}
+          {hasOrb && orb && (
+            <button className="inventory-item" type="button" onClick={() => navigate('/crafting/possible-integration-orb')}>
+              <div className="inventory-item__icon"><Circle/></div>
+              <span className={`item-status item-status--${orb.status}`}>{lifecycleLabel(orb.status)}</span>
+              <strong>Orbe da Integração Possível</strong>
+              <small>{orb.positioned ? 'Posicionado no Santuário' : 'Ciclo do Espírito em andamento'}</small>
             </button>
           )}
         </div>
