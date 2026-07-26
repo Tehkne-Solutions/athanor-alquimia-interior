@@ -10,6 +10,7 @@ import { CodexPage } from '../pages/CodexPage';
 import { CraftingPage } from '../pages/CraftingPage';
 import { DevPage } from '../pages/DevPage';
 import { EarthBodyPage } from '../pages/EarthBodyPage';
+import { EarthWorkPage } from '../pages/EarthWorkPage';
 import { FireBoundaryPage } from '../pages/FireBoundaryPage';
 import { FireChapterReviewPage } from '../pages/FireChapterReviewPage';
 import { FireCouragePage } from '../pages/FireCouragePage';
@@ -75,6 +76,7 @@ export function App() {
       <Route path="/temple/forge" element={<ForgePage/>}/>
       <Route path="/temple/garden" element={<GardenPage/>}/>
       <Route path="/mission/body-arrives-first" element={<EarthBodyPage/>}/>
+      <Route path="/mission/work-that-fits-today" element={<EarthWorkPage/>}/>
       <Route path="/mission/word-before-response" element={<MissionPage/>}/>
       <Route path="/mission/word-before-response/classification" element={<ClassificationPage/>}/>
       <Route path="/mission/word-before-response/chain" element={<ChainPage/>}/>
