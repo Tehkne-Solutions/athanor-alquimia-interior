@@ -33,6 +33,7 @@ import './styles/spirit-thread.css';
 import './styles/spirit-center.css';
 import './styles/spirit-council.css';
 import './styles/spirit-decision.css';
+import './styles/spirit-return.css';
 
 validateContent();
 

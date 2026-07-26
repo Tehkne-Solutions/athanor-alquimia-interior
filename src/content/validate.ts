@@ -19,6 +19,7 @@ import { spiritCenterBiblicalUnit, spiritCenterEntries, spiritCenterNodes, spiri
 import { spiritCouncilBiblicalUnit, spiritCouncilEntries, spiritCouncilNodes, spiritCouncilScenarios } from './spiritCouncil';
 import { spiritDecisionBiblicalUnit, spiritDecisionEntries, spiritDecisionNodes, spiritDecisionScenarios } from './spiritDecision';
 import { spiritFoundationBiblicalUnit, spiritFoundationNodes, spiritSynthesisDimensions } from './spiritFoundation';
+import { spiritReturnBiblicalUnit, spiritReturnEntries, spiritReturnNodes, spiritReturnScenarios } from './spiritReturn';
 import { spiritScenarios, spiritThreadEntries, spiritThreadNodes } from './spiritThread';
 import { waterBiblicalUnit, waterLamentBiblicalUnit, waterMemoryBiblicalUnit, waterMemoryEntries, waterMemoryNodes } from './water';
 import { waterChaliceRecipe } from './waterChalice';
@@ -49,6 +50,8 @@ const spiritCouncilEntrySchema = z.object({ id: z.string().min(1), text: z.strin
 const spiritCouncilScenarioSchema = z.object({ id: z.string().min(1), title: z.string().min(1), description: z.string().min(1), prompts: z.object({ word: z.string().min(1), emotion: z.string().min(1), impulse: z.string().min(1), body: z.string().min(1), action: z.string().min(1) }) });
 const spiritDecisionEntrySchema = z.object({ id: z.string().min(1), text: z.string().min(1), suggestedCategory: z.enum(['provisional_decision', 'promise', 'prediction', 'obedience']), explanation: z.string().min(1) });
 const spiritDecisionScenarioSchema = z.object({ id: z.string().min(1), title: z.string().min(1), description: z.string().min(1), positions: z.object({ word: z.string().min(1), emotion: z.string().min(1), impulse: z.string().min(1), body: z.string().min(1), action: z.string().min(1) }) });
+const spiritReturnEntrySchema = z.object({ id: z.string().min(1), text: z.string().min(1), suggestedCategory: z.enum(['review', 'correction', 'repetition', 'punishment']), explanation: z.string().min(1) });
+const spiritReturnScenarioSchema = z.object({ id: z.string().min(1), title: z.string().min(1), decision: z.string().min(1), observed: z.string().min(1), context: z.string().min(1), resources: z.string().min(1) });
 const waterChaliceRecipeSchema = z.object({ id: z.literal('recipe_memory_serene_chalice_v1'), name: z.string().min(1), componentIds: z.array(z.string().min(1)).length(4), principle: z.string().min(1), restrictions: z.array(z.string().min(1)).min(4), version: z.string().min(1) });
 const fireShieldRecipeSchema = z.object({ id: z.literal('recipe_just_boundary_shield_v1'), name: z.string().min(1), componentIds: z.array(z.string().min(1)).length(5), principle: z.string().min(1), restrictions: z.array(z.string().min(1)).min(5), version: z.string().min(1) });
 const earthStoneRecipeSchema = z.object({ id: z.literal('recipe_first_step_stone_v1'), name: z.string().min(1), componentIds: z.array(z.string().min(1)).length(5), principle: z.string().min(1), restrictions: z.array(z.string().min(1)).min(5), version: z.string().min(1) });
@@ -75,7 +78,8 @@ export function validateContent(): void {
     spiritFoundationBiblicalUnit,
     spiritCenterBiblicalUnit,
     spiritCouncilBiblicalUnit,
-    spiritDecisionBiblicalUnit
+    spiritDecisionBiblicalUnit,
+    spiritReturnBiblicalUnit
   ]);
 
   const allNodes = [
@@ -100,7 +104,8 @@ export function validateContent(): void {
     ...spiritThreadNodes,
     ...spiritCenterNodes,
     ...spiritCouncilNodes,
-    ...spiritDecisionNodes
+    ...spiritDecisionNodes,
+    ...spiritReturnNodes
   ];
 
   z.array(nodeSchema).parse(allNodes);
@@ -126,6 +131,8 @@ export function validateContent(): void {
   z.array(spiritCouncilScenarioSchema).length(4).parse(spiritCouncilScenarios);
   z.array(spiritDecisionEntrySchema).length(8).parse(spiritDecisionEntries);
   z.array(spiritDecisionScenarioSchema).length(4).parse(spiritDecisionScenarios);
+  z.array(spiritReturnEntrySchema).length(8).parse(spiritReturnEntries);
+  z.array(spiritReturnScenarioSchema).length(4).parse(spiritReturnScenarios);
   waterChaliceRecipeSchema.parse(waterChaliceRecipe);
   fireShieldRecipeSchema.parse(fireShieldRecipe);
   earthStoneRecipeSchema.parse(earthStoneRecipe);

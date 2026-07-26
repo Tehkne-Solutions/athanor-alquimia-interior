@@ -21,6 +21,7 @@ import { useFireTransformationStore } from '../state/useFireTransformationStore'
 import { useSpiritCenterStore } from '../state/useSpiritCenterStore';
 import { useSpiritCouncilStore } from '../state/useSpiritCouncilStore';
 import { useSpiritDecisionStore } from '../state/useSpiritDecisionStore';
+import { useSpiritReturnStore } from '../state/useSpiritReturnStore';
 import { useSpiritThreadStore } from '../state/useSpiritThreadStore';
 import { useWaterChaliceStore } from '../state/useWaterChaliceStore';
 import { useWaterChapterStore } from '../state/useWaterChapterStore';
@@ -54,6 +55,7 @@ export function DevPage() {
   const resetSpiritCenter = useSpiritCenterStore((state) => state.reset);
   const resetSpiritCouncil = useSpiritCouncilStore((state) => state.reset);
   const resetSpiritDecision = useSpiritDecisionStore((state) => state.reset);
+  const resetSpiritReturn = useSpiritReturnStore((state) => state.reset);
   const lamentProgress = useWaterLamentStore((state) => state.progress);
   const memoryProgress = useWaterMemoryStore((state) => state.progress);
   const trustProgress = useWaterTrustStore((state) => state.progress);
@@ -77,6 +79,7 @@ export function DevPage() {
   const spiritCenterProgress = useSpiritCenterStore((state) => state.progress);
   const spiritCouncilProgress = useSpiritCouncilStore((state) => state.progress);
   const spiritDecisionProgress = useSpiritDecisionStore((state) => state.progress);
+  const spiritReturnProgress = useSpiritReturnStore((state) => state.progress);
   const state = useAthanorStore();
 
   const reset = async () => {
@@ -104,6 +107,7 @@ export function DevPage() {
     resetSpiritCenter();
     resetSpiritCouncil();
     resetSpiritDecision();
+    resetSpiritReturn();
     navigate('/welcome');
   };
 
@@ -138,6 +142,7 @@ export function DevPage() {
     spiritCenter: spiritCenterProgress ? { status: spiritCenterProgress.status, scenarioId: spiritCenterProgress.scenarioId, centralDimension: spiritCenterProgress.centralDimension, noCenter: spiritCenterProgress.noCenter, focusHistory: spiritCenterProgress.focusHistory, decision: spiritCenterProgress.decision, centerDeclined: spiritCenterProgress.centerDeclined, provisionalCenterKnotCreated: spiritCenterProgress.provisionalCenterKnotCreated } : undefined,
     spiritCouncil: spiritCouncilProgress ? { status: spiritCouncilProgress.status, scenarioId: spiritCouncilProgress.scenarioId, voiceStates: spiritCouncilProgress.voiceStates, disagreement: spiritCouncilProgress.disagreement, basis: spiritCouncilProgress.basis, decision: spiritCouncilProgress.decision, councilDeclined: spiritCouncilProgress.councilDeclined, openCouncilSealCreated: spiritCouncilProgress.openCouncilSealCreated } : undefined,
     spiritDecision: spiritDecisionProgress ? { status: spiritDecisionProgress.status, scenarioId: spiritDecisionProgress.scenarioId, positions: spiritDecisionProgress.positions, choice: spiritDecisionProgress.choice, revision: spiritDecisionProgress.revision, reviewWindow: spiritDecisionProgress.reviewWindow, reviewCondition: spiritDecisionProgress.reviewCondition, decisionDeclined: spiritDecisionProgress.decisionDeclined, revisableDecisionMarkCreated: spiritDecisionProgress.revisableDecisionMarkCreated } : undefined,
+    spiritReturn: spiritReturnProgress ? { status: spiritReturnProgress.status, scenarioId: spiritReturnProgress.scenarioId, observation: spiritReturnProgress.observation, context: spiritReturnProgress.context, resources: spiritReturnProgress.resources, basis: spiritReturnProgress.basis, disposition: spiritReturnProgress.disposition, returnDeclined: spiritReturnProgress.returnDeclined, possibleReturnKeyCreated: spiritReturnProgress.possibleReturnKeyCreated } : undefined,
     inventory: state.inventory.map((item) => item.name)
   }, null, 2)}</pre></Card><Card title="Ações"><Button variant="danger" onClick={reset}><RotateCcw size={18}/> Resetar todo o estado</Button></Card></div></div>;
 }
