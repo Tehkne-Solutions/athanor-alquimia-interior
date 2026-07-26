@@ -31,10 +31,12 @@ import { ItemPage } from '../pages/ItemPage';
 import { LibraryPage } from '../pages/LibraryPage';
 import { LimitsPage } from '../pages/LimitsPage';
 import { MissionPage } from '../pages/MissionPage';
+import { NewWorkPage } from '../pages/NewWorkPage';
 import { PsalmsChamberPage } from '../pages/PsalmsChamberPage';
 import { ReviewPage } from '../pages/ReviewPage';
 import { SafetyPage } from '../pages/SafetyPage';
 import { SpiritCenterPage } from '../pages/SpiritCenterPage';
+import { SpiritChapterReviewPage } from '../pages/SpiritChapterReviewPage';
 import { SpiritCouncilPage } from '../pages/SpiritCouncilPage';
 import { SpiritDecisionPage } from '../pages/SpiritDecisionPage';
 import { SpiritOrbPage } from '../pages/SpiritOrbPage';
@@ -88,6 +90,7 @@ export function App() {
       <Route path="/temple/forge" element={<ForgePage/>}/>
       <Route path="/temple/garden" element={<GardenPage/>}/>
       <Route path="/temple/spirit-sanctuary" element={<SpiritSanctuaryPage/>}/>
+      <Route path="/temple/new-work" element={<NewWorkPage/>}/>
       <Route path="/mission/thread-that-gathers" element={<SpiritThreadPage/>}/>
       <Route path="/mission/center-without-erasing-parts" element={<SpiritCenterPage/>}/>
       <Route path="/mission/center-without-erasing" element={<SpiritCenterPage/>}/>
@@ -96,6 +99,7 @@ export function App() {
       <Route path="/mission/decision-remains-open" element={<SpiritDecisionPage/>}/>
       <Route path="/mission/return-without-condemnation" element={<SpiritReturnPage/>}/>
       <Route path="/crafting/possible-integration-orb" element={<SpiritOrbPage/>}/>
+      <Route path="/review/spirit-chapter" element={<SpiritChapterReviewPage/>}/>
       <Route path="/mission/body-arrives-first" element={<EarthBodyPage/>}/>
       <Route path="/mission/work-that-fits-today" element={<EarthWorkPage/>}/>
       <Route path="/mission/house-of-resources" element={<EarthResourcesPage/>}/>
