@@ -17,6 +17,7 @@ import {
   RefreshCw,
   Shield,
   ShieldCheck,
+  Sparkles,
   Sprout
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -28,6 +29,7 @@ import { TempleMap } from '../components/TempleMap';
 import { biblicalUnits } from '../content/seed';
 import { useAthanorStore } from '../state/useAthanorStore';
 import { useEarthBodyStore } from '../state/useEarthBodyStore';
+import { useEarthChapterStore } from '../state/useEarthChapterStore';
 import { useEarthOrderStore } from '../state/useEarthOrderStore';
 import { useEarthResourcesStore } from '../state/useEarthResourcesStore';
 import { useEarthRhythmStore } from '../state/useEarthRhythmStore';
@@ -75,6 +77,7 @@ export function TemplePage() {
   const rawEarthRhythm = useEarthRhythmStore((state) => state.progress);
   const rawEarthOrder = useEarthOrderStore((state) => state.progress);
   const rawEarthStone = useEarthStoneStore((state) => state.progress);
+  const rawEarthChapter = useEarthChapterStore((state) => state.progress);
   const passage = biblicalUnits[0];
 
   if (!character || !temple) return null;
@@ -85,6 +88,7 @@ export function TemplePage() {
   const psalmsChamber = temple.rooms.find((room) => room.roomId === 'psalms-chamber');
   const forge = temple.rooms.find((room) => room.roomId === 'forge');
   const garden = temple.rooms.find((room) => room.roomId === 'garden');
+  const centralTree = temple.rooms.find((room) => room.roomId === 'central-tree');
   const waterAvailable = Boolean(integrated || (psalmsChamber && psalmsChamber.status !== 'dormant' && psalmsChamber.status !== 'hidden'));
   const waterCompleted = Boolean(waterChapter && waterJourney && waterChapter.journeyStartedAt === waterJourney.startedAt && waterChapter.status === 'completed');
   const forgeAvailable = Boolean(waterCompleted || (forge && forge.status !== 'dormant' && forge.status !== 'hidden'));
@@ -130,13 +134,18 @@ export function TemplePage() {
   const sourceOrderMapId = orderMapCreated && earthOrder ? earthOrder.completedAt ?? `${earthOrder.sourceRhythmCompassId}:order-map` : undefined;
   const stoneProgress = sourceOrderMapId && rawEarthStone?.sourceOrderMapId === sourceOrderMapId ? rawEarthStone : undefined;
   const stoneCreated = Boolean(stoneProgress?.stoneCreated);
+  const sourceStoneId = stoneProgress?.craftedAt ?? (stoneProgress ? `${stoneProgress.sourceOrderMapId}:stone` : undefined);
+  const earthChapter = sourceStoneId && rawEarthChapter?.sourceStoneId === sourceStoneId ? rawEarthChapter : undefined;
+  const earthCompleted = earthChapter?.status === 'completed';
   const gardenAvailable = Boolean(fireCompleted || (garden && garden.status !== 'dormant' && garden.status !== 'hidden'));
+  const sanctuaryAvailable = Boolean(earthCompleted || (centralTree && centralTree.status !== 'dormant' && centralTree.status !== 'hidden'));
 
   const roomSelect = (roomId: string) => {
     if (roomId === 'proverbs-library') navigate('/temple/proverbs-library');
     if (roomId === 'psalms-chamber') navigate('/temple/psalms-chamber');
     if (roomId === 'forge') navigate('/temple/forge');
     if (roomId === 'garden') navigate('/temple/garden');
+    if (roomId === 'central-tree') navigate('/temple/spirit-sanctuary');
   };
 
   const missionAction = awaitingReview
@@ -149,46 +158,52 @@ export function TemplePage() {
   const fireAction = fireCompleted ? 'Visitar a Forja restaurada' : shieldProgress?.positioned ? 'Concluir o capítulo do Fogo' : shieldCreated ? 'Continuar o ciclo do Escudo' : shieldProgress ? 'Continuar a Forja do Escudo' : transformedMetalCreated ? 'Forjar o Escudo do Limite Justo' : transformationProgress ? 'Continuar O que Precisa Ser Transformado' : courageMarkCreated ? 'Iniciar O que Precisa Ser Transformado' : courageProgress ? 'Continuar A Coragem Proporcional' : boundaryPlateCreated ? 'Iniciar A Coragem Proporcional' : boundaryProgress ? 'Continuar O Limite que Protege' : intervalEmberCreated ? 'Iniciar O Limite que Protege' : intervalProgress ? 'Continuar O Instante Antes do Gesto' : namedFlameCreated ? 'Iniciar O Instante Antes do Gesto' : fireProgress ? 'Continuar O Nome da Chama' : 'Iniciar O Nome da Chama';
   const fireRoute = fireCompleted ? '/temple/forge' : shieldProgress?.positioned ? '/review/fire-chapter' : transformedMetalCreated || shieldProgress ? '/crafting/just-boundary-shield' : courageMarkCreated ? '/mission/what-needs-transformation' : boundaryPlateCreated ? '/mission/proportional-courage' : intervalEmberCreated ? '/mission/limit-that-protects' : namedFlameCreated ? '/mission/before-the-gesture' : '/mission/name-the-flame';
 
-  const earthAction = stoneProgress?.positioned
-    ? 'Revisar a Pedra posicionada'
-    : stoneProgress?.status === 'integrated'
-      ? 'Posicionar a Pedra'
-      : stoneCreated
-        ? 'Continuar o ciclo da Pedra'
-        : stoneProgress
-          ? 'Continuar a lapidação da Pedra'
-          : orderMapCreated
-            ? 'Lapidar a Pedra do Primeiro Passo'
-            : earthOrder
-              ? 'Continuar A Ordem que Serve'
-              : rhythmCompassCreated
-                ? 'Iniciar A Ordem que Serve'
-                : earthRhythm
-                  ? 'Continuar O Ritmo que Pode Ser Mantido'
-                  : resourcesBasketCreated
-                    ? 'Iniciar O Ritmo que Pode Ser Mantido'
-                    : earthResources
-                      ? 'Continuar A Casa dos Recursos'
-                      : firstStepSeedCreated
-                        ? 'Iniciar A Casa dos Recursos'
-                        : earthWork
-                          ? 'Continuar O Trabalho que Cabe Hoje'
-                          : bodyMarkCreated
-                            ? 'Iniciar O Trabalho que Cabe Hoje'
-                            : earthBody
-                              ? 'Continuar O Corpo Chega Primeiro'
-                              : 'Iniciar O Corpo Chega Primeiro';
-  const earthRoute = orderMapCreated
-    ? '/crafting/first-step-stone'
-    : rhythmCompassCreated
-      ? '/mission/order-that-serves'
-      : resourcesBasketCreated
-        ? '/mission/sustainable-rhythm'
-        : firstStepSeedCreated
-          ? '/mission/house-of-resources'
-          : bodyMarkCreated
-            ? '/mission/work-that-fits-today'
-            : '/mission/body-arrives-first';
+  const earthAction = earthCompleted
+    ? 'Visitar o Jardim restaurado'
+    : stoneProgress?.positioned
+      ? 'Concluir o capítulo da Terra'
+      : stoneProgress?.status === 'integrated'
+        ? 'Posicionar a Pedra'
+        : stoneCreated
+          ? 'Continuar o ciclo da Pedra'
+          : stoneProgress
+            ? 'Continuar a lapidação da Pedra'
+            : orderMapCreated
+              ? 'Lapidar a Pedra do Primeiro Passo'
+              : earthOrder
+                ? 'Continuar A Ordem que Serve'
+                : rhythmCompassCreated
+                  ? 'Iniciar A Ordem que Serve'
+                  : earthRhythm
+                    ? 'Continuar O Ritmo que Pode Ser Mantido'
+                    : resourcesBasketCreated
+                      ? 'Iniciar O Ritmo que Pode Ser Mantido'
+                      : earthResources
+                        ? 'Continuar A Casa dos Recursos'
+                        : firstStepSeedCreated
+                          ? 'Iniciar A Casa dos Recursos'
+                          : earthWork
+                            ? 'Continuar O Trabalho que Cabe Hoje'
+                            : bodyMarkCreated
+                              ? 'Iniciar O Trabalho que Cabe Hoje'
+                              : earthBody
+                                ? 'Continuar O Corpo Chega Primeiro'
+                                : 'Iniciar O Corpo Chega Primeiro';
+  const earthRoute = earthCompleted
+    ? '/temple/garden'
+    : stoneProgress?.positioned
+      ? '/review/earth-chapter'
+      : orderMapCreated
+        ? '/crafting/first-step-stone'
+        : rhythmCompassCreated
+          ? '/mission/order-that-serves'
+          : resourcesBasketCreated
+            ? '/mission/sustainable-rhythm'
+            : firstStepSeedCreated
+              ? '/mission/house-of-resources'
+              : bodyMarkCreated
+                ? '/mission/work-that-fits-today'
+                : '/mission/body-arrives-first';
 
   const activeRoomCount = temple.rooms.filter((room) => ['active', 'restored', 'available'].includes(room.status)).length;
   const componentCount = inventory.length
@@ -206,29 +221,31 @@ export function TemplePage() {
     + Number(rhythmCompassCreated)
     + Number(orderMapCreated)
     + Number(stoneCreated);
-  const cycleCount = reviews.length + Number(waterCompleted) + Number(fireCompleted);
+  const cycleCount = reviews.length + Number(waterCompleted) + Number(fireCompleted) + Number(earthCompleted);
 
-  const heroMessage = stoneCreated
-    ? 'Os cinco componentes da Terra foram reunidos em uma Pedra que ainda depende de revisão explícita.'
-    : orderMapCreated
-      ? 'A quinta prática da Terra registrou uma ordem limitada sem criar urgência automática.'
-      : rhythmCompassCreated
-        ? 'A quarta prática da Terra registrou uma cadência pausável sem criar sequência obrigatória.'
-        : resourcesBasketCreated
-          ? 'A terceira prática da Terra registrou recursos possíveis sem prometer disponibilidade.'
-          : firstStepSeedCreated
-            ? 'A segunda prática da Terra registrou uma unidade pequena sem obrigação de execução.'
-            : bodyMarkCreated
-              ? 'A primeira prática da Terra registrou presença sem diagnóstico.'
-              : fireCompleted
-                ? 'O ciclo do Fogo foi registrado e o Jardim Interior foi aberto.'
-                : shieldProgress?.positioned
-                  ? 'O Escudo está posicionado e aguarda a revisão geral do Fogo.'
-                  : waterCompleted
-                    ? 'O ciclo da Água foi registrado e a Forja foi aberta.'
-                    : integrated
-                      ? 'A primeira Obra foi revisada.'
-                      : 'A Biblioteca aguarda sua primeira restauração.';
+  const heroMessage = earthCompleted
+    ? 'O ciclo da Terra foi registrado, o Jardim foi restaurado e o Santuário do Espírito foi aberto.'
+    : stoneCreated
+      ? 'Os cinco componentes da Terra foram reunidos em uma Pedra que ainda depende de revisão explícita.'
+      : orderMapCreated
+        ? 'A quinta prática da Terra registrou uma ordem limitada sem criar urgência automática.'
+        : rhythmCompassCreated
+          ? 'A quarta prática da Terra registrou uma cadência pausável sem criar sequência obrigatória.'
+          : resourcesBasketCreated
+            ? 'A terceira prática da Terra registrou recursos possíveis sem prometer disponibilidade.'
+            : firstStepSeedCreated
+              ? 'A segunda prática da Terra registrou uma unidade pequena sem obrigação de execução.'
+              : bodyMarkCreated
+                ? 'A primeira prática da Terra registrou presença sem diagnóstico.'
+                : fireCompleted
+                  ? 'O ciclo do Fogo foi registrado e o Jardim Interior foi aberto.'
+                  : shieldProgress?.positioned
+                    ? 'O Escudo está posicionado e aguarda a revisão geral do Fogo.'
+                    : waterCompleted
+                      ? 'O ciclo da Água foi registrado e a Forja foi aberta.'
+                      : integrated
+                        ? 'A primeira Obra foi revisada.'
+                        : 'A Biblioteca aguarda sua primeira restauração.';
 
   return <div className="page page--temple">
     <PageHeader eyebrow="Átrio da Presença" title={`Bem-vindo ao Templo, ${character.name}.`} description="Seu Templo registra ciclos de gameplay, itens e revisões. Ele não mede sua condição espiritual." action={<span className="local-badge"><Database size={16}/> Dados locais</span>}/>
@@ -238,9 +255,10 @@ export function TemplePage() {
       <Card eyebrow={integrated ? 'Ciclo integrado' : awaitingReview ? 'Retorno pendente' : 'Missão principal'} title="A Palavra Antes da Resposta" className="mission-card"><div className="mission-card__icon">{integrated ? <CheckCircle2/> : awaitingReview ? <Clock3/> : <BookOpenText/>}</div><p>{integrated ? 'A Lâmpada integra a Primeira Obra.' : awaitingReview ? 'O ciclo aguarda revisão.' : 'Organize fato, interpretação, previsão e intenção.'}</p><Button variant="secondary" onClick={() => navigate(missionAction.route)}>{missionAction.label} <MissionActionIcon size={18}/></Button></Card>
       {waterAvailable && <Card eyebrow={waterCompleted ? 'Capítulo concluído' : 'Capítulo disponível'} title="A Câmara dos Salmos" className="mission-card mission-card--water"><div className="mission-card__icon">{waterCompleted ? <CupSoda/> : <Droplets/>}</div><p>{waterCompleted ? 'O ciclo da Água foi registrado.' : 'Reconheça emoção, lamento, memória e apoio sem diagnóstico.'}</p><Button variant="secondary" onClick={() => navigate(waterCompleted ? '/temple/psalms-chamber' : chaliceProgress?.positioned ? '/review/water-chapter' : '/temple/psalms-chamber')}>{waterAction} <ArrowRight size={18}/></Button></Card>}
       {forgeAvailable && <Card eyebrow={fireCompleted ? 'Capítulo concluído' : shieldProgress?.positioned ? 'Revisão geral disponível' : shieldCreated ? 'Escudo criado' : 'Capítulo disponível'} title="A Forja dos Elementos" className="mission-card mission-card--fire"><div className="mission-card__icon">{fireCompleted ? <CheckCircle2/> : shieldCreated ? <Shield/> : transformedMetalCreated ? <Hammer/> : <Flame/>}</div><p>{fireCompleted ? 'O primeiro ciclo do Fogo foi registrado.' : shieldProgress?.positioned ? 'O Escudo está pronto para o encerramento do capítulo.' : 'O Fogo avança por componentes separados e recusáveis.'}</p><Button variant="secondary" onClick={() => navigate(fireRoute)}>{fireAction} <ArrowRight size={18}/></Button></Card>}
-      {gardenAvailable && <Card eyebrow={stoneCreated ? 'Item da Terra criado' : orderMapCreated ? 'Cinco componentes reunidos' : rhythmCompassCreated ? 'Quarto componente criado' : resourcesBasketCreated ? 'Terceiro componente criado' : firstStepSeedCreated ? 'Segundo componente criado' : bodyMarkCreated ? 'Primeiro componente criado' : earthBody ? 'Missão em andamento' : 'Novo capítulo disponível'} title="O Jardim Interior" className="mission-card mission-card--earth"><div className="mission-card__icon">{stoneCreated ? <Gem/> : orderMapCreated ? <Map/> : rhythmCompassCreated ? <Clock3/> : resourcesBasketCreated ? <ListChecks/> : firstStepSeedCreated ? <Sprout/> : bodyMarkCreated ? <Footprints/> : <Sprout/>}</div><p>{stoneCreated ? 'A Pedra registra uma fórmula local que ainda depende de revisão.' : orderMapCreated ? 'A receita da Pedra do Primeiro Passo está disponível.' : rhythmCompassCreated ? 'O Compasso registra uma cadência interrompível sem streak.' : resourcesBasketCreated ? 'O Cesto registra disponibilidade e limite sem prometer abundância.' : firstStepSeedCreated ? 'A Semente registra uma unidade pequena sem medir produtividade.' : bodyMarkCreated ? 'A Marca registra presença percebida sem avaliar saúde ou produtividade.' : 'A Terra começa por corpo percebido, descanso, estrutura e uma ação pequena.'}</p><Button variant="secondary" onClick={() => navigate(earthRoute)}>{earthAction} <ArrowRight size={18}/></Button></Card>}
-      <Card title="Mapa do Templo" eyebrow="Ambientes"><TempleMap temple={temple} onRoomSelect={roomSelect} unlockedRoomIds={[...(integrated ? ['psalms-chamber'] : []), ...(waterCompleted ? ['forge'] : []), ...(fireCompleted ? ['garden'] : [])]}/></Card>
-      <Card title="Instrumentos da Obra" eyebrow={fireCompleted ? 'Ar, Água, Fogo e Terra' : namedFlameCreated ? 'Ar, Água e Fogo' : chaliceAvailable ? 'Água e Ar' : 'Instrumentos'}>
+      {gardenAvailable && <Card eyebrow={earthCompleted ? 'Capítulo concluído' : stoneProgress?.positioned ? 'Revisão geral disponível' : stoneCreated ? 'Item da Terra criado' : orderMapCreated ? 'Cinco componentes reunidos' : rhythmCompassCreated ? 'Quarto componente criado' : resourcesBasketCreated ? 'Terceiro componente criado' : firstStepSeedCreated ? 'Segundo componente criado' : bodyMarkCreated ? 'Primeiro componente criado' : earthBody ? 'Missão em andamento' : 'Novo capítulo disponível'} title="O Jardim Interior" className="mission-card mission-card--earth"><div className="mission-card__icon">{earthCompleted ? <CheckCircle2/> : stoneCreated ? <Gem/> : orderMapCreated ? <Map/> : rhythmCompassCreated ? <Clock3/> : resourcesBasketCreated ? <ListChecks/> : firstStepSeedCreated ? <Sprout/> : bodyMarkCreated ? <Footprints/> : <Sprout/>}</div><p>{earthCompleted ? 'O primeiro ciclo da Terra foi registrado.' : stoneProgress?.positioned ? 'A Pedra está pronta para o encerramento do capítulo.' : stoneCreated ? 'A Pedra registra uma fórmula local que ainda depende de revisão.' : orderMapCreated ? 'A receita da Pedra do Primeiro Passo está disponível.' : rhythmCompassCreated ? 'O Compasso registra uma cadência interrompível sem streak.' : resourcesBasketCreated ? 'O Cesto registra disponibilidade e limite sem prometer abundância.' : firstStepSeedCreated ? 'A Semente registra uma unidade pequena sem medir produtividade.' : bodyMarkCreated ? 'A Marca registra presença percebida sem avaliar saúde ou produtividade.' : 'A Terra começa por corpo percebido, descanso, estrutura e uma ação pequena.'}</p><Button variant="secondary" onClick={() => navigate(earthRoute)}>{earthAction} <ArrowRight size={18}/></Button></Card>}
+      {sanctuaryAvailable && <Card eyebrow="Fundação disponível" title="Santuário do Espírito" className="mission-card mission-card--spirit"><div className="mission-card__icon"><Sparkles/></div><p>Palavra, emoção, impulso, corpo e ação serão observados em conjunto sem leitura oculta ou exigência de completude.</p><Button variant="secondary" onClick={() => navigate('/temple/spirit-sanctuary')}>Entrar no Santuário <ArrowRight size={18}/></Button></Card>}
+      <Card title="Mapa do Templo" eyebrow="Ambientes"><TempleMap temple={temple} onRoomSelect={roomSelect} unlockedRoomIds={[...(integrated ? ['psalms-chamber'] : []), ...(waterCompleted ? ['forge'] : []), ...(fireCompleted ? ['garden'] : []), ...(earthCompleted ? ['central-tree'] : [])]}/></Card>
+      <Card title="Instrumentos da Obra" eyebrow={earthCompleted ? 'Ar, Água, Fogo, Terra e síntese' : fireCompleted ? 'Ar, Água, Fogo e Terra' : namedFlameCreated ? 'Ar, Água e Fogo' : chaliceAvailable ? 'Água e Ar' : 'Instrumentos'}>
         {lamp ? <div className="item-mini"><div className="lamp-icon"><LampDesk/></div><div><strong>{lamp.name}</strong><p>{lamp.action}</p></div></div> : <div className="empty-state"><LampDesk/><p>Sua primeira receita será desbloqueada na Biblioteca.</p></div>}
         {chaliceAvailable && <div className="item-mini"><div className="lamp-icon"><CupSoda/></div><div><strong>Cálice da Memória Serena</strong><p>{waterCompleted ? 'Ciclo registrado' : 'Ciclo em revisão'}</p></div></div>}
         {namedFlameCreated && <div className="item-mini"><div className="lamp-icon"><Flame/></div><div><strong>Chama Nomeada</strong><p>Primeiro componente do Fogo</p></div></div>}
@@ -254,7 +272,7 @@ export function TemplePage() {
         {resourcesBasketCreated && <div className="item-mini"><div className="lamp-icon"><ListChecks/></div><div><strong>Cesto dos Recursos Possíveis</strong><p>Terceiro componente da Terra</p></div></div>}
         {rhythmCompassCreated && <div className="item-mini"><div className="lamp-icon"><Clock3/></div><div><strong>Compasso do Ritmo Sustentável</strong><p>Quarto componente da Terra</p></div></div>}
         {orderMapCreated && <div className="item-mini"><div className="lamp-icon"><Map/></div><div><strong>Mapa da Ordem Possível</strong><p>Quinto componente da Terra</p></div></div>}
-        {stoneCreated && <div className="item-mini"><div className="lamp-icon"><Gem/></div><div><strong>Pedra do Primeiro Passo</strong><p>{stoneProgress?.positioned ? 'Posicionada no Jardim' : stoneProgress?.status === 'integrated' ? 'Integrada' : stoneProgress?.status === 'resting' ? 'Em repouso' : 'Ciclo em revisão'}</p></div></div>}
+        {stoneCreated && <div className="item-mini"><div className="lamp-icon"><Gem/></div><div><strong>Pedra do Primeiro Passo</strong><p>{earthCompleted ? 'Ciclo da Terra registrado' : stoneProgress?.positioned ? 'Posicionada no Jardim' : stoneProgress?.status === 'integrated' ? 'Integrada' : stoneProgress?.status === 'resting' ? 'Em repouso' : 'Ciclo em revisão'}</p></div></div>}
       </Card>
       <Card title="Limites do sistema" eyebrow="Segurança"><div className="safety-summary"><ShieldCheck/><p>Nenhum status é diagnóstico. Símbolos não determinam o futuro, e toda ação pode ser recusada.</p></div></Card>
     </div>
