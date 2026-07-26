@@ -12,7 +12,6 @@ import {
   Hammer,
   LampDesk,
   RefreshCw,
-  Seedling,
   Shield,
   ShieldCheck,
   Sprout
@@ -152,7 +151,7 @@ export function TemplePage() {
 
         {forgeAvailable && <Card eyebrow={fireCompleted ? 'Capítulo concluído' : shieldProgress?.positioned ? 'Revisão geral disponível' : shieldCreated ? 'Escudo criado' : 'Capítulo disponível'} title="A Forja dos Elementos" className="mission-card mission-card--fire"><div className="mission-card__icon">{fireCompleted ? <CheckCircle2/> : shieldCreated ? <Shield/> : transformedMetalCreated ? <Hammer/> : <Flame/>}</div><p>{fireCompleted ? 'O primeiro ciclo do Fogo foi registrado.' : shieldProgress?.positioned ? 'O Escudo está pronto para o encerramento do capítulo.' : 'O Fogo avança por componentes separados e recusáveis.'}</p><Button variant="secondary" onClick={() => navigate(fireRoute)}>{fireAction} <ArrowRight size={18}/></Button></Card>}
 
-        {gardenAvailable && <Card eyebrow={firstStepSeedCreated ? 'Segundo componente criado' : bodyMarkCreated ? 'Primeiro componente criado' : earthBody ? 'Missão em andamento' : 'Novo capítulo disponível'} title="O Jardim Interior" className="mission-card mission-card--earth"><div className="mission-card__icon">{firstStepSeedCreated ? <Seedling/> : bodyMarkCreated ? <Footprints/> : <Sprout/>}</div><p>{firstStepSeedCreated ? 'A Semente registra uma unidade pequena sem medir produtividade.' : bodyMarkCreated ? 'A Marca registra presença percebida sem avaliar saúde ou produtividade.' : 'A Terra começa por corpo percebido, descanso, estrutura e uma ação pequena.'}</p><Button variant="secondary" onClick={() => navigate(earthRoute)}>{earthAction} <ArrowRight size={18}/></Button></Card>}
+        {gardenAvailable && <Card eyebrow={firstStepSeedCreated ? 'Segundo componente criado' : bodyMarkCreated ? 'Primeiro componente criado' : earthBody ? 'Missão em andamento' : 'Novo capítulo disponível'} title="O Jardim Interior" className="mission-card mission-card--earth"><div className="mission-card__icon">{firstStepSeedCreated ? <Sprout/> : bodyMarkCreated ? <Footprints/> : <Sprout/>}</div><p>{firstStepSeedCreated ? 'A Semente registra uma unidade pequena sem medir produtividade.' : bodyMarkCreated ? 'A Marca registra presença percebida sem avaliar saúde ou produtividade.' : 'A Terra começa por corpo percebido, descanso, estrutura e uma ação pequena.'}</p><Button variant="secondary" onClick={() => navigate(earthRoute)}>{earthAction} <ArrowRight size={18}/></Button></Card>}
 
         <Card title="Mapa do Templo" eyebrow="Ambientes"><TempleMap temple={temple} onRoomSelect={roomSelect} unlockedRoomIds={[...(integrated ? ['psalms-chamber'] : []), ...(waterCompleted ? ['forge'] : []), ...(fireCompleted ? ['garden'] : [])]}/></Card>
 
@@ -166,7 +165,7 @@ export function TemplePage() {
           {transformedMetalCreated && <div className="item-mini"><div className="lamp-icon"><Hammer/></div><div><strong>Metal Transformado</strong><p>Quinto componente do Fogo</p></div></div>}
           {shieldCreated && <div className="item-mini"><div className="lamp-icon"><Shield/></div><div><strong>Escudo do Limite Justo</strong><p>{fireCompleted ? 'Ciclo do Fogo registrado' : shieldProgress?.positioned ? 'Posicionado na Forja' : shieldProgress?.status === 'integrated' ? 'Integrado' : 'Ciclo em revisão'}</p></div></div>}
           {bodyMarkCreated && <div className="item-mini"><div className="lamp-icon"><Footprints/></div><div><strong>Marca da Presença Corporal</strong><p>Primeiro componente da Terra</p></div></div>}
-          {firstStepSeedCreated && <div className="item-mini"><div className="lamp-icon"><Seedling/></div><div><strong>Semente do Primeiro Passo</strong><p>Segundo componente da Terra</p></div></div>}
+          {firstStepSeedCreated && <div className="item-mini"><div className="lamp-icon"><Sprout/></div><div><strong>Semente do Primeiro Passo</strong><p>Segundo componente da Terra</p></div></div>}
         </Card>
 
         <Card title="Limites do sistema" eyebrow="Segurança"><div className="safety-summary"><ShieldCheck/><p>Nenhum status é diagnóstico. Símbolos não determinam o futuro, e toda ação pode ser recusada.</p></div></Card>
