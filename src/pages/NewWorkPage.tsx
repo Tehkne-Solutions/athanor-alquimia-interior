@@ -5,6 +5,7 @@ import { Card } from '../components/Card';
 import { PageHeader } from '../components/PageHeader';
 import { newWorkBiblicalUnit, newWorkModes, newWorkRestrictions, newWorkStartPoints } from '../content/newWork';
 import { canRegisterNewWork } from '../domain/continuousJourney';
+import { useContinuousCycleStore } from '../state/useContinuousCycleStore';
 import { useContinuousJourneyStore } from '../state/useContinuousJourneyStore';
 import { useSpiritChapterStore } from '../state/useSpiritChapterStore';
 
@@ -12,6 +13,7 @@ export function NewWorkPage() {
   const navigate = useNavigate();
   const spiritChapter = useSpiritChapterStore((state) => state.progress);
   const storedProgress = useContinuousJourneyStore((state) => state.progress);
+  const cycleInstances = useContinuousCycleStore((state) => state.progress.instances);
   const start = useContinuousJourneyStore((state) => state.start);
   const selectStartPoint = useContinuousJourneyStore((state) => state.selectStartPoint);
   const selectMode = useContinuousJourneyStore((state) => state.selectMode);
@@ -41,8 +43,8 @@ export function NewWorkPage() {
     <Card title="1. Ponto de partida" eyebrow="Nenhum reinício automático"><div className="new-work-option-grid">{newWorkStartPoints.map((option) => <button key={option.id} type="button" aria-pressed={progress.selectedStartPoint === option.id} onClick={() => selectStartPoint(option.id)}>{option.id === 'rest' ? <MoonStar/> : <Circle/>}<span><strong>{option.label}</strong><small>{option.description}</small></span></button>)}</div></Card>
     <Card title="2. Forma de retorno" eyebrow="Escolha revisável"><div className="new-work-option-grid">{newWorkModes.map((option) => { const blocked = progress.selectedStartPoint === 'rest' ? option.id !== 'rest_without_start' : option.id === 'rest_without_start'; return <button key={option.id} type="button" disabled={blocked} aria-pressed={progress.selectedMode === option.id} onClick={() => selectMode(option.id)}><CheckCircle2/><span><strong>{option.label}</strong><small>{option.description}</small></span></button>; })}</div></Card>
     <Card title="Registrar a Nova Obra" eyebrow="Sem apagar ciclos"><div className="safety-summary"><ShieldCheck/><p>O registro não inicia cronômetro, missão, mensagem ou ação externa. Ele apenas preserva uma escolha local.</p></div><div className="new-work-actions"><Button disabled={!ready} onClick={register}>Registrar ponto possível</Button><Button variant="ghost" onClick={() => navigate('/temple')}>Voltar ao Átrio</Button></div>{!ready && <p className="field-help">Escolha um ponto e uma forma compatível de retorno.</p>}</Card>
-    {latestRecord && latestPoint && <Card title="Última Nova Obra registrada" eyebrow="Histórico local preservado"><div className="new-work-latest"><CheckCircle2/><div><strong>{latestPoint.label}</strong><p>{newWorkModes.find((mode) => mode.id === latestRecord.mode)?.label}</p><small>{new Date(latestRecord.createdAt).toLocaleString('pt-BR')}</small></div></div><Button variant="secondary" onClick={() => navigate(latestPoint.route)}>Abrir {latestPoint.label}</Button></Card>}
-    {progress.records.length > 0 && <Card title="Histórico de pontos" eyebrow={`${progress.records.length} registros`}><ul className="simple-list">{progress.records.slice().reverse().map((record) => { const point = newWorkStartPoints.find((item) => item.id === record.startPoint); const mode = newWorkModes.find((item) => item.id === record.mode); return <li key={record.id}><strong>{point?.label}</strong> · {mode?.label}</li>; })}</ul></Card>}
+    {latestRecord && latestPoint && <Card title="Última Nova Obra registrada" eyebrow="Histórico local preservado"><div className="new-work-latest"><CheckCircle2/><div><strong>{latestPoint.label}</strong><p>{newWorkModes.find((mode) => mode.id === latestRecord.mode)?.label}</p><small>{new Date(latestRecord.createdAt).toLocaleString('pt-BR')}</small></div></div><div className="new-work-actions"><Button variant="secondary" onClick={() => navigate('/temple/continuous-cycles')}>Ativar ou gerenciar jornada</Button><Button variant="ghost" onClick={() => navigate(latestPoint.route)}>Somente abrir {latestPoint.label}</Button></div></Card>}
+    {progress.records.length > 0 && <Card title="Histórico de pontos" eyebrow={`${progress.records.length} registros`}><ul className="simple-list">{progress.records.slice().reverse().map((record) => { const point = newWorkStartPoints.find((item) => item.id === record.startPoint); const mode = newWorkModes.find((item) => item.id === record.mode); const relatedInstances = cycleInstances.filter((instance) => instance.sourceRecordId === record.id); return <li key={record.id}><strong>{point?.label}</strong> · {mode?.label} · {relatedInstances.length} jornada(s)</li>; })}</ul><Button variant="secondary" onClick={() => navigate('/temple/continuous-cycles')}>Abrir jornadas contínuas</Button></Card>}
     <Card title="Limites do modo contínuo" eyebrow="Autonomia"><ul className="simple-list">{newWorkRestrictions.map((restriction) => <li key={restriction}>{restriction}</li>)}</ul>{selectedPoint && <p className="muted">Seleção atual: {selectedPoint.label}. Ela ainda não foi registrada.</p>}</Card>
   </div>;
 }
