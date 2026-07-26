@@ -21,6 +21,7 @@ import './styles/fire-transformation.css';
 import './styles/fire-shield.css';
 import './styles/fire-chapter.css';
 import './styles/earth.css';
+import './styles/earth-body.css';
 
 validateContent();
 

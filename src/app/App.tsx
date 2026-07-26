@@ -9,6 +9,7 @@ import { ClassificationPage } from '../pages/ClassificationPage';
 import { CodexPage } from '../pages/CodexPage';
 import { CraftingPage } from '../pages/CraftingPage';
 import { DevPage } from '../pages/DevPage';
+import { EarthBodyPage } from '../pages/EarthBodyPage';
 import { FireBoundaryPage } from '../pages/FireBoundaryPage';
 import { FireChapterReviewPage } from '../pages/FireChapterReviewPage';
 import { FireCouragePage } from '../pages/FireCouragePage';
@@ -73,6 +74,7 @@ export function App() {
       <Route path="/temple/psalms-chamber" element={<PsalmsChamberPage/>}/>
       <Route path="/temple/forge" element={<ForgePage/>}/>
       <Route path="/temple/garden" element={<GardenPage/>}/>
+      <Route path="/mission/body-arrives-first" element={<EarthBodyPage/>}/>
       <Route path="/mission/word-before-response" element={<MissionPage/>}/>
       <Route path="/mission/word-before-response/classification" element={<ClassificationPage/>}/>
       <Route path="/mission/word-before-response/chain" element={<ChainPage/>}/>
