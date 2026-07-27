@@ -6,6 +6,7 @@ import { PageHeader } from '../components/PageHeader';
 import { useAthanorStore } from '../state/useAthanorStore';
 import { useContinuousCycleStore } from '../state/useContinuousCycleStore';
 import { useContinuousJourneyStore } from '../state/useContinuousJourneyStore';
+import { useContinuousThemeCycleStore } from '../state/useContinuousThemeCycleStore';
 import { useContinuousTrailStore } from '../state/useContinuousTrailStore';
 import { useEarthBodyStore } from '../state/useEarthBodyStore';
 import { useEarthChapterStore } from '../state/useEarthChapterStore';
@@ -66,6 +67,7 @@ export function DevPage() {
   const resetContinuousJourney = useContinuousJourneyStore((state) => state.reset);
   const resetContinuousCycles = useContinuousCycleStore((state) => state.reset);
   const resetContinuousTrails = useContinuousTrailStore((state) => state.reset);
+  const resetContinuousThemeCycles = useContinuousThemeCycleStore((state) => state.reset);
   const lamentProgress = useWaterLamentStore((state) => state.progress);
   const memoryProgress = useWaterMemoryStore((state) => state.progress);
   const trustProgress = useWaterTrustStore((state) => state.progress);
@@ -95,6 +97,7 @@ export function DevPage() {
   const continuousProgress = useContinuousJourneyStore((state) => state.progress);
   const continuousCycleProgress = useContinuousCycleStore((state) => state.progress);
   const continuousTrailProgress = useContinuousTrailStore((state) => state.progress);
+  const continuousThemeCycleProgress = useContinuousThemeCycleStore((state) => state.progress);
   const state = useAthanorStore();
 
   const reset = async () => {
@@ -128,6 +131,7 @@ export function DevPage() {
     resetContinuousJourney();
     resetContinuousCycles();
     resetContinuousTrails();
+    resetContinuousThemeCycles();
     navigate('/welcome');
   };
 
@@ -185,6 +189,17 @@ export function DevPage() {
       themeRotationCount: trail.themeRotationCount,
       themeHistory: trail.themeHistory,
       traceCreated: trail.continuousTrailTraceCreated
+    })),
+    continuousThemeCycles: continuousThemeCycleProgress.instances.map((instance) => ({
+      id: instance.id,
+      sourceTrailId: instance.sourceTrailId,
+      packageId: instance.packageId,
+      catalogVersion: instance.catalogVersion,
+      depth: instance.depth,
+      status: instance.status,
+      currentPassageIndex: instance.currentPassageIndex,
+      passages: instance.passages.map((passage) => ({ id: passage.id, stage: passage.stage, result: passage.result })),
+      endedEarly: instance.endedEarly
     })),
     inventory: state.inventory.map((item) => item.name)
   }, null, 2)}</pre></Card><Card title="Ações"><Button variant="danger" onClick={reset}><RotateCcw size={18}/> Resetar todo o estado</Button></Card></div></div>;
