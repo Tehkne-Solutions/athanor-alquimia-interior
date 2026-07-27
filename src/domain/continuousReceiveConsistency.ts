@@ -4,6 +4,7 @@ import {
   attachContinuousConsistency,
   verifyContinuousConsistency
 } from './continuousConsistency';
+import { validateContinuousInertJson } from './continuousInertJson';
 import {
   fingerprintContinuousSharePackage,
   parseContinuousCollectionShare,
@@ -16,6 +17,11 @@ import {
 } from './continuousVersion';
 
 export function parseContinuousCollectionShareWithConsistency(input: unknown): ContinuousReceiveResult {
+  const inert = validateContinuousInertJson(input);
+  if (!inert.ok) {
+    return { ok: false, errors: inert.errors.map((error) => `Forma JSON recusada: ${error}`) };
+  }
+
   const resource = inspectContinuousResourceBudget(input);
   if (!resource.ok) {
     return { ok: false, errors: resource.errors.map((error) => `Limite local recusado: ${error}`) };
@@ -42,7 +48,12 @@ export function parseContinuousCollectionShareWithConsistency(input: unknown): C
     ...parsed.package,
     catalogVersion: continuousShareCatalog.version
   });
-  const warnings = [...parsed.warnings, resource.message, compatibility.message];
+  const warnings = [
+    ...parsed.warnings,
+    inert.message,
+    resource.message,
+    compatibility.message
+  ];
   if (compatibility.status === 'supported-legacy') {
     warnings.push('A cópia sanitizada usa a versão atual, sem alterar ou sobrescrever o arquivo recebido.');
   }

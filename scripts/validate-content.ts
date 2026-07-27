@@ -15,6 +15,7 @@ try {
   await import('../src/content/validateContinuousConsistency');
   await import('../src/content/validateContinuousVersion');
   await import('../src/content/validateContinuousResource');
+  await import('../src/content/validateContinuousInertJson');
   console.log('Conteúdo Athanor validado com sucesso.');
 } catch (error) {
   console.error('Falha na validação editorial:');

@@ -1,3 +1,5 @@
+import { validateContinuousInertJson } from './continuousInertJson';
+
 export interface ContinuousResourceLimits {
   maxFileBytes: number;
   maxTextCharacters: number;
@@ -181,6 +183,11 @@ export async function readContinuousJsonFile(
     value = JSON.parse(text);
   } catch {
     return { ok: false, errors: ['Não foi possível interpretar o arquivo como JSON.'] };
+  }
+
+  const inertResult = validateContinuousInertJson(value);
+  if (!inertResult.ok) {
+    return { ok: false, errors: inertResult.errors.map((error) => `Forma JSON recusada: ${error}`) };
   }
 
   const structureResult = inspectContinuousResourceBudget(value, limits);

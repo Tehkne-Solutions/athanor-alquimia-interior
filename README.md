@@ -47,7 +47,8 @@ Este repositório contém a experiência funcional do Athanor, iniciada pelo ver
 - **8.10 — O Retorno que Não Reabre o Ciclo:** leitura transitória de respostas, sem histórico, confirmação, lembrete ou reabertura da origem;
 - **8.11 — A Conferência que Não Promete Autenticidade:** selo local de consistência para detectar alterações sem afirmar identidade, autoria ou segurança criptográfica;
 - **8.12 — A Versão que Não Reescreve o Passado:** matriz SemVer explícita, sem downgrade ou migração silenciosa de formatos desconhecidos;
-- **8.13 — A Medida que Protege sem Julgar o Conteúdo:** orçamento local de bytes, texto, profundidade e complexidade antes de checksum, versão e sanitização.
+- **8.13 — A Medida que Protege sem Julgar o Conteúdo:** orçamento local de bytes, texto, profundidade e complexidade antes de checksum, versão e sanitização;
+- **8.14 — A Forma que Não Esconde Comportamento:** validação de JSON inerte, sem funções, acessores, protótipos especiais, arrays esparsos ou chaves reservadas.
 
 ## Ciclo validável
 
@@ -64,7 +65,7 @@ Fonte bíblica
 → Nova Obra contínua
 ```
 
-A progressão não mede valor pessoal, espiritual ou emocional. Recusar, pausar, encerrar cedo, manter vazio, preservar desconhecido, permanecer em silêncio, descartar um retorno, usar arquivo legado, interromper uma versão incompatível ou recusar uma estrutura acima do orçamento técnico são estados válidos quando previstos pelo fluxo.
+A progressão não mede valor pessoal, espiritual ou emocional. Recusar, pausar, encerrar cedo, manter vazio, preservar desconhecido, permanecer em silêncio, descartar um retorno, usar arquivo legado, interromper uma versão incompatível, recusar uma estrutura acima do orçamento técnico ou rejeitar uma forma não inerte são estados válidos quando previstos pelo fluxo.
 
 ## Stack
 
@@ -114,6 +115,8 @@ Novas partilhas e respostas recebem um checksum local determinístico. Ele detec
 A versão declarada de cada pacote também precisa coincidir com uma matriz SemVer explícita. Versões futuras ou antigas sem migração documentada são recusadas sem alterar o arquivo, criar histórico ou tentar conversão aproximada.
 
 Antes de qualquer checksum ou versão, o Athanor aplica um orçamento técnico local. Arquivos grandes demais não são lidos; estruturas profundas ou extensas são interrompidas sem truncamento, reparo automático, persistência da recusa ou julgamento do conteúdo.
+
+Depois do `JSON.parse` e antes do orçamento estrutural, os valores também precisam permanecer JSON inerte. Funções, getters, setters, símbolos, protótipos especiais, arrays esparsos e chaves reservadas são recusados sem execução, conversão automática ou registro da tentativa.
 
 ## Assinatura
 

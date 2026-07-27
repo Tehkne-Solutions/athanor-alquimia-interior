@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/Button';
 import { Card } from '../components/Card';
 import { PageHeader } from '../components/PageHeader';
+import { continuousInertJsonCatalog } from '../content/continuousInertJson';
 import {
   continuousReceiveBiblicalUnit,
   continuousReceiveCatalog,
@@ -138,7 +139,7 @@ export function ContinuousReceivePage() {
         <ul className="simple-list">
           <li>Schema aceito: {continuousReceiveCatalog.acceptedSchema}</li>
           <li>Biblioteca: separada e local</li>
-          <li>Mescla com jornadas: não</li>
+          <li>Forma aceita: JSON inerte v{continuousInertJsonCatalog.version}</li>
           <li>Limite de arquivo: {continuousResourceCatalog.maxFileBytes / 1024} KiB</li>
         </ul>
         <div className="safety-summary"><ShieldCheck/><p>Selecionar ou descartar um arquivo não envia confirmação e não registra recusa.</p></div>
@@ -152,7 +153,7 @@ export function ContinuousReceivePage() {
           <span>Selecionar pacote JSON da Fase 8.7</span>
           <input type="file" accept="application/json,.json" onChange={handleFile}/>
         </label>
-        <p>O tamanho é conferido antes da leitura. Depois, estrutura, selo, versão, schema e conteúdo curado são validados nesta ordem.</p>
+        <p>O tamanho é conferido antes da leitura. Depois, forma inerte, orçamento estrutural, selo, versão, schema e conteúdo curado são validados nessa ordem.</p>
       </div>
       {errors.length > 0 && <ul className="continuous-receive-errors">{errors.map((error) => <li key={error}>{error}</li>)}</ul>}
     </Card>
