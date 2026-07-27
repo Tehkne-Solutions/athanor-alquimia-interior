@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { App } from './app/App';
 import { validateContent } from './content/validate';
 import './content/validateContinuousCycle';
+import './content/validateContinuousMap';
 import './content/validateContinuousTheme';
 import './content/validateContinuousThemeCycle';
 import './content/validateContinuousTrail';
@@ -46,6 +47,7 @@ import './styles/new-work.css';
 import './styles/continuous-cycle.css';
 import './styles/continuous-trail.css';
 import './styles/continuous-theme-cycle.css';
+import './styles/continuous-map.css';
 
 validateContent();
 
