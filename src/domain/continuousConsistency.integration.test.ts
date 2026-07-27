@@ -1,8 +1,15 @@
 import { describe, expect, it } from 'vitest';
 import { continuousResponseGestures } from '../content/continuousResponse';
-import { attachContinuousConsistency, verifyContinuousConsistency } from './continuousConsistency';
+import type { ContinuousCollection } from './continuousCollection';
+import {
+  attachContinuousConsistency,
+  verifyContinuousConsistency
+} from './continuousConsistency';
+import type { ContinuousReceivedCollection } from './continuousReceive';
 import { parseContinuousCollectionShareWithConsistency } from './continuousReceiveConsistency';
+import { createContinuousResponseExport } from './continuousResponse';
 import { parseContinuousResponseReturnWithConsistency } from './continuousReturnConsistency';
+import { createContinuousCollectionShareExport } from './continuousShare';
 
 const generatedAt = '2026-07-27T16:00:00.000Z';
 
@@ -62,7 +69,75 @@ function responsePayload() {
   };
 }
 
+function emptyCollection(): ContinuousCollection {
+  return {
+    id: 'collection-local',
+    templateId: 'collection-open',
+    label: 'Coleção aberta',
+    status: 'active',
+    items: [],
+    createdAt: generatedAt,
+    updatedAt: generatedAt
+  };
+}
+
+function receivedRecord(): ContinuousReceivedCollection {
+  return {
+    id: 'received-local',
+    fingerprint: 'received-12345678',
+    status: 'active',
+    package: sharePayload(),
+    receivedAt: generatedAt,
+    updatedAt: generatedAt
+  };
+}
+
+const shareConsent = {
+  collection: true,
+  preview: true,
+  localFile: true,
+  recipient: true,
+  noPersonalNotes: true
+};
+
+const responseConsent = {
+  source: true,
+  preview: true,
+  localFile: true,
+  noReply: true
+};
+
 describe('consistência no ciclo compartilhado', () => {
+  it('gera novas partilhas com selo válido', () => {
+    const result = createContinuousCollectionShareExport(
+      emptyCollection(),
+      shareConsent,
+      { includeDates: false },
+      '1.0.0',
+      generatedAt
+    );
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(verifyContinuousConsistency(result.export).status).toBe('valid');
+    expect(result.export.consistency?.cryptographic).toBe(false);
+  });
+
+  it('gera novas respostas com selo válido', () => {
+    const gesture = continuousResponseGestures.find((entry) => entry.id === 'gratitude');
+    if (!gesture) throw new Error('Gesto curado ausente.');
+    const result = createContinuousResponseExport(
+      receivedRecord(),
+      gesture,
+      responseConsent,
+      '1.0.0',
+      generatedAt
+    );
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(verifyContinuousConsistency(result.export).status).toBe('valid');
+    expect(result.export.consistency?.authenticatesIdentity).toBe(false);
+  });
+
   it('aceita partilha selada e preserva aviso de limite', () => {
     const result = parseContinuousCollectionShareWithConsistency(attachContinuousConsistency(sharePayload()));
     expect(result.ok).toBe(true);
