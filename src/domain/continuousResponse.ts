@@ -4,6 +4,7 @@ import {
   attachContinuousConsistency,
   type ContinuousConsistencySeal
 } from './continuousConsistency';
+import { validateContinuousResponseExactRelation } from './continuousExactRelation';
 import { validateContinuousResponseExactTime } from './continuousExactTime';
 import { validateContinuousExactText } from './continuousExactText';
 import { validateContinuousInertJson } from './continuousInertJson';
@@ -86,7 +87,8 @@ export function buildContinuousResponsePreview(
     'O arquivo final contém somente JSON inerte, sem comportamento oculto.',
     'Textos e nomes de campos permanecem Unicode NFC e sem controles invisíveis, sem reescrita automática.',
     'Nenhuma margem textual externa é removida durante a geração ou a leitura.',
-    'O instante de geração usa UTC canônico com milissegundos e nunca é convertido silenciosamente.'
+    'O instante de geração usa UTC canônico com milissegundos e nunca é convertido silenciosamente.',
+    'A resposta não acrescenta relações temporais além do instante de geração canônico.'
   ];
   if (record.package.collection.itemCount === 0) {
     notices.push('A origem é uma coleção vazia e permanece válida.');
@@ -168,6 +170,11 @@ export function createContinuousResponseExport(
   const exactTime = validateContinuousResponseExactTime(payload);
   if (!exactTime.ok) {
     return { ok: false, errors: exactTime.errors.map((error) => `Não foi possível preservar o instante temporal: ${error}`) };
+  }
+
+  const exactRelation = validateContinuousResponseExactRelation(payload);
+  if (!exactRelation.ok) {
+    return { ok: false, errors: exactRelation.errors.map((error) => `Não foi possível preservar a relação interna: ${error}`) };
   }
 
   return {

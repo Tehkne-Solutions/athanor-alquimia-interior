@@ -4,6 +4,7 @@ import {
   attachContinuousConsistency,
   verifyContinuousConsistency
 } from './continuousConsistency';
+import { validateContinuousShareExactRelation } from './continuousExactRelation';
 import { validateContinuousShareExactTime } from './continuousExactTime';
 import { validateContinuousExactText } from './continuousExactText';
 import { validateContinuousInertJson } from './continuousInertJson';
@@ -65,6 +66,11 @@ export function parseContinuousCollectionShareWithConsistency(input: unknown): C
     return { ok: false, errors: exactTime.errors.map((error) => `Tempo recusado: ${error}`) };
   }
 
+  const exactRelation = validateContinuousShareExactRelation(input);
+  if (!exactRelation.ok) {
+    return { ok: false, errors: exactRelation.errors.map((error) => `Relação recusada: ${error}`) };
+  }
+
   const parsed = parseContinuousCollectionShare(input);
   if (!parsed.ok) return parsed;
 
@@ -80,7 +86,8 @@ export function parseContinuousCollectionShareWithConsistency(input: unknown): C
     compatibility.message,
     strictContract.message,
     exactText.message,
-    exactTime.message
+    exactTime.message,
+    exactRelation.message
   ];
   if (compatibility.status === 'supported-legacy') {
     warnings.push('A cópia sanitizada usa a versão atual, sem alterar ou sobrescrever o arquivo recebido.');

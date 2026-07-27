@@ -32,15 +32,11 @@ export function isCanonicalContinuousUtcInstant(value: string): boolean {
   }
 }
 
-function validateInstant(value: unknown, path: string, errors: string[]): number | undefined {
-  if (typeof value !== 'string') return undefined;
-  if (!isCanonicalContinuousUtcInstant(value)) {
-    if (errors.length < maxReportedIssues) {
-      errors.push(`${path}: instante temporal não canônico; use YYYY-MM-DDTHH:mm:ss.sssZ em UTC.`);
-    }
-    return undefined;
+function validateInstant(value: unknown, path: string, errors: string[]): void {
+  if (typeof value !== 'string') return;
+  if (!isCanonicalContinuousUtcInstant(value) && errors.length < maxReportedIssues) {
+    errors.push(`${path}: instante temporal não canônico; use YYYY-MM-DDTHH:mm:ss.sssZ em UTC.`);
   }
-  return Date.parse(value);
 }
 
 function validateGeneratedAt(input: unknown, errors: string[]): void {
@@ -56,15 +52,8 @@ export function validateContinuousShareExactTime(input: unknown): ContinuousExac
     input.items.forEach((item, index) => {
       if (!isRecord(item)) return;
       const base = safeIndexPath('$.items', index);
-      const occurred = item.occurredAt === undefined
-        ? undefined
-        : validateInstant(item.occurredAt, `${base}.occurredAt`, errors);
-      const completed = item.completedAt === undefined
-        ? undefined
-        : validateInstant(item.completedAt, `${base}.completedAt`, errors);
-      if (occurred !== undefined && completed !== undefined && completed < occurred && errors.length < maxReportedIssues) {
-        errors.push(`${base}: completedAt não pode anteceder occurredAt.`);
-      }
+      if (item.occurredAt !== undefined) validateInstant(item.occurredAt, `${base}.occurredAt`, errors);
+      if (item.completedAt !== undefined) validateInstant(item.completedAt, `${base}.completedAt`, errors);
     });
   }
 

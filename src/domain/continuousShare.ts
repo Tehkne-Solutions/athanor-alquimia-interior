@@ -5,6 +5,7 @@ import {
   attachContinuousConsistency,
   type ContinuousConsistencySeal
 } from './continuousConsistency';
+import { validateContinuousShareExactRelation } from './continuousExactRelation';
 import { validateContinuousShareExactTime } from './continuousExactTime';
 import { validateContinuousExactText } from './continuousExactText';
 import { validateContinuousInertJson } from './continuousInertJson';
@@ -133,7 +134,8 @@ export function buildContinuousSharePreview(
     'O arquivo final contém somente JSON inerte, sem comportamento oculto.',
     'Textos e nomes de campos permanecem Unicode NFC e sem controles invisíveis, sem reescrita automática.',
     'Nenhuma margem textual externa é removida durante a geração ou a leitura.',
-    'Instantes temporais usam UTC canônico com milissegundos e nunca são convertidos silenciosamente.'
+    'Instantes temporais usam UTC canônico com milissegundos e nunca são convertidos silenciosamente.',
+    'Quantidade, posições, política de datas e cronologia precisam concordar antes do download.'
   ];
   if (!options.includeDates) notices.push('Datas foram omitidas.');
   if (collection.items.length === 0) notices.push('Esta coleção está vazia e continua válida para exportação.');
@@ -204,6 +206,11 @@ export function createContinuousCollectionShareExport(
   const exactTime = validateContinuousShareExactTime(payload);
   if (!exactTime.ok) {
     return { ok: false, errors: exactTime.errors.map((error) => `Não foi possível preservar o instante temporal: ${error}`) };
+  }
+
+  const exactRelation = validateContinuousShareExactRelation(payload);
+  if (!exactRelation.ok) {
+    return { ok: false, errors: exactRelation.errors.map((error) => `Não foi possível preservar a sequência: ${error}`) };
   }
 
   return {
