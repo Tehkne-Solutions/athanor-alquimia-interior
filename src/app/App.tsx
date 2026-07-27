@@ -11,6 +11,7 @@ import { ContinuousCollectionPage } from '../pages/ContinuousCollectionPage';
 import { ContinuousCyclePage } from '../pages/ContinuousCyclePage';
 import { ContinuousMapPage } from '../pages/ContinuousMapPage';
 import { ContinuousReceivePage } from '../pages/ContinuousReceivePage';
+import { ContinuousResponsePage } from '../pages/ContinuousResponsePage';
 import { ContinuousSharePage } from '../pages/ContinuousSharePage';
 import { ContinuousThemeCyclePage } from '../pages/ContinuousThemeCyclePage';
 import { ContinuousTrailPage } from '../pages/ContinuousTrailPage';
@@ -103,6 +104,7 @@ export function App() {
       <Route path="/temple/continuous-collections" element={<ContinuousCollectionPage/>}/>
       <Route path="/temple/continuous-collections/:collectionId/share" element={<ContinuousSharePage/>}/>
       <Route path="/temple/continuous-received" element={<ContinuousReceivePage/>}/>
+      <Route path="/temple/continuous-received/:recordId/respond" element={<ContinuousResponsePage/>}/>
       <Route path="/temple/continuous-cycles/:instanceId/trail" element={<ContinuousTrailPage/>}/>
       <Route path="/temple/continuous-cycles/:instanceId/trail/theme-cycle" element={<ContinuousThemeCyclePage/>}/>
       <Route path="/mission/thread-that-gathers" element={<SpiritThreadPage/>}/>
