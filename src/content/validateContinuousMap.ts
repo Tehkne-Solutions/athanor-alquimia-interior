@@ -67,6 +67,6 @@ if (new Set(continuousMapStatusOptions.map((item) => item.id)).size !== continuo
   throw new Error('A Fase 8.5 contém estados duplicados.');
 }
 
-if (continuousMapRestrictions.some((restriction) => /ranking|pontuaç[aã]o/i.test(restriction) === false) && continuousMapRestrictions.length < 8) {
+if (!continuousMapRestrictions.some((restriction) => /ranking|pontuaç[aã]o/i.test(restriction))) {
   throw new Error('A Fase 8.5 precisa preservar explicitamente a política sem ranking.');
 }
