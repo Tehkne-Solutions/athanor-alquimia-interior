@@ -4,6 +4,7 @@ import { Button } from '../components/Button';
 import { Card } from '../components/Card';
 import { PageHeader } from '../components/PageHeader';
 import { useAthanorStore } from '../state/useAthanorStore';
+import { useContinuousCollectionStore } from '../state/useContinuousCollectionStore';
 import { useContinuousCycleStore } from '../state/useContinuousCycleStore';
 import { useContinuousJourneyStore } from '../state/useContinuousJourneyStore';
 import { useContinuousThemeCycleStore } from '../state/useContinuousThemeCycleStore';
@@ -68,6 +69,7 @@ export function DevPage() {
   const resetContinuousCycles = useContinuousCycleStore((state) => state.reset);
   const resetContinuousTrails = useContinuousTrailStore((state) => state.reset);
   const resetContinuousThemeCycles = useContinuousThemeCycleStore((state) => state.reset);
+  const resetContinuousCollections = useContinuousCollectionStore((state) => state.reset);
   const lamentProgress = useWaterLamentStore((state) => state.progress);
   const memoryProgress = useWaterMemoryStore((state) => state.progress);
   const trustProgress = useWaterTrustStore((state) => state.progress);
@@ -98,6 +100,7 @@ export function DevPage() {
   const continuousCycleProgress = useContinuousCycleStore((state) => state.progress);
   const continuousTrailProgress = useContinuousTrailStore((state) => state.progress);
   const continuousThemeCycleProgress = useContinuousThemeCycleStore((state) => state.progress);
+  const continuousCollectionRegistry = useContinuousCollectionStore((state) => state.registry);
   const state = useAthanorStore();
 
   const reset = async () => {
@@ -132,6 +135,7 @@ export function DevPage() {
     resetContinuousCycles();
     resetContinuousTrails();
     resetContinuousThemeCycles();
+    resetContinuousCollections();
     navigate('/welcome');
   };
 
@@ -200,6 +204,19 @@ export function DevPage() {
       currentPassageIndex: instance.currentPassageIndex,
       passages: instance.passages.map((passage) => ({ id: passage.id, stage: passage.stage, result: passage.result })),
       endedEarly: instance.endedEarly
+    })),
+    continuousCollections: continuousCollectionRegistry.collections.map((collection) => ({
+      id: collection.id,
+      templateId: collection.templateId,
+      label: collection.label,
+      status: collection.status,
+      items: collection.items.map((reference) => ({
+        key: reference.key,
+        source: reference.source,
+        linked: reference.item.linked,
+        kind: reference.item.kind,
+        itemId: reference.item.id
+      }))
     })),
     inventory: state.inventory.map((item) => item.name)
   }, null, 2)}</pre></Card><Card title="Ações"><Button variant="danger" onClick={reset}><RotateCcw size={18}/> Resetar todo o estado</Button></Card></div></div>;
