@@ -31,7 +31,7 @@ describe('chaves JSON únicas antes do parse', () => {
   });
 
   it('recusa chave literal equivalente a escape Unicode', () => {
-    const result = inspectContinuousJsonUniqueKeys('{"catalogVersion":"1.0.0","\u0063atalogVersion":"2.0.0"}');
+    const result = inspectContinuousJsonUniqueKeys(String.raw`{"catalogVersion":"1.0.0","\u0063atalogVersion":"2.0.0"}`);
     expect(result.ok).toBe(false);
     if (result.ok) return;
     expect(result.kind).toBe('duplicate');
@@ -39,12 +39,12 @@ describe('chaves JSON únicas antes do parse', () => {
   });
 
   it('recusa barra escapada equivalente à barra literal', () => {
-    const result = inspectContinuousJsonUniqueKeys('{"a/b":1,"a\/b":2}');
+    const result = inspectContinuousJsonUniqueKeys(String.raw`{"a/b":1,"a\/b":2}`);
     expect(result.ok).toBe(false);
   });
 
   it('recusa emoji literal equivalente a pares Unicode escapados', () => {
-    const result = inspectContinuousJsonUniqueKeys('{"😀":1,"\uD83D\uDE00":2}');
+    const result = inspectContinuousJsonUniqueKeys(String.raw`{"😀":1,"\uD83D\uDE00":2}`);
     expect(result.ok).toBe(false);
     if (result.ok) return;
     expect(result.errors.join(' ')).toMatch(/\\u\{1F600\}/i);
@@ -82,7 +82,7 @@ describe('chaves JSON únicas antes do parse', () => {
   });
 
   it('recusa escape JSON inválido', () => {
-    const result = inspectContinuousJsonUniqueKeys('{"a\x":1}');
+    const result = inspectContinuousJsonUniqueKeys(String.raw`{"a\x":1}`);
     expect(result.ok).toBe(false);
     if (result.ok) return;
     expect(result.kind).toBe('syntax');
