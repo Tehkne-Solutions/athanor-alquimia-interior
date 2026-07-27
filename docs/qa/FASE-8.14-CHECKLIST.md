@@ -11,7 +11,7 @@
 - acessores, símbolos e funções explicitamente recusados;
 - chaves reservadas documentadas;
 - limite de garantia sem promessa de autenticidade;
-- quatorze restrições editoriais presentes.
+- quinze restrições editoriais presentes.
 
 ## Domínio
 
@@ -32,7 +32,8 @@
 - propriedade extra em array recusada;
 - referência repetida recusada;
 - referência circular recusada;
-- limite de inspeção respeitado;
+- teto próprio de 50.000 nós respeitado;
+- orçamento estrutural permanece independente em 10.000 nós;
 - proxy que bloqueia inspeção tratado como falha.
 
 ## Integração — leitura local
@@ -41,7 +42,8 @@
 - JSON malformado permanece recusado antes da forma;
 - chave reservada em JSON válido é recusada antes do orçamento;
 - forma inerte válida continua para o orçamento estrutural;
-- erro informa `Forma JSON recusada`;
+- lista extensa recebe diagnóstico específico do orçamento;
+- erro informa `Forma JSON recusada` quando aplicável;
 - arquivo externo não é alterado.
 
 ## Integração — partilha
