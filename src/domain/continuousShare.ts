@@ -7,6 +7,7 @@ import {
 } from './continuousConsistency';
 import { validateContinuousInertJson } from './continuousInertJson';
 import { inspectContinuousResourceBudget } from './continuousResource';
+import { validateContinuousTextVisibility } from './continuousTextVisibility';
 
 export interface ContinuousShareConsent {
   collection: boolean;
@@ -127,7 +128,8 @@ export function buildContinuousSharePreview(
     'O pacote não contém IDs internos de jornadas, Rastros, ciclos ou coleções.',
     'O arquivo final recebe um selo local de consistência que não autentica identidade ou autoria.',
     'O arquivo final precisa permanecer dentro do orçamento local de tamanho e complexidade.',
-    'O arquivo final contém somente JSON inerte, sem comportamento oculto.'
+    'O arquivo final contém somente JSON inerte, sem comportamento oculto.',
+    'Textos e nomes de campos permanecem Unicode NFC e sem controles invisíveis, sem reescrita automática.'
   ];
   if (!options.includeDates) notices.push('Datas foram omitidas.');
   if (collection.items.length === 0) notices.push('Esta coleção está vazia e continua válida para exportação.');
@@ -183,6 +185,11 @@ export function createContinuousCollectionShareExport(
   const resource = inspectContinuousResourceBudget(payload);
   if (!resource.ok) {
     return { ok: false, errors: resource.errors.map((error) => `Não foi possível gerar o arquivo: ${error}`) };
+  }
+
+  const visibleText = validateContinuousTextVisibility(payload);
+  if (!visibleText.ok) {
+    return { ok: false, errors: visibleText.errors.map((error) => `Não foi possível gerar texto visível: ${error}`) };
   }
 
   return {
