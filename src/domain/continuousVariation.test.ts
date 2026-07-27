@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import type { ContinuousCycleInstance } from './continuousCycle';
 import {
   advanceContinuousTrail,
+  chooseNoContinuousTrailTheme,
   createContinuousTrailProgress,
   getContinuousTrailVariantHistory,
   keepContinuousTrailVariant,
@@ -91,13 +92,15 @@ describe('continuousVariation', () => {
     expect(progress.trails[0].contentVariantId).not.toBe(firstRotated);
   });
 
-  it('preserva prática, etapa e resultados ao trocar a variante', () => {
+  it('preserva prática, etapa, tema e resultados ao trocar a variante', () => {
     let progress = started();
     progress = selectContinuousTrailPractice(progress, 'trail-variation-1', 'water-name-tone', later);
+    progress = chooseNoContinuousTrailTheme(progress, 'trail-variation-1', '1.0.0', later);
     progress = advanceContinuousTrail(progress, 'trail-variation-1', 'completed', later);
     progress = rotateContinuousTrailVariant(progress, 'trail-variation-1', candidates, catalogVersion, '2026-07-26T22:10:00.000Z');
     const trail = progress.trails[0];
     expect(trail.practiceId).toBe('water-name-tone');
+    expect(trail.noTheme).toBe(true);
     expect(trail.currentStage).toBe('observation');
     expect(trail.stages.orientation.result).toBe('completed');
   });
