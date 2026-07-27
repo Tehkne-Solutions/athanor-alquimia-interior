@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { provenanceClassSchema } from '../domain/types';
+import { continuousThemes } from './continuousTheme';
 import {
   continuousThemeCycleBiblicalUnit,
   continuousThemeCycleCatalog,
@@ -9,7 +10,17 @@ import {
 
 const startPointSchema = z.enum(['word', 'water', 'fire', 'earth', 'spirit', 'rest']);
 const stageSchema = z.enum(['orientation', 'observation', 'review']);
-const themeSchema = z.enum(['clarity', 'proportion', 'support', 'transition', 'boundary', 'resources', 'rhythm', 'rest', 'no-theme']);
+const themeSchema = z.enum([
+  'theme-clarity',
+  'theme-proportion',
+  'theme-support',
+  'theme-transition',
+  'theme-boundary',
+  'theme-resources',
+  'theme-rhythm',
+  'theme-rest',
+  'no-theme'
+]);
 
 const provenanceSchema = z.object({
   id: z.string().min(1),
@@ -70,6 +81,15 @@ for (const item of continuousThemeCyclePackages) {
   const stages = new Set(item.passages.map((passage) => passage.stage));
   if (stages.size !== 3) {
     throw new Error(`O pacote ${item.id} precisa cobrir orientação, observação e revisão.`);
+  }
+  if (item.themeId !== 'no-theme') {
+    const sourceTheme = continuousThemes.find((theme) => theme.id === item.themeId);
+    if (!sourceTheme) throw new Error(`O pacote ${item.id} referencia um tema inexistente.`);
+    const packagePoints = [...item.startPoints].sort().join('|');
+    const themePoints = [...sourceTheme.startPoints].sort().join('|');
+    if (packagePoints !== themePoints) {
+      throw new Error(`O pacote ${item.id} precisa usar exatamente os elementos compatíveis do tema ${item.themeId}.`);
+    }
   }
 }
 
