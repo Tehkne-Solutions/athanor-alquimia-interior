@@ -17,7 +17,7 @@ export interface ContinuousInertJsonOptions {
 }
 
 export const defaultContinuousInertJsonOptions: ContinuousInertJsonOptions = {
-  maxInspectionNodes: 10_000,
+  maxInspectionNodes: 50_000,
   dangerousKeys: ['__proto__', 'prototype', 'constructor']
 };
 
