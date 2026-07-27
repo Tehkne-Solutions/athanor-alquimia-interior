@@ -4,6 +4,7 @@ import { BrowserRouter } from 'react-router-dom';
 import { App } from './app/App';
 import { validateContent } from './content/validate';
 import './content/validateContinuousCollection';
+import './content/validateContinuousConsistency';
 import './content/validateContinuousCycle';
 import './content/validateContinuousMap';
 import './content/validateContinuousReceive';
