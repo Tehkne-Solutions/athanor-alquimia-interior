@@ -1,6 +1,7 @@
 import { continuousResponseCatalog } from '../content/continuousResponse';
 import { continuousVersionCatalog } from '../content/continuousVersion';
 import { attachContinuousConsistency, verifyContinuousConsistency } from './continuousConsistency';
+import { validateContinuousExactText } from './continuousExactText';
 import { validateContinuousInertJson } from './continuousInertJson';
 import { inspectContinuousResourceBudget } from './continuousResource';
 import {
@@ -49,6 +50,11 @@ export function parseContinuousResponseReturnWithConsistency(input: unknown): Co
     return { ok: false, errors: strictContract.errors.map((error) => `Contrato recusado: ${error}`) };
   }
 
+  const exactText = validateContinuousExactText(input, 'Pacote de resposta');
+  if (!exactText.ok) {
+    return { ok: false, errors: exactText.errors.map((error) => `Margem textual recusada: ${error}`) };
+  }
+
   const parsed = parseContinuousResponseReturn(input);
   if (!parsed.ok) return parsed;
 
@@ -58,7 +64,8 @@ export function parseContinuousResponseReturnWithConsistency(input: unknown): Co
     resource.message,
     visibleText.message,
     compatibility.message,
-    strictContract.message
+    strictContract.message,
+    exactText.message
   ];
   if (compatibility.status === 'supported-legacy') {
     warnings.push('A prévia sanitizada usa a versão atual, sem alterar ou sobrescrever o arquivo recebido.');
