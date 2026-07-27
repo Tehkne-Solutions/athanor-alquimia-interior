@@ -47,7 +47,7 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 }
 
 function isString(value: unknown): value is string {
-  return typeof value === 'string' && value.trim().length > 0;
+  return typeof value === 'string' && value.length > 0;
 }
 
 function isNonNegativeInteger(value: unknown): value is number {
@@ -175,7 +175,7 @@ export function completeContinuousReturnReview(
   consent: ContinuousReturnConsent
 ): ContinuousReturnCompletionResult {
   const errors: string[] = [];
-  if (!response.source.fingerprint.trim()) errors.push('A impressão da origem é obrigatória.');
+  if (response.source.fingerprint.length === 0) errors.push('A impressão da origem é obrigatória.');
   if (!hasExplicitContinuousReturnConsent(consent)) errors.push('As três confirmações explícitas são obrigatórias.');
   if (errors.length > 0) return { ok: false, errors };
 
