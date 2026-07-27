@@ -4,6 +4,7 @@ import {
   attachContinuousConsistency,
   type ContinuousConsistencySeal
 } from './continuousConsistency';
+import { inspectContinuousResourceBudget } from './continuousResource';
 
 export interface ContinuousResponseConsent {
   source: boolean;
@@ -76,7 +77,8 @@ export function buildContinuousResponsePreview(
     'A resposta não inclui os itens nem as datas da coleção recebida.',
     'A impressão descritiva permite reconhecer manualmente o pacote sem identificar pessoas.',
     'Nenhuma resposta adicional é necessária.',
-    'O arquivo final recebe um selo local de consistência que não autentica identidade ou autoria.'
+    'O arquivo final recebe um selo local de consistência que não autentica identidade ou autoria.',
+    'O arquivo final precisa permanecer dentro do orçamento local de tamanho e complexidade.'
   ];
   if (record.package.collection.itemCount === 0) {
     notices.push('A origem é uma coleção vazia e permanece válida.');
@@ -134,6 +136,11 @@ export function createContinuousResponseExport(
     },
     ...buildContinuousResponsePreview(record, gesture)
   };
+
+  const resource = inspectContinuousResourceBudget(payload);
+  if (!resource.ok) {
+    return { ok: false, errors: resource.errors.map((error) => `Não foi possível gerar o arquivo: ${error}`) };
+  }
 
   return {
     ok: true,
