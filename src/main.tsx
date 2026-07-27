@@ -14,6 +14,7 @@ import './content/validateContinuousResource';
 import './content/validateContinuousResponse';
 import './content/validateContinuousReturn';
 import './content/validateContinuousShare';
+import './content/validateContinuousStrictContract';
 import './content/validateContinuousTextVisibility';
 import './content/validateContinuousTheme';
 import './content/validateContinuousThemeCycle';
