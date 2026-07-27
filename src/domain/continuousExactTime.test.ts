@@ -78,13 +78,11 @@ describe('tempo exato contínuo', () => {
     expect(validateContinuousShareExactTime(share({ items: [{}] })).ok).toBe(true);
   });
 
-  it('recusa conclusão anterior à ocorrência', () => {
+  it('deixa a ordem entre instantes para a barreira relacional', () => {
     const result = validateContinuousShareExactTime(share({
       items: [{ occurredAt: '2026-07-27T23:00:00.000Z', completedAt: '2026-07-27T22:00:00.000Z' }]
     }));
-    expect(result.ok).toBe(false);
-    if (result.ok) return;
-    expect(result.errors.join(' ')).toMatch(/não pode anteceder/i);
+    expect(result.ok).toBe(true);
   });
 
   it('deixa tipo não textual para o parser de domínio', () => {
