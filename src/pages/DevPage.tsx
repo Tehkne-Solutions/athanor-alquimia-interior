@@ -7,6 +7,7 @@ import { useAthanorStore } from '../state/useAthanorStore';
 import { useContinuousCollectionStore } from '../state/useContinuousCollectionStore';
 import { useContinuousCycleStore } from '../state/useContinuousCycleStore';
 import { useContinuousJourneyStore } from '../state/useContinuousJourneyStore';
+import { useContinuousReceivedStore } from '../state/useContinuousReceivedStore';
 import { useContinuousThemeCycleStore } from '../state/useContinuousThemeCycleStore';
 import { useContinuousTrailStore } from '../state/useContinuousTrailStore';
 import { useEarthBodyStore } from '../state/useEarthBodyStore';
@@ -70,6 +71,7 @@ export function DevPage() {
   const resetContinuousTrails = useContinuousTrailStore((state) => state.reset);
   const resetContinuousThemeCycles = useContinuousThemeCycleStore((state) => state.reset);
   const resetContinuousCollections = useContinuousCollectionStore((state) => state.reset);
+  const resetContinuousReceived = useContinuousReceivedStore((state) => state.reset);
   const lamentProgress = useWaterLamentStore((state) => state.progress);
   const memoryProgress = useWaterMemoryStore((state) => state.progress);
   const trustProgress = useWaterTrustStore((state) => state.progress);
@@ -101,6 +103,7 @@ export function DevPage() {
   const continuousTrailProgress = useContinuousTrailStore((state) => state.progress);
   const continuousThemeCycleProgress = useContinuousThemeCycleStore((state) => state.progress);
   const continuousCollectionRegistry = useContinuousCollectionStore((state) => state.registry);
+  const continuousReceivedRegistry = useContinuousReceivedStore((state) => state.registry);
   const state = useAthanorStore();
 
   const reset = async () => {
@@ -136,6 +139,7 @@ export function DevPage() {
     resetContinuousTrails();
     resetContinuousThemeCycles();
     resetContinuousCollections();
+    resetContinuousReceived();
     navigate('/welcome');
   };
 
@@ -217,6 +221,17 @@ export function DevPage() {
         kind: reference.item.kind,
         itemId: reference.item.id
       }))
+    })),
+    continuousReceived: continuousReceivedRegistry.records.map((record) => ({
+      id: record.id,
+      fingerprint: record.fingerprint,
+      status: record.status,
+      label: record.package.collection.label,
+      templateId: record.package.collection.templateId,
+      itemCount: record.package.items.length,
+      schema: record.package.schema,
+      policy: record.package.policy,
+      includeDates: record.package.options.includeDates
     })),
     inventory: state.inventory.map((item) => item.name)
   }, null, 2)}</pre></Card><Card title="Ações"><Button variant="danger" onClick={reset}><RotateCcw size={18}/> Resetar todo o estado</Button></Card></div></div>;

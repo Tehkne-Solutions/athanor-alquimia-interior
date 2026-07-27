@@ -6,6 +6,7 @@ import { validateContent } from './content/validate';
 import './content/validateContinuousCollection';
 import './content/validateContinuousCycle';
 import './content/validateContinuousMap';
+import './content/validateContinuousReceive';
 import './content/validateContinuousShare';
 import './content/validateContinuousTheme';
 import './content/validateContinuousThemeCycle';
@@ -52,6 +53,7 @@ import './styles/continuous-theme-cycle.css';
 import './styles/continuous-map.css';
 import './styles/continuous-collection.css';
 import './styles/continuous-share.css';
+import './styles/continuous-receive.css';
 
 validateContent();
 

@@ -41,7 +41,8 @@ Este repositório contém a experiência funcional do Athanor, iniciada pelo ver
 - **8.4 — O Ciclo Temático que se Expande:** pacotes curados e profundidade explícita;
 - **8.5 — O Mapa dos Ciclos que Não Hierarquiza:** mapa descritivo, filtros e exportação local;
 - **8.6 — A Coleção que Cresce sem Acumular Valor:** coleções locais sem ranking ou valor por quantidade;
-- **8.7 — A Partilha que Exige Consentimento:** prévia minimizada e arquivo local somente após cinco consentimentos explícitos.
+- **8.7 — A Partilha que Exige Consentimento:** prévia minimizada e arquivo local somente após cinco consentimentos explícitos;
+- **8.8 — A Recepção que Não se Apropria:** validação, sanitização e biblioteca recebida separada, sem mescla com progresso próprio.
 
 ## Ciclo validável
 
@@ -96,6 +97,8 @@ O projeto inclui `vercel.json` com fallback para rotas SPA e cabeçalhos especí
 A versão atual funciona sem conta e persiste o progresso no próprio dispositivo. Não há IA, sincronização ou analytics ativos.
 
 Registros de revisão permanecem locais e opcionais. Exportações de mapas, coleções ou partilhas são iniciadas manualmente. A partilha de coleções gera somente um arquivo local minimizado; o Athanor não envia, publica ou registra o destinatário.
+
+Pacotes recebidos são validados e guardados, quando explicitamente escolhidos, em uma biblioteca local separada. Eles não criam jornadas, não alteram coleções próprias, não confirmam leitura e não registram a identidade de origem.
 
 ## Assinatura
 
