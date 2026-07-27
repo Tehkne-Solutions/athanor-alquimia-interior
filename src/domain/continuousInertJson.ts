@@ -54,8 +54,11 @@ function inspectOwnKeys(value: object): PropertyKey[] | ContinuousInertJsonFailu
   }
 }
 
-function isFailure<T extends object>(value: T | ContinuousInertJsonFailure): value is ContinuousInertJsonFailure {
-  return 'ok' in value && value.ok === false;
+function isFailure(value: unknown): value is ContinuousInertJsonFailure {
+  return typeof value === 'object'
+    && value !== null
+    && 'ok' in value
+    && (value as { ok?: unknown }).ok === false;
 }
 
 function isCanonicalArrayIndex(key: string, length: number): boolean {
@@ -149,8 +152,7 @@ export function validateContinuousInertJson(
     }
 
     if (prototype !== Object.prototype && prototype !== null) {
-      const label = prototype?.constructor?.name ?? 'desconhecido';
-      return fail(`Um objeto com protótipo especial (${label}) foi recusado em ${current.path}.`);
+      return fail(`Um objeto com protótipo especial foi recusado em ${current.path}.`);
     }
 
     for (const key of ownKeys) {
