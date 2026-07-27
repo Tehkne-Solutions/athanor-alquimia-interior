@@ -214,13 +214,13 @@ export function parseContinuousCollectionShare(input: unknown): ContinuousReceiv
     },
     collection: {
       templateId: input.collection.templateId as string,
-      label: (input.collection.label as string).trim(),
+      label: input.collection.label as string,
       status: input.collection.status as 'active' | 'archived',
       itemCount: input.collection.itemCount as number
     },
     options,
     items,
-    notices: (input.notices as string[]).map((notice) => notice.trim())
+    notices: [...input.notices as string[]]
   };
 
   const warnings: string[] = [];

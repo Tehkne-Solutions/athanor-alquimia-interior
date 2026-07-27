@@ -52,7 +52,8 @@ Este repositório contém a experiência funcional do Athanor, iniciada pelo ver
 - **8.15 — A Palavra que Não se Disfarça:** Unicode NFC obrigatório e recusa de controles invisíveis ou bidirecionais, sem reescrita silenciosa;
 - **8.16 — A Chave que Não se Repete em Silêncio:** detecção de nomes duplicados no texto JSON antes que o parser descarte valores anteriores;
 - **8.17 — O Número que Não Muda em Silêncio:** preservação da medida decimal antes do parse, sem inteiros inseguros, overflow, underflow ou arredondamento oculto;
-- **8.18 — O Campo que Não Some em Silêncio:** contratos recursivos de campos, sem propriedades extras descartadas durante a sanitização.
+- **8.18 — O Campo que Não Some em Silêncio:** contratos recursivos de campos, sem propriedades extras descartadas durante a sanitização;
+- **8.19 — A Margem que Não se Apaga em Silêncio:** espaços e quebras nas extremidades são recusados, sem `trim()` ou correção automática dos textos.
 
 ## Ciclo validável
 
@@ -69,7 +70,7 @@ Fonte bíblica
 → Nova Obra contínua
 ```
 
-A progressão não mede valor pessoal, espiritual ou emocional. Recusar, pausar, encerrar cedo, manter vazio, preservar desconhecido, permanecer em silêncio, descartar um retorno, usar arquivo legado, interromper uma versão incompatível, recusar uma estrutura acima do orçamento técnico, rejeitar uma forma não inerte, interromper texto Unicode ambíguo, recusar chaves repetidas, impedir uma mudança numérica silenciosa ou interromper campos desconhecidos são estados válidos quando previstos pelo fluxo.
+A progressão não mede valor pessoal, espiritual ou emocional. Recusar, pausar, encerrar cedo, manter vazio, preservar desconhecido, permanecer em silêncio, descartar um retorno, usar arquivo legado, interromper uma versão incompatível, recusar uma estrutura acima do orçamento técnico, rejeitar uma forma não inerte, interromper texto Unicode ambíguo, recusar chaves repetidas, impedir uma mudança numérica silenciosa, interromper campos desconhecidos ou recusar margens textuais externas são estados válidos quando previstos pelo fluxo.
 
 ## Stack
 
@@ -129,6 +130,8 @@ Depois do `JSON.parse` e antes do orçamento estrutural, os valores também prec
 Depois do orçamento e antes do checksum, textos e nomes de campos precisam estar em Unicode NFC e não podem conter controles invisíveis, direção bidirecional, pares substitutos inválidos, não caracteres ou `U+FFFD`. O Athanor recusa sem normalizar, traduzir ou reescrever o arquivo.
 
 Depois do checksum e da matriz de versão, cada propriedade presente precisa pertencer ao manifesto recursivo do formato conhecido. Campos extras são recusados antes da sanitização; nenhum dado desconhecido é apagado, migrado ou reinterpretado silenciosamente.
+
+Depois do contrato estrito, cada string conhecida precisa coincidir com seu próprio `trim()`. Espaços e quebras nas extremidades são recusados sem alteração; whitespace interno permanece preservado, e os parsers copiam os textos aprovados exatamente.
 
 ## Assinatura
 

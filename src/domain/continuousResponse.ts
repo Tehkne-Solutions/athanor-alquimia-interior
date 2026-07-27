@@ -4,6 +4,7 @@ import {
   attachContinuousConsistency,
   type ContinuousConsistencySeal
 } from './continuousConsistency';
+import { validateContinuousExactText } from './continuousExactText';
 import { validateContinuousInertJson } from './continuousInertJson';
 import { inspectContinuousResourceBudget } from './continuousResource';
 import { validateContinuousTextVisibility } from './continuousTextVisibility';
@@ -82,7 +83,8 @@ export function buildContinuousResponsePreview(
     'O arquivo final recebe um selo local de consistência que não autentica identidade ou autoria.',
     'O arquivo final precisa permanecer dentro do orçamento local de tamanho e complexidade.',
     'O arquivo final contém somente JSON inerte, sem comportamento oculto.',
-    'Textos e nomes de campos permanecem Unicode NFC e sem controles invisíveis, sem reescrita automática.'
+    'Textos e nomes de campos permanecem Unicode NFC e sem controles invisíveis, sem reescrita automática.',
+    'Nenhuma margem textual externa é removida durante a geração ou a leitura.'
   ];
   if (record.package.collection.itemCount === 0) {
     notices.push('A origem é uma coleção vazia e permanece válida.');
@@ -120,12 +122,12 @@ export function createContinuousResponseExport(
   generatedAt: string
 ): ContinuousResponseResult {
   const errors: string[] = [];
-  if (!record.fingerprint.trim()) errors.push('A impressão da cópia recebida é obrigatória.');
-  if (!record.package.collection.label.trim()) errors.push('O rótulo da coleção recebida é obrigatório.');
+  if (record.fingerprint.length === 0) errors.push('A impressão da cópia recebida é obrigatória.');
+  if (record.package.collection.label.length === 0) errors.push('O rótulo da coleção recebida é obrigatório.');
   if (!gesture.createsFile) errors.push('O silêncio preservado não gera arquivo de resposta.');
   if (!hasExplicitContinuousResponseConsent(consent)) errors.push('As quatro confirmações explícitas são obrigatórias.');
-  if (!catalogVersion.trim()) errors.push('A versão do catálogo de resposta é obrigatória.');
-  if (!generatedAt.trim()) errors.push('A data local de geração é obrigatória.');
+  if (catalogVersion.length === 0) errors.push('A versão do catálogo de resposta é obrigatória.');
+  if (generatedAt.length === 0) errors.push('A data local de geração é obrigatória.');
   if (errors.length > 0) return { ok: false, errors };
 
   const payload: ContinuousResponseExport = {
@@ -154,6 +156,11 @@ export function createContinuousResponseExport(
   const visibleText = validateContinuousTextVisibility(payload);
   if (!visibleText.ok) {
     return { ok: false, errors: visibleText.errors.map((error) => `Não foi possível gerar texto visível: ${error}`) };
+  }
+
+  const exactText = validateContinuousExactText(payload, 'Resposta gerada');
+  if (!exactText.ok) {
+    return { ok: false, errors: exactText.errors.map((error) => `Não foi possível preservar a margem textual: ${error}`) };
   }
 
   return {
