@@ -2,14 +2,14 @@ import type { NewWorkStartPoint } from '../domain/continuousJourney';
 import type { ContinuousTrailStage } from '../domain/continuousTrail';
 
 export type ContinuousThemeCycleThemeId =
-  | 'clarity'
-  | 'proportion'
-  | 'support'
-  | 'transition'
-  | 'boundary'
-  | 'resources'
-  | 'rhythm'
-  | 'rest'
+  | 'theme-clarity'
+  | 'theme-proportion'
+  | 'theme-support'
+  | 'theme-transition'
+  | 'theme-boundary'
+  | 'theme-resources'
+  | 'theme-rhythm'
+  | 'theme-rest'
   | 'no-theme';
 
 export interface ContinuousThemeCyclePassage {
@@ -57,10 +57,10 @@ export const continuousThemeCycleCatalog = {
 export const continuousThemeCyclePackages: ContinuousThemeCyclePackage[] = [
   {
     id: 'package-clarity-window',
-    themeId: 'clarity',
+    themeId: 'theme-clarity',
     label: 'Janela da Clareza Provisória',
     description: 'Três passagens para separar o que está visível do que ainda permanece desconhecido.',
-    startPoints: ['word', 'water', 'fire', 'earth', 'spirit'],
+    startPoints: ['word', 'earth', 'spirit'],
     passages: [
       { id: 'clarity-name-visible', stage: 'orientation', label: 'Nomear o visível', prompt: 'Observe somente o elemento fictício que está claramente disponível na cena. O restante pode permanecer desconhecido.' },
       { id: 'clarity-separate-inference', stage: 'observation', label: 'Separar inferência', prompt: 'Diferencie um dado apresentado de uma interpretação possível, sem decidir qual é a correta.' },
@@ -69,10 +69,10 @@ export const continuousThemeCyclePackages: ContinuousThemeCyclePackage[] = [
   },
   {
     id: 'package-proportion-measure',
-    themeId: 'proportion',
+    themeId: 'theme-proportion',
     label: 'Câmara da Proporção Possível',
     description: 'Uma sequência para comparar tamanhos e intensidades sem criar uma medida moral.',
-    startPoints: ['word', 'water', 'fire', 'earth', 'spirit'],
+    startPoints: ['word', 'fire', 'earth', 'spirit'],
     passages: [
       { id: 'proportion-identify-parts', stage: 'orientation', label: 'Identificar partes', prompt: 'Observe duas partes fictícias da cena sem declarar que uma deveria dominar a outra.' },
       { id: 'proportion-reduce-scale', stage: 'observation', label: 'Reduzir a escala', prompt: 'Considere como a cena ficaria se apenas uma unidade pequena permanecesse ativa.' },
@@ -81,10 +81,10 @@ export const continuousThemeCyclePackages: ContinuousThemeCyclePackage[] = [
   },
   {
     id: 'package-support-bridge',
-    themeId: 'support',
+    themeId: 'theme-support',
     label: 'Ponte do Apoio Disponível',
     description: 'Passagens para reconhecer apoio presente, ausente ou desconhecido sem atribuir culpa.',
-    startPoints: ['water', 'earth', 'spirit', 'rest'],
+    startPoints: ['water', 'earth', 'spirit'],
     passages: [
       { id: 'support-map-present', stage: 'orientation', label: 'Mapear o presente', prompt: 'Identifique um apoio fictício disponível agora ou marque que nenhum apoio está visível.' },
       { id: 'support-allow-absence', stage: 'observation', label: 'Permitir ausência', prompt: 'Observe a cena sem preencher automaticamente a falta de apoio com promessa, cobrança ou inferência.' },
@@ -93,10 +93,10 @@ export const continuousThemeCyclePackages: ContinuousThemeCyclePackage[] = [
   },
   {
     id: 'package-transition-crossing',
-    themeId: 'transition',
+    themeId: 'theme-transition',
     label: 'Travessia da Transição Reversível',
     description: 'Uma sequência curta para observar mudança sem exigir chegada ou fechamento.',
-    startPoints: ['word', 'water', 'fire', 'spirit'],
+    startPoints: ['water', 'fire', 'spirit'],
     passages: [
       { id: 'transition-mark-before', stage: 'orientation', label: 'Marcar o antes', prompt: 'Observe o estado fictício anterior sem transformá-lo em erro ou etapa inferior.' },
       { id: 'transition-notice-crossing', stage: 'observation', label: 'Notar a travessia', prompt: 'Identifique uma mudança pequena e reversível entre dois estados da cena.' },
@@ -105,10 +105,10 @@ export const continuousThemeCyclePackages: ContinuousThemeCyclePackage[] = [
   },
   {
     id: 'package-boundary-outline',
-    themeId: 'boundary',
+    themeId: 'theme-boundary',
     label: 'Contorno do Limite em Primeira Pessoa',
     description: 'Passagens para observar contorno, pausa e revisão sem controlar outras partes.',
-    startPoints: ['word', 'fire', 'earth', 'spirit'],
+    startPoints: ['word', 'fire', 'spirit'],
     passages: [
       { id: 'boundary-name-line', stage: 'orientation', label: 'Nomear o contorno', prompt: 'Identifique um limite fictício formulado em primeira pessoa e sem ameaça.' },
       { id: 'boundary-observe-space', stage: 'observation', label: 'Observar o espaço', prompt: 'Considere o espaço preservado pelo limite sem avaliar obediência de terceiros.' },
@@ -117,10 +117,10 @@ export const continuousThemeCyclePackages: ContinuousThemeCyclePackage[] = [
   },
   {
     id: 'package-resources-basket',
-    themeId: 'resources',
+    themeId: 'theme-resources',
     label: 'Cesto dos Recursos do Ciclo',
     description: 'Uma sequência para trabalhar somente com recursos fictícios e disponibilidade declarada.',
-    startPoints: ['earth', 'fire', 'rest'],
+    startPoints: ['water', 'fire', 'earth'],
     passages: [
       { id: 'resources-list-available', stage: 'orientation', label: 'Listar o disponível', prompt: 'Observe apenas recursos fictícios disponíveis, futuros, ausentes ou desconhecidos.' },
       { id: 'resources-adjust-scope', stage: 'observation', label: 'Ajustar o escopo', prompt: 'Reduza a passagem para caber nos recursos apresentados, sem criar obrigação de continuar.' },
@@ -129,10 +129,10 @@ export const continuousThemeCyclePackages: ContinuousThemeCyclePackage[] = [
   },
   {
     id: 'package-rhythm-breath',
-    themeId: 'rhythm',
+    themeId: 'theme-rhythm',
     label: 'Compasso do Ritmo Curto',
     description: 'Passagens para alternar ação fictícia e repouso sem sequência obrigatória.',
-    startPoints: ['water', 'fire', 'earth', 'rest'],
+    startPoints: ['water', 'earth', 'rest'],
     passages: [
       { id: 'rhythm-choose-unit', stage: 'orientation', label: 'Escolher uma unidade', prompt: 'Defina uma unidade fictícia pequena ou marque que nenhuma unidade será usada.' },
       { id: 'rhythm-place-pause', stage: 'observation', label: 'Colocar uma pausa', prompt: 'Insira uma pausa igual ou maior que a unidade, sem cronômetro ou sequência obrigatória.' },
@@ -141,7 +141,7 @@ export const continuousThemeCyclePackages: ContinuousThemeCyclePackage[] = [
   },
   {
     id: 'package-rest-stillness',
-    themeId: 'rest',
+    themeId: 'theme-rest',
     label: 'Sala do Repouso Completo',
     description: 'Uma sequência em que observar e encerrar sem prática são resultados integrais.',
     startPoints: ['water', 'earth', 'spirit', 'rest'],
