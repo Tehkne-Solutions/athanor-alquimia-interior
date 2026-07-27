@@ -30,7 +30,7 @@ z.object({
   version: z.literal('1.0.0'),
   policy: z.literal('plain-json-no-hidden-behavior-v1'),
   mode: z.literal('iterative-own-data-properties-only'),
-  maxInspectionNodes: z.literal(10_000),
+  maxInspectionNodes: z.literal(50_000),
   allowObjectPrototype: z.literal(true),
   allowNullPrototype: z.literal(true),
   allowArrayPrototype: z.literal(true),
@@ -49,7 +49,7 @@ z.object({
   ])
 }).parse(continuousInertJsonCatalog);
 
-z.array(z.string().min(1)).min(14).parse(continuousInertJsonRestrictions);
+z.array(z.string().min(1)).min(15).parse(continuousInertJsonRestrictions);
 
 if (!continuousInertJsonRestrictions.some((restriction) => /getters e setters/i.test(restriction))) {
   throw new Error('A Fase 8.14 precisa recusar acessores explicitamente.');
@@ -57,6 +57,10 @@ if (!continuousInertJsonRestrictions.some((restriction) => /getters e setters/i.
 
 if (!continuousInertJsonRestrictions.some((restriction) => /__proto__/i.test(restriction))) {
   throw new Error('A Fase 8.14 precisa declarar as chaves reservadas.');
+}
+
+if (!continuousInertJsonRestrictions.some((restriction) => /não substitui o orçamento/i.test(restriction))) {
+  throw new Error('A Fase 8.14 precisa manter o orçamento estrutural como barreira independente.');
 }
 
 if (!continuousInertJsonRestrictions.some((restriction) => /não julga o conteúdo/i.test(restriction))) {
