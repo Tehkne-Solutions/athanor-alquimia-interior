@@ -6,6 +6,7 @@ import {
 } from './continuousConsistency';
 import { validateContinuousInertJson } from './continuousInertJson';
 import { inspectContinuousResourceBudget } from './continuousResource';
+import { validateContinuousTextVisibility } from './continuousTextVisibility';
 
 export interface ContinuousResponseConsent {
   source: boolean;
@@ -80,7 +81,8 @@ export function buildContinuousResponsePreview(
     'Nenhuma resposta adicional é necessária.',
     'O arquivo final recebe um selo local de consistência que não autentica identidade ou autoria.',
     'O arquivo final precisa permanecer dentro do orçamento local de tamanho e complexidade.',
-    'O arquivo final contém somente JSON inerte, sem comportamento oculto.'
+    'O arquivo final contém somente JSON inerte, sem comportamento oculto.',
+    'Textos e nomes de campos permanecem Unicode NFC e sem controles invisíveis, sem reescrita automática.'
   ];
   if (record.package.collection.itemCount === 0) {
     notices.push('A origem é uma coleção vazia e permanece válida.');
@@ -147,6 +149,11 @@ export function createContinuousResponseExport(
   const resource = inspectContinuousResourceBudget(payload);
   if (!resource.ok) {
     return { ok: false, errors: resource.errors.map((error) => `Não foi possível gerar o arquivo: ${error}`) };
+  }
+
+  const visibleText = validateContinuousTextVisibility(payload);
+  if (!visibleText.ok) {
+    return { ok: false, errors: visibleText.errors.map((error) => `Não foi possível gerar texto visível: ${error}`) };
   }
 
   return {

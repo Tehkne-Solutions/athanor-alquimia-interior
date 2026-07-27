@@ -1,4 +1,5 @@
 import { validateContinuousInertJson } from './continuousInertJson';
+import { validateContinuousTextVisibility } from './continuousTextVisibility';
 
 export interface ContinuousResourceLimits {
   maxFileBytes: number;
@@ -192,5 +193,11 @@ export async function readContinuousJsonFile(
 
   const structureResult = inspectContinuousResourceBudget(value, limits);
   if (!structureResult.ok) return structureResult;
+
+  const visibleText = validateContinuousTextVisibility(value);
+  if (!visibleText.ok) {
+    return { ok: false, errors: visibleText.errors.map((error) => `Texto recusado: ${error}`) };
+  }
+
   return { ok: true, value, stats: structureResult.stats };
 }

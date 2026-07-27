@@ -12,6 +12,7 @@ import {
   continuousReceiveRestrictions
 } from '../content/continuousReceive';
 import { continuousResourceCatalog } from '../content/continuousResource';
+import { continuousTextVisibilityCatalog } from '../content/continuousTextVisibility';
 import {
   findReceivedByFingerprint,
   findReceivedCollection,
@@ -140,6 +141,7 @@ export function ContinuousReceivePage() {
           <li>Schema aceito: {continuousReceiveCatalog.acceptedSchema}</li>
           <li>Biblioteca: separada e local</li>
           <li>Forma aceita: JSON inerte v{continuousInertJsonCatalog.version}</li>
+          <li>Texto aceito: Unicode {continuousTextVisibilityCatalog.normalization} v{continuousTextVisibilityCatalog.version}</li>
           <li>Limite de arquivo: {continuousResourceCatalog.maxFileBytes / 1024} KiB</li>
         </ul>
         <div className="safety-summary"><ShieldCheck/><p>Selecionar ou descartar um arquivo não envia confirmação e não registra recusa.</p></div>
@@ -153,7 +155,7 @@ export function ContinuousReceivePage() {
           <span>Selecionar pacote JSON da Fase 8.7</span>
           <input type="file" accept="application/json,.json" onChange={handleFile}/>
         </label>
-        <p>O tamanho é conferido antes da leitura. Depois, forma inerte, orçamento estrutural, selo, versão, schema e conteúdo curado são validados nessa ordem.</p>
+        <p>O tamanho é conferido antes da leitura. Depois, forma inerte, orçamento estrutural, texto visível, selo, versão, schema e conteúdo curado são validados nessa ordem.</p>
       </div>
       {errors.length > 0 && <ul className="continuous-receive-errors">{errors.map((error) => <li key={error}>{error}</li>)}</ul>}
     </Card>
