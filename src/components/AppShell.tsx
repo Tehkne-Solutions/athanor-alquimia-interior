@@ -1,4 +1,4 @@
-import { BookOpen, Boxes, ClipboardCheck, Map, ScrollText, Settings2, UserRound } from 'lucide-react';
+import { BookOpen, Boxes, ClipboardCheck, MailOpen, Map, ScrollText, Settings2, UserRound } from 'lucide-react';
 import { useEffect } from 'react';
 import { NavLink, Outlet } from 'react-router-dom';
 import { useAthanorStore } from '../state/useAthanorStore';
@@ -39,6 +39,10 @@ export function AppShell() {
           ))}
         </nav>
         <div className="side-nav__tools" aria-label="Ferramentas internas e configurações">
+          <NavLink className="side-nav__settings" to="/temple/continuous-return">
+            <MailOpen size={18} aria-hidden="true" />
+            <span>Retornos opcionais</span>
+          </NavLink>
           <NavLink className="side-nav__settings" to="/settings/accessibility">
             <Settings2 size={18} aria-hidden="true" />
             <span>Acessibilidade</span>
