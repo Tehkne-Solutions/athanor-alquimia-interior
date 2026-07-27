@@ -13,9 +13,9 @@ import {
 import {
   findReceivedByFingerprint,
   findReceivedCollection,
-  parseContinuousCollectionShare,
   type ContinuousReceiveSuccess
 } from '../domain/continuousReceive';
+import { parseContinuousCollectionShareWithConsistency } from '../domain/continuousReceiveConsistency';
 import { useContinuousReceivedStore } from '../state/useContinuousReceivedStore';
 
 interface ReceiveConsent {
@@ -81,7 +81,7 @@ export function ContinuousReceivePage() {
     if (!file) return;
     try {
       const parsedJson: unknown = JSON.parse(await file.text());
-      const result = parseContinuousCollectionShare(parsedJson);
+      const result = parseContinuousCollectionShareWithConsistency(parsedJson);
       if (!result.ok) {
         setErrors(result.errors);
         return;
@@ -148,7 +148,7 @@ export function ContinuousReceivePage() {
           <span>Selecionar pacote JSON da Fase 8.7</span>
           <input type="file" accept="application/json,.json" onChange={handleFile}/>
         </label>
-        <p>Somente arquivos com schema, política, autoria e transmissão oficiais são aceitos.</p>
+        <p>Somente arquivos com schema, política, autoria e transmissão oficiais são aceitos. Selos presentes também precisam corresponder ao conteúdo.</p>
       </div>
       {errors.length > 0 && <ul className="continuous-receive-errors">{errors.map((error) => <li key={error}>{error}</li>)}</ul>}
     </Card>

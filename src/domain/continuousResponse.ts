@@ -1,5 +1,9 @@
 import type { ContinuousReceivedCollection } from './continuousReceive';
 import type { ContinuousResponseGesture } from '../content/continuousResponse';
+import {
+  attachContinuousConsistency,
+  type ContinuousConsistencySeal
+} from './continuousConsistency';
 
 export interface ContinuousResponseConsent {
   source: boolean;
@@ -38,6 +42,7 @@ export interface ContinuousResponseExport extends ContinuousResponsePreview {
     author: 'Tehkné Solutions';
     transmission: 'manual-local-file';
   };
+  consistency?: ContinuousConsistencySeal;
 }
 
 export interface ContinuousResponseSuccess {
@@ -70,7 +75,8 @@ export function buildContinuousResponsePreview(
   const notices = [
     'A resposta não inclui os itens nem as datas da coleção recebida.',
     'A impressão descritiva permite reconhecer manualmente o pacote sem identificar pessoas.',
-    'Nenhuma resposta adicional é necessária.'
+    'Nenhuma resposta adicional é necessária.',
+    'O arquivo final recebe um selo local de consistência que não autentica identidade ou autoria.'
   ];
   if (record.package.collection.itemCount === 0) {
     notices.push('A origem é uma coleção vazia e permanece válida.');
@@ -116,19 +122,21 @@ export function createContinuousResponseExport(
   if (!generatedAt.trim()) errors.push('A data local de geração é obrigatória.');
   if (errors.length > 0) return { ok: false, errors };
 
+  const payload: ContinuousResponseExport = {
+    schema: 'athanor-continuous-response-v1',
+    policy: 'optional-curated-no-tracking-v1',
+    catalogVersion,
+    generatedAt,
+    provenance: {
+      product: 'Athanor — Alquimia Interior',
+      author: 'Tehkné Solutions',
+      transmission: 'manual-local-file'
+    },
+    ...buildContinuousResponsePreview(record, gesture)
+  };
+
   return {
     ok: true,
-    export: {
-      schema: 'athanor-continuous-response-v1',
-      policy: 'optional-curated-no-tracking-v1',
-      catalogVersion,
-      generatedAt,
-      provenance: {
-        product: 'Athanor — Alquimia Interior',
-        author: 'Tehkné Solutions',
-        transmission: 'manual-local-file'
-      },
-      ...buildContinuousResponsePreview(record, gesture)
-    }
+    export: attachContinuousConsistency(payload)
   };
 }

@@ -1,6 +1,10 @@
 import type { ContinuousCollection, ContinuousCollectionItemReference } from './continuousCollection';
 import type { ContinuousMapItemKind, ContinuousMapStatus } from './continuousMap';
 import type { NewWorkStartPoint } from './continuousJourney';
+import {
+  attachContinuousConsistency,
+  type ContinuousConsistencySeal
+} from './continuousConsistency';
 
 export interface ContinuousShareConsent {
   collection: boolean;
@@ -57,6 +61,7 @@ export interface ContinuousCollectionShareExport extends ContinuousSharePreview 
     author: 'Tehkné Solutions';
     transmission: 'manual-local-file';
   };
+  consistency?: ContinuousConsistencySeal;
 }
 
 export interface ContinuousShareSuccess {
@@ -117,7 +122,8 @@ export function buildContinuousSharePreview(
 ): ContinuousSharePreview {
   const notices = [
     'A ordem é preservada somente como organização manual, sem prioridade implícita.',
-    'O pacote não contém IDs internos de jornadas, Rastros, ciclos ou coleções.'
+    'O pacote não contém IDs internos de jornadas, Rastros, ciclos ou coleções.',
+    'O arquivo final recebe um selo local de consistência que não autentica identidade ou autoria.'
   ];
   if (!options.includeDates) notices.push('Datas foram omitidas.');
   if (collection.items.length === 0) notices.push('Esta coleção está vazia e continua válida para exportação.');
@@ -152,19 +158,21 @@ export function createContinuousCollectionShareExport(
   if (!generatedAt.trim()) errors.push('A data local de geração é obrigatória.');
   if (errors.length > 0) return { ok: false, errors };
 
+  const payload: ContinuousCollectionShareExport = {
+    schema: 'athanor-continuous-collection-share-v1',
+    policy: 'explicit-consent-minimized-local-export-v1',
+    catalogVersion,
+    generatedAt,
+    provenance: {
+      product: 'Athanor — Alquimia Interior',
+      author: 'Tehkné Solutions',
+      transmission: 'manual-local-file'
+    },
+    ...buildContinuousSharePreview(collection, options)
+  };
+
   return {
     ok: true,
-    export: {
-      schema: 'athanor-continuous-collection-share-v1',
-      policy: 'explicit-consent-minimized-local-export-v1',
-      catalogVersion,
-      generatedAt,
-      provenance: {
-        product: 'Athanor — Alquimia Interior',
-        author: 'Tehkné Solutions',
-        transmission: 'manual-local-file'
-      },
-      ...buildContinuousSharePreview(collection, options)
-    }
+    export: attachContinuousConsistency(payload)
   };
 }
