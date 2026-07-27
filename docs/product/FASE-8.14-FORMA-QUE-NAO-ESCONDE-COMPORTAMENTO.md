@@ -18,7 +18,7 @@ Garantir que arquivos compartilhados e exportações do Athanor contenham soment
 - versão: `1.0.0`;
 - política: `plain-json-no-hidden-behavior-v1`;
 - modo: `iterative-own-data-properties-only`;
-- limite de inspeção: 10.000 nós;
+- limite de inspeção: 50.000 nós;
 - protótipos aceitos: `Object.prototype`, `null` e `Array.prototype`;
 - acessores: recusados;
 - funções, símbolos, bigint e undefined: recusados;
@@ -60,6 +60,8 @@ tamanho declarado do arquivo
 ```
 
 Em chamadas diretas de domínio, a validação começa em **forma JSON inerte**.
+
+O teto de 50.000 nós da inspeção de forma é um fusível próprio contra chamadas programáticas extremas. Ele não substitui o orçamento estrutural da Fase 8.13, que permanece mais restritivo em 10.000 nós e também possui limites específicos para listas, profundidade, campos e textos. Assim, uma estrutura inerte mas extensa recebe o diagnóstico do orçamento correspondente.
 
 ## Inspeção por descritores
 
@@ -219,6 +221,7 @@ Ela garante somente que a estrutura aceita permanece composta por dados JSON pas
 - referências repetidas e circulares recusadas;
 - proxies hostis tratados como falha;
 - leitura local valida forma antes do orçamento;
+- inspeção de forma e orçamento mantêm limites independentes;
 - partilha e retorno validam forma antes de checksum e versão;
 - exportações geradas passam pela validação;
 - campos opcionais undefined são omitidos;
