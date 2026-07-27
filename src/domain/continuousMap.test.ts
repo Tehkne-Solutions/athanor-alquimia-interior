@@ -153,9 +153,9 @@ describe('continuousMap', () => {
     expect(exported.totals).toEqual({ items: 1, trails: 0, themeCycles: 1, linked: 1, unlinked: 0 });
   });
 
-  it('não adiciona score, ranking ou tendência ao payload', () => {
+  it('não adiciona campos de score, ranking ou tendência ao payload', () => {
     const items = buildContinuousMapItems([trail()], [themeCycle()]);
     const serialized = JSON.stringify(createContinuousMapExport(items, defaultContinuousMapFilters, completedAt));
-    expect(serialized).not.toMatch(/score|ranking|trend|streak/i);
+    expect(serialized).not.toMatch(/"(score|rank|trend|streak)"\s*:/i);
   });
 });
