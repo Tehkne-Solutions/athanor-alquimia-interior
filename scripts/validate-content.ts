@@ -13,6 +13,7 @@ try {
   await import('../src/content/validateContinuousResponse');
   await import('../src/content/validateContinuousReturn');
   await import('../src/content/validateContinuousConsistency');
+  await import('../src/content/validateContinuousVersion');
   console.log('Conteúdo Athanor validado com sucesso.');
 } catch (error) {
   console.error('Falha na validação editorial:');
