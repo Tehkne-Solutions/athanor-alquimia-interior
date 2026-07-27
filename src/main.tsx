@@ -8,6 +8,7 @@ import './content/validateContinuousConsistency';
 import './content/validateContinuousCycle';
 import './content/validateContinuousInertJson';
 import './content/validateContinuousMap';
+import './content/validateContinuousNumericLexeme';
 import './content/validateContinuousReceive';
 import './content/validateContinuousResource';
 import './content/validateContinuousResponse';
