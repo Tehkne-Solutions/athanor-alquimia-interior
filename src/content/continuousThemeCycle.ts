@@ -39,7 +39,7 @@ export const continuousThemeCycleBiblicalUnit = {
   provenance: [{
     id: 'bible-proverbs-15-23',
     label: 'Provérbios 15:23',
-    class: 'biblical_primary' as const,
+    class: 'BIB' as const,
     explanation: 'Referência bíblica principal da fase, aplicada editorialmente sem promessa, previsão ou leitura pessoal.',
     sourceLabel: 'Bíblia'
   }]
