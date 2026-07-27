@@ -11,6 +11,7 @@ try {
   await import('../src/content/validateContinuousShare');
   await import('../src/content/validateContinuousReceive');
   await import('../src/content/validateContinuousResponse');
+  await import('../src/content/validateContinuousReturn');
   console.log('Conteúdo Athanor validado com sucesso.');
 } catch (error) {
   console.error('Falha na validação editorial:');

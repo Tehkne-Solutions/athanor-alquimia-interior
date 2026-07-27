@@ -43,7 +43,8 @@ Este repositório contém a experiência funcional do Athanor, iniciada pelo ver
 - **8.6 — A Coleção que Cresce sem Acumular Valor:** coleções locais sem ranking ou valor por quantidade;
 - **8.7 — A Partilha que Exige Consentimento:** prévia minimizada e arquivo local somente após cinco consentimentos explícitos;
 - **8.8 — A Recepção que Não se Apropria:** validação, sanitização e biblioteca recebida separada, sem mescla com progresso próprio;
-- **8.9 — A Resposta que Não Cobra Retorno:** gestos curados ou silêncio, arquivo local opcional e nenhuma expectativa de continuidade.
+- **8.9 — A Resposta que Não Cobra Retorno:** gestos curados ou silêncio, arquivo local opcional e nenhuma expectativa de continuidade;
+- **8.10 — O Retorno que Não Reabre o Ciclo:** leitura transitória de respostas, sem histórico, confirmação, lembrete ou reabertura da origem.
 
 ## Ciclo validável
 
@@ -60,7 +61,7 @@ Fonte bíblica
 → Nova Obra contínua
 ```
 
-A progressão não mede valor pessoal, espiritual ou emocional. Recusar, pausar, encerrar cedo, manter vazio, preservar desconhecido e permanecer em silêncio são estados válidos quando previstos pelo fluxo.
+A progressão não mede valor pessoal, espiritual ou emocional. Recusar, pausar, encerrar cedo, manter vazio, preservar desconhecido, permanecer em silêncio e descartar um retorno são estados válidos quando previstos pelo fluxo.
 
 ## Stack
 
@@ -102,6 +103,8 @@ Registros de revisão permanecem locais e opcionais. Exportações de mapas, col
 Pacotes recebidos são validados e guardados, quando explicitamente escolhidos, em uma biblioteca local separada. Eles não criam jornadas, não alteram coleções próprias, não confirmam leitura e não registram a identidade de origem.
 
 Respostas são opcionais e usam somente gestos curados. O silêncio não cria registro. Quando escolhido, o arquivo de resposta é gerado localmente, não inclui o conteúdo recebido e declara que nenhum retorno adicional é necessário.
+
+Retornos de resposta são apenas validados e exibidos em prévia transitória. O Athanor não os armazena, não confirma leitura, não cria lembrete e não reabre a coleção ou a partilha original.
 
 ## Assinatura
 
