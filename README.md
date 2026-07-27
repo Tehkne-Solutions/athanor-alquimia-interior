@@ -54,7 +54,8 @@ Este repositório contém a experiência funcional do Athanor, iniciada pelo ver
 - **8.17 — O Número que Não Muda em Silêncio:** preservação da medida decimal antes do parse, sem inteiros inseguros, overflow, underflow ou arredondamento oculto;
 - **8.18 — O Campo que Não Some em Silêncio:** contratos recursivos de campos, sem propriedades extras descartadas durante a sanitização;
 - **8.19 — A Margem que Não se Apaga em Silêncio:** espaços e quebras nas extremidades são recusados, sem `trim()` ou correção automática dos textos;
-- **8.20 — O Tempo que Não se Converte em Silêncio:** instantes UTC canônicos, sem offset, fuso implícito, data impossível ou normalização silenciosa.
+- **8.20 — O Tempo que Não se Converte em Silêncio:** instantes UTC canônicos, sem offset, fuso implícito, data impossível ou normalização silenciosa;
+- **8.21 — A Sequência que Não se Inverte em Silêncio:** quantidades, posições, política de datas e cronologia interna precisam concordar antes do domínio.
 
 ## Ciclo validável
 
@@ -71,7 +72,7 @@ Fonte bíblica
 → Nova Obra contínua
 ```
 
-A progressão não mede valor pessoal, espiritual ou emocional. Recusar, pausar, encerrar cedo, manter vazio, preservar desconhecido, permanecer em silêncio, descartar um retorno, usar arquivo legado, interromper uma versão incompatível, recusar uma estrutura acima do orçamento técnico, rejeitar uma forma não inerte, interromper texto Unicode ambíguo, recusar chaves repetidas, impedir uma mudança numérica silenciosa, interromper campos desconhecidos, recusar margens textuais externas ou interromper um instante temporal não canônico são estados válidos quando previstos pelo fluxo.
+A progressão não mede valor pessoal, espiritual ou emocional. Recusar, pausar, encerrar cedo, manter vazio, preservar desconhecido, permanecer em silêncio, descartar um retorno, usar arquivo legado, interromper uma versão incompatível, recusar uma estrutura acima do orçamento técnico, rejeitar uma forma não inerte, interromper texto Unicode ambíguo, recusar chaves repetidas, impedir uma mudança numérica silenciosa, interromper campos desconhecidos, recusar margens textuais externas, interromper um instante temporal não canônico ou rejeitar campos relacionados contraditórios são estados válidos quando previstos pelo fluxo.
 
 ## Stack
 
@@ -134,7 +135,9 @@ Depois do checksum e da matriz de versão, cada propriedade presente precisa per
 
 Depois do contrato estrito, cada string conhecida precisa coincidir com seu próprio `trim()`. Espaços e quebras nas extremidades são recusados sem alteração; whitespace interno permanece preservado, e os parsers copiam os textos aprovados exatamente.
 
-Depois das margens exatas, campos temporais conhecidos precisam usar `YYYY-MM-DDTHH:mm:ss.sssZ` em UTC e sobreviver a um round-trip idêntico com `Date.toISOString()`. Offsets, fuso implícito, precisão diferente, datas impossíveis e conclusão anterior à ocorrência são recusados sem conversão ou correção.
+Depois das margens exatas, campos temporais conhecidos precisam usar `YYYY-MM-DDTHH:mm:ss.sssZ` em UTC e sobreviver a um round-trip idêntico com `Date.toISOString()`. Offsets, fuso implícito, precisão diferente e datas impossíveis são recusados sem conversão ou correção.
+
+Depois do formato temporal, a partilha precisa manter relações coerentes: `itemCount` corresponde à lista, posições são sequenciais, datas respeitam `includeDates`, conclusão exige ocorrência, conclusão não antecede ocorrência e nenhum instante interno pode ultrapassar `generatedAt`. O relógio atual não participa da validação.
 
 ## Assinatura
 
