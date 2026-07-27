@@ -1,6 +1,7 @@
 import { continuousResponseCatalog } from '../content/continuousResponse';
 import { continuousVersionCatalog } from '../content/continuousVersion';
 import { attachContinuousConsistency, verifyContinuousConsistency } from './continuousConsistency';
+import { inspectContinuousResourceBudget } from './continuousResource';
 import {
   parseContinuousResponseReturn,
   type ContinuousReturnResult
@@ -11,6 +12,11 @@ import {
 } from './continuousVersion';
 
 export function parseContinuousResponseReturnWithConsistency(input: unknown): ContinuousReturnResult {
+  const resource = inspectContinuousResourceBudget(input);
+  if (!resource.ok) {
+    return { ok: false, errors: resource.errors.map((error) => `Limite local recusado: ${error}`) };
+  }
+
   const verification = verifyContinuousConsistency(input);
   if (verification.status === 'invalid' || verification.status === 'unsupported') {
     return { ok: false, errors: [`Selo de consistência recusado: ${verification.message}`] };
@@ -28,7 +34,7 @@ export function parseContinuousResponseReturnWithConsistency(input: unknown): Co
   const parsed = parseContinuousResponseReturn(input);
   if (!parsed.ok) return parsed;
 
-  const warnings = [...parsed.warnings, compatibility.message];
+  const warnings = [...parsed.warnings, resource.message, compatibility.message];
   if (compatibility.status === 'supported-legacy') {
     warnings.push('A prévia sanitizada usa a versão atual, sem alterar ou sobrescrever o arquivo recebido.');
   }
