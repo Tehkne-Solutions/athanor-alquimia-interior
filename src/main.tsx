@@ -6,6 +6,7 @@ import { validateContent } from './content/validate';
 import './content/validateContinuousCollection';
 import './content/validateContinuousConsistency';
 import './content/validateContinuousCycle';
+import './content/validateContinuousInertJson';
 import './content/validateContinuousMap';
 import './content/validateContinuousReceive';
 import './content/validateContinuousResource';
