@@ -136,16 +136,16 @@ export function parseContinuousResponseReturn(input: unknown): ContinuousReturnR
   const sanitized: ContinuousResponseExport = {
     schema: 'athanor-continuous-response-v1',
     policy: 'optional-curated-no-tracking-v1',
-    catalogVersion: (input.catalogVersion as string).trim(),
-    generatedAt: (input.generatedAt as string).trim(),
+    catalogVersion: input.catalogVersion as string,
+    generatedAt: input.generatedAt as string,
     provenance: {
       product: 'Athanor — Alquimia Interior',
       author: 'Tehkné Solutions',
       transmission: 'manual-local-file'
     },
     source: {
-      fingerprint: (input.source.fingerprint as string).trim(),
-      collectionLabel: (input.source.collectionLabel as string).trim(),
+      fingerprint: input.source.fingerprint as string,
+      collectionLabel: input.source.collectionLabel as string,
       itemCount: input.source.itemCount as number,
       status: input.source.status as 'active' | 'archived'
     },
@@ -159,7 +159,7 @@ export function parseContinuousResponseReturn(input: unknown): ContinuousReturnR
       deliveryTracked: false,
       recipientStored: false
     },
-    notices: (input.notices as string[]).map((notice) => notice.trim())
+    notices: [...input.notices as string[]]
   };
 
   const warnings: string[] = [];
