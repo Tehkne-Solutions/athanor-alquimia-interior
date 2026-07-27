@@ -169,8 +169,9 @@ export function validateContinuousTextVisibility(
     if (isFailure(descriptors)) return descriptors;
 
     for (const propertyKey of keys) {
-      if (typeof propertyKey === 'symbol') {
-        return fail(`A inspeção textual encontrou uma chave simbólica em ${current.path}.`);
+      if (typeof propertyKey !== 'string') {
+        const kind = typeof propertyKey === 'symbol' ? 'simbólica' : 'não textual';
+        return fail(`A inspeção textual encontrou uma chave ${kind} em ${current.path}.`);
       }
       if (Array.isArray(current.value) && propertyKey === 'length') continue;
 
