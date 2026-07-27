@@ -1,5 +1,5 @@
 import { useMemo, useState, type ChangeEvent } from 'react';
-import { Archive, ArrowDown, ArrowUp, BookOpenText, FolderOpen, Import, RotateCcw, ShieldCheck, Trash2 } from 'lucide-react';
+import { Archive, ArrowDown, ArrowUp, BookOpenText, FolderOpen, Import, RotateCcw, Share2, ShieldCheck, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/Button';
 import { Card } from '../components/Card';
@@ -110,7 +110,7 @@ export function ContinuousCollectionPage() {
           <li>Modo: referências locais curadas</li>
           <li>Política: sem valor acumulado</li>
           <li>Coleções: {registry.collections.length}</li>
-          <li>Compartilhamento: consentimento explícito futuro</li>
+          <li>Partilha: arquivo local com consentimento explícito</li>
         </ul>
         <div className="safety-summary"><ShieldCheck/><p>Uma coleção vazia possui o mesmo valor de uma coleção preenchida.</p></div>
       </Card>
@@ -149,6 +149,7 @@ export function ContinuousCollectionPage() {
           {selectedCollection.status === 'active'
             ? <Button variant="ghost" onClick={() => archiveCollection(selectedCollection.id)}><Archive size={17}/> Arquivar coleção</Button>
             : <Button variant="secondary" onClick={() => reactivateCollection(selectedCollection.id)}><RotateCcw size={17}/> Reativar coleção</Button>}
+          <Button variant="secondary" onClick={() => navigate(`/temple/continuous-collections/${selectedCollection.id}/share`)}><Share2 size={17}/> Preparar partilha</Button>
           <Button variant="ghost" onClick={() => navigate('/temple/continuous-map')}>Consultar mapa</Button>
         </div>
 

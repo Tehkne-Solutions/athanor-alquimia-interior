@@ -51,6 +51,6 @@ export const continuousCollectionRestrictions = [
   'Importação aceita somente schema e política conhecidos do mapa local',
   'Registros desconhecidos são preservados como desconhecidos, sem interpretação',
   'Nenhum texto pessoal, emoção, nota ou diagnóstico é solicitado',
-  'Compartilhamento futuro exigirá consentimento explícito e não está ativo nesta fase',
-  'Todos os dados permanecem no dispositivo'
+  'Partilha exige consentimento explícito e gera somente um arquivo local minimizado',
+  'Todos os dados permanecem no dispositivo até uma exportação deliberada'
 ];
