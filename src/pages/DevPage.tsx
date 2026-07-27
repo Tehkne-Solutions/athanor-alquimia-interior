@@ -167,7 +167,25 @@ export function DevPage() {
     spiritChapter: spiritChapterProgress ? { status: spiritChapterProgress.status, cycleId: spiritChapterProgress.cycleId, destinations: spiritChapterProgress.destinations } : undefined,
     continuousJourney: continuousProgress ? { sourceSpiritCycleId: continuousProgress.sourceSpiritCycleId, records: continuousProgress.records } : undefined,
     continuousCycles: continuousCycleProgress.instances.map((instance) => ({ id: instance.id, sourceRecordId: instance.sourceRecordId, startPoint: instance.startPoint, status: instance.status, comparison: instance.comparison })),
-    continuousTrails: continuousTrailProgress.trails.map((trail) => ({ id: trail.id, sourceCycleInstanceId: trail.sourceCycleInstanceId, startPoint: trail.startPoint, status: trail.status, currentStage: trail.currentStage, practiceId: trail.practiceId, noPractice: trail.noPractice, traceCreated: trail.continuousTrailTraceCreated })),
+    continuousTrails: continuousTrailProgress.trails.map((trail) => ({
+      id: trail.id,
+      sourceCycleInstanceId: trail.sourceCycleInstanceId,
+      startPoint: trail.startPoint,
+      status: trail.status,
+      currentStage: trail.currentStage,
+      practiceId: trail.practiceId,
+      noPractice: trail.noPractice,
+      variantId: trail.contentVariantId,
+      variantCatalogVersion: trail.catalogVersion,
+      variantRotationCount: trail.variantRotationCount,
+      variantHistory: trail.variantHistory,
+      themeId: trail.themeId,
+      noTheme: trail.noTheme,
+      themeCatalogVersion: trail.themeCatalogVersion,
+      themeRotationCount: trail.themeRotationCount,
+      themeHistory: trail.themeHistory,
+      traceCreated: trail.continuousTrailTraceCreated
+    })),
     inventory: state.inventory.map((item) => item.name)
   }, null, 2)}</pre></Card><Card title="Ações"><Button variant="danger" onClick={reset}><RotateCcw size={18}/> Resetar todo o estado</Button></Card></div></div>;
 }
