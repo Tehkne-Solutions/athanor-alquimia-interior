@@ -5,6 +5,7 @@ import { Button } from '../components/Button';
 import { Card } from '../components/Card';
 import { PageHeader } from '../components/PageHeader';
 import { continuousInertJsonCatalog } from '../content/continuousInertJson';
+import { continuousNumericLexemeCatalog } from '../content/continuousNumericLexeme';
 import { continuousResourceCatalog } from '../content/continuousResource';
 import {
   continuousReturnBiblicalUnit,
@@ -104,6 +105,7 @@ export function ContinuousReturnPage() {
         <ul className="simple-list">
           <li>Schema aceito: {continuousReturnCatalog.acceptedSchema}</li>
           <li>Chaves: únicas antes do parse · v{continuousUniqueKeysCatalog.version}</li>
+          <li>Números: medida decimal preservada · v{continuousNumericLexemeCatalog.version}</li>
           <li>Forma aceita: JSON inerte v{continuousInertJsonCatalog.version}</li>
           <li>Texto aceito: Unicode {continuousTextVisibilityCatalog.normalization} v{continuousTextVisibilityCatalog.version}</li>
           <li>Limite de arquivo: {continuousResourceCatalog.maxFileBytes / 1024} KiB</li>
@@ -119,7 +121,7 @@ export function ContinuousReturnPage() {
           <span>Selecionar JSON da Fase 8.9</span>
           <input type="file" accept="application/json,.json" onChange={handleFile}/>
         </label>
-        <p>Tamanho e texto bruto são limitados primeiro. Depois, chaves únicas, JSON.parse, forma inerte, orçamento estrutural, texto visível, selo, versão e gesto curado são validados sem criar histórico.</p>
+        <p>Tamanho e texto bruto são limitados primeiro. Depois, chaves únicas, medida numérica, JSON.parse, forma inerte, orçamento estrutural, texto visível, selo, versão e gesto curado são validados sem criar histórico.</p>
       </div>
       {errors.length > 0 && <ul className="continuous-return-errors">{errors.map((error) => <li key={error}>{error}</li>)}</ul>}
     </Card>
