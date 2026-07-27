@@ -206,7 +206,7 @@ export function validateContinuousStrictContract(
     for (let index = keys.length - 1; index >= 0; index -= 1) {
       const key = keys[index];
       const path = appendObjectPath(current.path, key);
-      if (typeof key !== 'string' || !(key in current.node.fields)) {
+      if (typeof key !== 'string' || !Object.prototype.hasOwnProperty.call(current.node.fields, key)) {
         stats.unknownFields += 1;
         if (unknownPaths.length < maxReports) unknownPaths.push(path);
         continue;
