@@ -5,6 +5,7 @@ import {
   attachContinuousConsistency,
   type ContinuousConsistencySeal
 } from './continuousConsistency';
+import { validateContinuousInertJson } from './continuousInertJson';
 import { inspectContinuousResourceBudget } from './continuousResource';
 
 export interface ContinuousShareConsent {
@@ -103,17 +104,17 @@ function minimizeReference(
     position,
     kind: item.kind,
     startPoint: item.startPoint,
-    themeId: item.themeId,
     noTheme: item.noTheme,
     variantId: item.variantId,
-    packageId: item.packageId,
-    packageLabel: item.packageLabel,
     status: item.status,
-    depth: item.depth,
     endedEarly: item.endedEarly,
     passageSummary: { ...item.passageSummary },
-    occurredAt: options.includeDates ? item.occurredAt : undefined,
-    completedAt: options.includeDates ? item.completedAt : undefined
+    ...(item.themeId !== undefined ? { themeId: item.themeId } : {}),
+    ...(item.packageId !== undefined ? { packageId: item.packageId } : {}),
+    ...(item.packageLabel !== undefined ? { packageLabel: item.packageLabel } : {}),
+    ...(item.depth !== undefined ? { depth: item.depth } : {}),
+    ...(options.includeDates && item.occurredAt !== undefined ? { occurredAt: item.occurredAt } : {}),
+    ...(options.includeDates && item.completedAt !== undefined ? { completedAt: item.completedAt } : {})
   };
 }
 
@@ -125,7 +126,8 @@ export function buildContinuousSharePreview(
     'A ordem é preservada somente como organização manual, sem prioridade implícita.',
     'O pacote não contém IDs internos de jornadas, Rastros, ciclos ou coleções.',
     'O arquivo final recebe um selo local de consistência que não autentica identidade ou autoria.',
-    'O arquivo final precisa permanecer dentro do orçamento local de tamanho e complexidade.'
+    'O arquivo final precisa permanecer dentro do orçamento local de tamanho e complexidade.',
+    'O arquivo final contém somente JSON inerte, sem comportamento oculto.'
   ];
   if (!options.includeDates) notices.push('Datas foram omitidas.');
   if (collection.items.length === 0) notices.push('Esta coleção está vazia e continua válida para exportação.');
@@ -172,6 +174,11 @@ export function createContinuousCollectionShareExport(
     },
     ...buildContinuousSharePreview(collection, options)
   };
+
+  const inert = validateContinuousInertJson(payload);
+  if (!inert.ok) {
+    return { ok: false, errors: inert.errors.map((error) => `Não foi possível gerar JSON inerte: ${error}`) };
+  }
 
   const resource = inspectContinuousResourceBudget(payload);
   if (!resource.ok) {
