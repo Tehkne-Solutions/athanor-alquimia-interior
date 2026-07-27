@@ -7,6 +7,7 @@ try {
   await import('../src/content/validateContinuousTheme');
   await import('../src/content/validateContinuousThemeCycle');
   await import('../src/content/validateContinuousMap');
+  await import('../src/content/validateContinuousCollection');
   console.log('Conteúdo Athanor validado com sucesso.');
 } catch (error) {
   console.error('Falha na validação editorial:');
