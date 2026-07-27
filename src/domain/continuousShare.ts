@@ -5,6 +5,7 @@ import {
   attachContinuousConsistency,
   type ContinuousConsistencySeal
 } from './continuousConsistency';
+import { validateContinuousExactText } from './continuousExactText';
 import { validateContinuousInertJson } from './continuousInertJson';
 import { inspectContinuousResourceBudget } from './continuousResource';
 import { validateContinuousTextVisibility } from './continuousTextVisibility';
@@ -129,7 +130,8 @@ export function buildContinuousSharePreview(
     'O arquivo final recebe um selo local de consistência que não autentica identidade ou autoria.',
     'O arquivo final precisa permanecer dentro do orçamento local de tamanho e complexidade.',
     'O arquivo final contém somente JSON inerte, sem comportamento oculto.',
-    'Textos e nomes de campos permanecem Unicode NFC e sem controles invisíveis, sem reescrita automática.'
+    'Textos e nomes de campos permanecem Unicode NFC e sem controles invisíveis, sem reescrita automática.',
+    'Nenhuma margem textual externa é removida durante a geração ou a leitura.'
   ];
   if (!options.includeDates) notices.push('Datas foram omitidas.');
   if (collection.items.length === 0) notices.push('Esta coleção está vazia e continua válida para exportação.');
@@ -158,10 +160,10 @@ export function createContinuousCollectionShareExport(
   generatedAt: string
 ): ContinuousShareResult {
   const errors: string[] = [];
-  if (!collection.label.trim()) errors.push('A coleção selecionada não possui rótulo válido.');
+  if (collection.label.length === 0) errors.push('A coleção selecionada não possui rótulo válido.');
   if (!hasExplicitContinuousShareConsent(consent)) errors.push('Todas as confirmações explícitas são obrigatórias.');
-  if (!catalogVersion.trim()) errors.push('A versão do catálogo de partilha é obrigatória.');
-  if (!generatedAt.trim()) errors.push('A data local de geração é obrigatória.');
+  if (catalogVersion.length === 0) errors.push('A versão do catálogo de partilha é obrigatória.');
+  if (generatedAt.length === 0) errors.push('A data local de geração é obrigatória.');
   if (errors.length > 0) return { ok: false, errors };
 
   const payload: ContinuousCollectionShareExport = {
@@ -190,6 +192,11 @@ export function createContinuousCollectionShareExport(
   const visibleText = validateContinuousTextVisibility(payload);
   if (!visibleText.ok) {
     return { ok: false, errors: visibleText.errors.map((error) => `Não foi possível gerar texto visível: ${error}`) };
+  }
+
+  const exactText = validateContinuousExactText(payload, 'Partilha gerada');
+  if (!exactText.ok) {
+    return { ok: false, errors: exactText.errors.map((error) => `Não foi possível preservar a margem textual: ${error}`) };
   }
 
   return {
