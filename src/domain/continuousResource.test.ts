@@ -62,7 +62,11 @@ describe('orçamento local de recursos', () => {
   });
 
   it('recusa quantidade excessiva de nós', () => {
-    const result = inspectContinuousResourceBudget({ a: [1, 2, 3, 4], b: [1, 2, 3, 4] }, limits);
+    const result = inspectContinuousResourceBudget({
+      a: [1, 2, 3, 4],
+      b: [1, 2, 3, 4],
+      c: [1, 2, 3, 4]
+    }, limits);
     expect(result.ok).toBe(false);
     if (result.ok) return;
     expect(result.errors.join(' ')).toMatch(/nós/i);
