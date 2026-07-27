@@ -17,6 +17,7 @@ import './content/validateContinuousTextVisibility';
 import './content/validateContinuousTheme';
 import './content/validateContinuousThemeCycle';
 import './content/validateContinuousTrail';
+import './content/validateContinuousUniqueKeys';
 import './content/validateContinuousVariation';
 import './content/validateContinuousVersion';
 import './content/validateNewWork';
