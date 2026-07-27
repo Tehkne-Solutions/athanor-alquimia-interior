@@ -5,6 +5,7 @@ import {
   attachContinuousConsistency,
   type ContinuousConsistencySeal
 } from './continuousConsistency';
+import { validateContinuousShareExactTime } from './continuousExactTime';
 import { validateContinuousExactText } from './continuousExactText';
 import { validateContinuousInertJson } from './continuousInertJson';
 import { inspectContinuousResourceBudget } from './continuousResource';
@@ -131,7 +132,8 @@ export function buildContinuousSharePreview(
     'O arquivo final precisa permanecer dentro do orçamento local de tamanho e complexidade.',
     'O arquivo final contém somente JSON inerte, sem comportamento oculto.',
     'Textos e nomes de campos permanecem Unicode NFC e sem controles invisíveis, sem reescrita automática.',
-    'Nenhuma margem textual externa é removida durante a geração ou a leitura.'
+    'Nenhuma margem textual externa é removida durante a geração ou a leitura.',
+    'Instantes temporais usam UTC canônico com milissegundos e nunca são convertidos silenciosamente.'
   ];
   if (!options.includeDates) notices.push('Datas foram omitidas.');
   if (collection.items.length === 0) notices.push('Esta coleção está vazia e continua válida para exportação.');
@@ -197,6 +199,11 @@ export function createContinuousCollectionShareExport(
   const exactText = validateContinuousExactText(payload, 'Partilha gerada');
   if (!exactText.ok) {
     return { ok: false, errors: exactText.errors.map((error) => `Não foi possível preservar a margem textual: ${error}`) };
+  }
+
+  const exactTime = validateContinuousShareExactTime(payload);
+  if (!exactTime.ok) {
+    return { ok: false, errors: exactTime.errors.map((error) => `Não foi possível preservar o instante temporal: ${error}`) };
   }
 
   return {
