@@ -5,6 +5,7 @@ import { Button } from '../components/Button';
 import { Card } from '../components/Card';
 import { PageHeader } from '../components/PageHeader';
 import { continuousInertJsonCatalog } from '../content/continuousInertJson';
+import { continuousNumericLexemeCatalog } from '../content/continuousNumericLexeme';
 import {
   continuousReceiveBiblicalUnit,
   continuousReceiveCatalog,
@@ -141,6 +142,7 @@ export function ContinuousReceivePage() {
         <ul className="simple-list">
           <li>Schema aceito: {continuousReceiveCatalog.acceptedSchema}</li>
           <li>Chaves: únicas antes do parse · v{continuousUniqueKeysCatalog.version}</li>
+          <li>Números: medida decimal preservada · v{continuousNumericLexemeCatalog.version}</li>
           <li>Forma aceita: JSON inerte v{continuousInertJsonCatalog.version}</li>
           <li>Texto aceito: Unicode {continuousTextVisibilityCatalog.normalization} v{continuousTextVisibilityCatalog.version}</li>
           <li>Limite de arquivo: {continuousResourceCatalog.maxFileBytes / 1024} KiB</li>
@@ -156,7 +158,7 @@ export function ContinuousReceivePage() {
           <span>Selecionar pacote JSON da Fase 8.7</span>
           <input type="file" accept="application/json,.json" onChange={handleFile}/>
         </label>
-        <p>Tamanho e texto bruto são limitados primeiro. Depois, chaves únicas, JSON.parse, forma inerte, orçamento estrutural, texto visível, selo, versão, schema e conteúdo curado são validados nessa ordem.</p>
+        <p>Tamanho e texto bruto são limitados primeiro. Depois, chaves únicas, medida numérica, JSON.parse, forma inerte, orçamento estrutural, texto visível, selo, versão, schema e conteúdo curado são validados nessa ordem.</p>
       </div>
       {errors.length > 0 && <ul className="continuous-receive-errors">{errors.map((error) => <li key={error}>{error}</li>)}</ul>}
     </Card>

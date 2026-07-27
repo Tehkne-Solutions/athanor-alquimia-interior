@@ -18,6 +18,7 @@ try {
   await import('../src/content/validateContinuousInertJson');
   await import('../src/content/validateContinuousTextVisibility');
   await import('../src/content/validateContinuousUniqueKeys');
+  await import('../src/content/validateContinuousNumericLexeme');
   console.log('Conteúdo Athanor validado com sucesso.');
 } catch (error) {
   console.error('Falha na validação editorial:');

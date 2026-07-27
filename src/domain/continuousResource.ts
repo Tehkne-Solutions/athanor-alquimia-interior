@@ -1,4 +1,5 @@
 import { validateContinuousInertJson } from './continuousInertJson';
+import { inspectContinuousJsonNumbers } from './continuousNumericLexeme';
 import { validateContinuousTextVisibility } from './continuousTextVisibility';
 import { inspectContinuousJsonUniqueKeys } from './continuousUniqueKeys';
 
@@ -186,6 +187,14 @@ export async function readContinuousJsonFile(
       return { ok: false, errors: ['Não foi possível interpretar o arquivo como JSON.'] };
     }
     return { ok: false, errors: uniqueKeys.errors.map((error) => `Chave JSON recusada: ${error}`) };
+  }
+
+  const numericLexemes = inspectContinuousJsonNumbers(text);
+  if (!numericLexemes.ok) {
+    if (numericLexemes.kind === 'syntax') {
+      return { ok: false, errors: ['Não foi possível interpretar o arquivo como JSON.'] };
+    }
+    return { ok: false, errors: numericLexemes.errors.map((error) => `Número JSON recusado: ${error}`) };
   }
 
   let value: unknown;

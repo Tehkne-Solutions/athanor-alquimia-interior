@@ -50,7 +50,8 @@ Este repositório contém a experiência funcional do Athanor, iniciada pelo ver
 - **8.13 — A Medida que Protege sem Julgar o Conteúdo:** orçamento local de bytes, texto, profundidade e complexidade antes de checksum, versão e sanitização;
 - **8.14 — A Forma que Não Esconde Comportamento:** validação de JSON inerte, sem funções, acessores, protótipos especiais, arrays esparsos ou chaves reservadas;
 - **8.15 — A Palavra que Não se Disfarça:** Unicode NFC obrigatório e recusa de controles invisíveis ou bidirecionais, sem reescrita silenciosa;
-- **8.16 — A Chave que Não se Repete em Silêncio:** detecção de nomes duplicados no texto JSON antes que o parser descarte valores anteriores.
+- **8.16 — A Chave que Não se Repete em Silêncio:** detecção de nomes duplicados no texto JSON antes que o parser descarte valores anteriores;
+- **8.17 — O Número que Não Muda em Silêncio:** preservação da medida decimal antes do parse, sem inteiros inseguros, overflow, underflow ou arredondamento oculto.
 
 ## Ciclo validável
 
@@ -67,7 +68,7 @@ Fonte bíblica
 → Nova Obra contínua
 ```
 
-A progressão não mede valor pessoal, espiritual ou emocional. Recusar, pausar, encerrar cedo, manter vazio, preservar desconhecido, permanecer em silêncio, descartar um retorno, usar arquivo legado, interromper uma versão incompatível, recusar uma estrutura acima do orçamento técnico, rejeitar uma forma não inerte, interromper texto Unicode ambíguo ou recusar chaves repetidas são estados válidos quando previstos pelo fluxo.
+A progressão não mede valor pessoal, espiritual ou emocional. Recusar, pausar, encerrar cedo, manter vazio, preservar desconhecido, permanecer em silêncio, descartar um retorno, usar arquivo legado, interromper uma versão incompatível, recusar uma estrutura acima do orçamento técnico, rejeitar uma forma não inerte, interromper texto Unicode ambíguo, recusar chaves repetidas ou impedir uma mudança numérica silenciosa são estados válidos quando previstos pelo fluxo.
 
 ## Stack
 
@@ -119,6 +120,8 @@ A versão declarada de cada pacote também precisa coincidir com uma matriz SemV
 Antes de qualquer checksum ou versão, o Athanor aplica um orçamento técnico local. Arquivos grandes demais não são lidos; estruturas profundas ou extensas são interrompidas sem truncamento, reparo automático, persistência da recusa ou julgamento do conteúdo.
 
 Antes do `JSON.parse`, o texto bruto é inspecionado para impedir chaves repetidas no mesmo objeto. Escapes diferentes que representam o mesmo nome são tratados como duplicatas, e nenhum primeiro ou último valor é escolhido silenciosamente.
+
+Ainda antes do parse, os lexemas numéricos precisam preservar a mesma medida decimal quando convertidos para `Number`. Inteiros fora da faixa segura, overflow, underflow, `-0` e arredondamentos silenciosos são recusados sem correção automática.
 
 Depois do `JSON.parse` e antes do orçamento estrutural, os valores também precisam permanecer JSON inerte. Funções, getters, setters, símbolos, protótipos especiais, arrays esparsos e chaves reservadas são recusados sem execução, conversão automática ou registro da tentativa.
 
