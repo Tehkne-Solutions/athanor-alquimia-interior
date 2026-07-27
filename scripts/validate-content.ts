@@ -9,6 +9,7 @@ try {
   await import('../src/content/validateContinuousMap');
   await import('../src/content/validateContinuousCollection');
   await import('../src/content/validateContinuousShare');
+  await import('../src/content/validateContinuousReceive');
   console.log('Conteúdo Athanor validado com sucesso.');
 } catch (error) {
   console.error('Falha na validação editorial:');
