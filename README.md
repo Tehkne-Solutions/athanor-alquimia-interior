@@ -44,7 +44,8 @@ Este repositório contém a experiência funcional do Athanor, iniciada pelo ver
 - **8.7 — A Partilha que Exige Consentimento:** prévia minimizada e arquivo local somente após cinco consentimentos explícitos;
 - **8.8 — A Recepção que Não se Apropria:** validação, sanitização e biblioteca recebida separada, sem mescla com progresso próprio;
 - **8.9 — A Resposta que Não Cobra Retorno:** gestos curados ou silêncio, arquivo local opcional e nenhuma expectativa de continuidade;
-- **8.10 — O Retorno que Não Reabre o Ciclo:** leitura transitória de respostas, sem histórico, confirmação, lembrete ou reabertura da origem.
+- **8.10 — O Retorno que Não Reabre o Ciclo:** leitura transitória de respostas, sem histórico, confirmação, lembrete ou reabertura da origem;
+- **8.11 — A Conferência que Não Promete Autenticidade:** selo local de consistência para detectar alterações sem afirmar identidade, autoria ou segurança criptográfica.
 
 ## Ciclo validável
 
@@ -61,7 +62,7 @@ Fonte bíblica
 → Nova Obra contínua
 ```
 
-A progressão não mede valor pessoal, espiritual ou emocional. Recusar, pausar, encerrar cedo, manter vazio, preservar desconhecido, permanecer em silêncio e descartar um retorno são estados válidos quando previstos pelo fluxo.
+A progressão não mede valor pessoal, espiritual ou emocional. Recusar, pausar, encerrar cedo, manter vazio, preservar desconhecido, permanecer em silêncio, descartar um retorno e usar arquivo legado são estados válidos quando previstos pelo fluxo.
 
 ## Stack
 
@@ -105,6 +106,8 @@ Pacotes recebidos são validados e guardados, quando explicitamente escolhidos, 
 Respostas são opcionais e usam somente gestos curados. O silêncio não cria registro. Quando escolhido, o arquivo de resposta é gerado localmente, não inclui o conteúdo recebido e declara que nenhum retorno adicional é necessário.
 
 Retornos de resposta são apenas validados e exibidos em prévia transitória. O Athanor não os armazena, não confirma leitura, não cria lembrete e não reabre a coleção ou a partilha original.
+
+Novas partilhas e respostas recebem um checksum local determinístico. Ele detecta alterações de conteúdo, mas não é assinatura digital, não é criptográfico e não autentica identidade ou autoria. Arquivos legados continuam aceitos com aviso quando passam pelas demais validações.
 
 ## Assinatura
 
