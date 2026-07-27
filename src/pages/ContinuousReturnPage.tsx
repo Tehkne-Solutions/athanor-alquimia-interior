@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/Button';
 import { Card } from '../components/Card';
 import { PageHeader } from '../components/PageHeader';
+import { continuousInertJsonCatalog } from '../content/continuousInertJson';
 import { continuousResourceCatalog } from '../content/continuousResource';
 import {
   continuousReturnBiblicalUnit,
@@ -101,7 +102,7 @@ export function ContinuousReturnPage() {
         <ul className="simple-list">
           <li>Schema aceito: {continuousReturnCatalog.acceptedSchema}</li>
           <li>Modo: prévia local transitória</li>
-          <li>Histórico persistente: não</li>
+          <li>Forma aceita: JSON inerte v{continuousInertJsonCatalog.version}</li>
           <li>Limite de arquivo: {continuousResourceCatalog.maxFileBytes / 1024} KiB</li>
         </ul>
         <div className="safety-summary"><ShieldCheck/><p>A ausência de arquivo ou de retorno continua sendo um encerramento completo.</p></div>
@@ -115,7 +116,7 @@ export function ContinuousReturnPage() {
           <span>Selecionar JSON da Fase 8.9</span>
           <input type="file" accept="application/json,.json" onChange={handleFile}/>
         </label>
-        <p>O tamanho é conferido antes da leitura. Depois, estrutura, selo, versão e gesto curado são validados sem criar histórico.</p>
+        <p>O tamanho é conferido antes da leitura. Depois, forma inerte, orçamento estrutural, selo, versão e gesto curado são validados sem criar histórico.</p>
       </div>
       {errors.length > 0 && <ul className="continuous-return-errors">{errors.map((error) => <li key={error}>{error}</li>)}</ul>}
     </Card>
