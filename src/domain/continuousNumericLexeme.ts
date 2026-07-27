@@ -44,6 +44,33 @@ function safeLexemeLabel(value: string): string {
   return value.length <= 80 ? value : `${value.slice(0, 77)}...`;
 }
 
+function safePathKey(value: string): string {
+  const pieces: string[] = [];
+  let count = 0;
+  for (const character of value) {
+    if (count >= 48) {
+      pieces.push('...');
+      break;
+    }
+    const codePoint = character.codePointAt(0) ?? 0;
+    if (codePoint >= 0x20 && codePoint <= 0x7E && character !== '\\' && character !== '"') {
+      pieces.push(character);
+    } else if (character === '\\') {
+      pieces.push('\\\\');
+    } else if (character === '"') {
+      pieces.push('\\"');
+    } else {
+      pieces.push(`\\u{${codePoint.toString(16).toUpperCase()}}`);
+    }
+    count += 1;
+  }
+  return `"${pieces.join('')}"`;
+}
+
+function appendPath(path: string, key: string): string {
+  return `${path}[${safePathKey(key)}]`;
+}
+
 function normalizeExponent(value: string | undefined): bigint {
   if (!value) return 0n;
   return BigInt(value.startsWith('+') ? value.slice(1) : value);
@@ -176,7 +203,7 @@ class JsonNumericLexemeScanner {
         return this.fail('syntax', `Era esperado ':' depois de uma chave na posição ${this.index + 1}.`);
       }
       this.index += 1;
-      if (!this.parseValue(`${path}[${JSON.stringify(key)}]`, depth + 1)) return false;
+      if (!this.parseValue(appendPath(path, key), depth + 1)) return false;
       this.skipWhitespace();
       const separator = this.text[this.index];
       if (separator === '}') {
@@ -318,6 +345,12 @@ class JsonNumericLexemeScanner {
 
     const normalized = normalizeContinuousDecimalLexeme(lexeme);
     if (!normalized) return this.fail('syntax', `Número JSON inválido na posição ${start + 1}.`);
+
+    const parsed = Number(lexeme);
+    if (!Number.isFinite(parsed)) {
+      return this.fail('range', `O número ${safeLexemeLabel(lexeme)} em ${path} não permanece finito no JavaScript.`);
+    }
+
     if (isMathematicalInteger(normalized)) {
       this.stats.integers += 1;
       if (exceedsSafeInteger(normalized)) {
@@ -328,10 +361,6 @@ class JsonNumericLexemeScanner {
       }
     }
 
-    const parsed = Number(lexeme);
-    if (!Number.isFinite(parsed)) {
-      return this.fail('range', `O número ${safeLexemeLabel(lexeme)} em ${path} não permanece finito no JavaScript.`);
-    }
     if (Object.is(parsed, -0)) {
       return this.fail('precision', `O número -0 em ${path} perderia o sinal em uma nova serialização JSON.`);
     }
