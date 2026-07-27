@@ -124,9 +124,10 @@ function isRecord(value: unknown): value is Record<string, unknown> {
 
 function safeKeyLabel(key: PropertyKey): string {
   if (typeof key === 'symbol') return '[symbol]';
+  const text = String(key);
   const pieces: string[] = [];
   let count = 0;
-  for (const character of key) {
+  for (const character of text) {
     if (count >= 48) {
       pieces.push('...');
       break;
