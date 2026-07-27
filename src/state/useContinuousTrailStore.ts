@@ -5,8 +5,10 @@ import {
   advanceContinuousTrail,
   chooseNoContinuousTrailPractice,
   createContinuousTrailProgress,
+  keepContinuousTrailVariant,
   pauseContinuousTrail,
   resumeContinuousTrail,
+  rotateContinuousTrailVariant,
   selectContinuousTrailPractice,
   startContinuousTrail,
   type ContinuousTrailAdvanceResult,
@@ -19,7 +21,9 @@ const now = () => new Date().toISOString();
 interface ContinuousTrailStoreState {
   schemaVersion: number;
   progress: ContinuousTrailProgress;
-  start: (cycle: ContinuousCycleInstance, contentVariantId: string) => void;
+  start: (cycle: ContinuousCycleInstance, contentVariantId: string, catalogVersion: string) => void;
+  keepVariant: (trailId: string, catalogVersion: string) => void;
+  requestVariant: (trailId: string, candidateVariantIds: string[], catalogVersion: string) => void;
   selectPractice: (trailId: string, practiceId: string) => void;
   chooseNoPractice: (trailId: string) => void;
   advance: (trailId: string, result: ContinuousTrailAdvanceResult) => void;
@@ -33,10 +37,16 @@ const initialProgress = () => createContinuousTrailProgress(now());
 export const useContinuousTrailStore = create<ContinuousTrailStoreState>()(
   persist(
     (set) => ({
-      schemaVersion: 1,
+      schemaVersion: 2,
       progress: initialProgress(),
-      start: (cycle, contentVariantId) => set((state) => ({
-        progress: startContinuousTrail(state.progress, cycle, crypto.randomUUID(), contentVariantId, now())
+      start: (cycle, contentVariantId, catalogVersion) => set((state) => ({
+        progress: startContinuousTrail(state.progress, cycle, crypto.randomUUID(), contentVariantId, now(), catalogVersion)
+      })),
+      keepVariant: (trailId, catalogVersion) => set((state) => ({
+        progress: keepContinuousTrailVariant(state.progress, trailId, catalogVersion, now())
+      })),
+      requestVariant: (trailId, candidateVariantIds, catalogVersion) => set((state) => ({
+        progress: rotateContinuousTrailVariant(state.progress, trailId, candidateVariantIds, catalogVersion, now())
       })),
       selectPractice: (trailId, practiceId) => set((state) => ({
         progress: selectContinuousTrailPractice(state.progress, trailId, practiceId, now())

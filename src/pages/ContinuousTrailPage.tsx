@@ -1,4 +1,4 @@
-import { BookOpenText, CheckCircle2, Circle, Clock3, Pause, Play, ShieldCheck, Sparkles } from 'lucide-react';
+import { BookOpenText, CheckCircle2, Circle, Clock3, History, Pause, Play, RefreshCw, ShieldCheck, Sparkles } from 'lucide-react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { Button } from '../components/Button';
 import { Card } from '../components/Card';
@@ -12,10 +12,17 @@ import {
   selectContinuousTrailVariant
 } from '../content/continuousTrail';
 import {
+  continuousTrailCatalogDefinition,
+  continuousVariationBiblicalUnit,
+  continuousVariationRestrictions
+} from '../content/continuousVariation';
+import {
   canCompleteContinuousTrailStage,
   findTrailByCycleInstance,
+  getContinuousTrailVariantHistory,
   summarizeContinuousTrail,
-  type ContinuousTrailStage
+  type ContinuousTrailStage,
+  type ContinuousTrailVariantAction
 } from '../domain/continuousTrail';
 import { newWorkModes, newWorkStartPoints } from '../content/newWork';
 import { useContinuousCycleStore } from '../state/useContinuousCycleStore';
@@ -27,12 +34,20 @@ const stageLabels: Record<ContinuousTrailStage, string> = {
   review: 'Revisão'
 };
 
+const variantActionLabels: Record<ContinuousTrailVariantAction, string> = {
+  initial: 'Variante inicial',
+  kept: 'Mantida explicitamente',
+  rotated: 'Outra variante solicitada'
+};
+
 export function ContinuousTrailPage() {
   const navigate = useNavigate();
   const { instanceId } = useParams<{ instanceId: string }>();
   const cycleProgress = useContinuousCycleStore((state) => state.progress);
   const trailProgress = useContinuousTrailStore((state) => state.progress);
   const start = useContinuousTrailStore((state) => state.start);
+  const keepVariant = useContinuousTrailStore((state) => state.keepVariant);
+  const requestVariant = useContinuousTrailStore((state) => state.requestVariant);
   const selectPractice = useContinuousTrailStore((state) => state.selectPractice);
   const chooseNoPractice = useContinuousTrailStore((state) => state.chooseNoPractice);
   const advance = useContinuousTrailStore((state) => state.advance);
@@ -51,15 +66,19 @@ export function ContinuousTrailPage() {
   const selectedVariant = trail
     ? continuousTrailVariants.find((variant) => variant.id === trail.contentVariantId) ?? selectContinuousTrailVariant(cycle.contentSeed, cycle.startPoint)
     : selectContinuousTrailVariant(cycle.contentSeed, cycle.startPoint);
+  const candidateVariantIds = continuousTrailVariants
+    .filter((variant) => variant.startPoint === cycle.startPoint)
+    .map((variant) => variant.id);
 
   if (!trail) {
     const canStart = cycle.status === 'active';
     return <div className="page page--continuous-trail"><PageHeader eyebrow="A Jornada que se Desdobra" title={`${point?.label ?? 'Jornada'} · conteúdo curado por semente`} description="Orientação, observação e revisão permanecem separadas por instância. Nenhuma resposta anterior é reutilizada."/>
       <div className="continuous-trail-intro-grid">
         <Card title={continuousTrailBiblicalUnit.title} eyebrow={continuousTrailBiblicalUnit.reference}><blockquote>{continuousTrailBiblicalUnit.principle}</blockquote><p>{continuousTrailBiblicalUnit.context}</p><div className="provenance-inline"><BookOpenText size={17}/><span>A Bíblia inicia a reflexão; as variantes e práticas são estruturas autorais da Tehkné Solutions.</span></div></Card>
-        <Card title="Variante selecionada" eyebrow={selectedVariant.id}><ul className="simple-list"><li><strong>Orientação:</strong> {selectedVariant.orientation}</li><li><strong>Observação:</strong> {selectedVariant.observation}</li><li><strong>Revisão:</strong> {selectedVariant.review}</li></ul><p className="muted">Origem: {point?.label} · {mode?.label}. A semente utiliza somente metadados curados da instância.</p></Card>
+        <Card title="Variante selecionada" eyebrow={selectedVariant.id}><ul className="simple-list"><li><strong>Orientação:</strong> {selectedVariant.orientation}</li><li><strong>Observação:</strong> {selectedVariant.observation}</li><li><strong>Revisão:</strong> {selectedVariant.review}</li></ul><p className="muted">Catálogo {continuousTrailCatalogDefinition.version} · {point?.label} · {mode?.label}. A semente utiliza somente metadados curados da instância.</p></Card>
+        <Card title={continuousVariationBiblicalUnit.title} eyebrow={continuousVariationBiblicalUnit.reference}><blockquote>{continuousVariationBiblicalUnit.principle}</blockquote><p>{continuousVariationBiblicalUnit.context}</p><div className="safety-summary"><History/><p>Depois de iniciar, a variante poderá ser mantida ou trocada por outra versão curada sem alterar o progresso.</p></div></Card>
       </div>
-      <Card title="Abrir o desdobramento" eyebrow="Ativação explícita"><div className="safety-summary"><ShieldCheck/><p>Iniciar não reinicia a missão do elemento e não copia respostas, notas ou destinos anteriores.</p></div><Button disabled={!canStart} onClick={() => start(cycle, selectedVariant.id)}>{canStart ? 'Iniciar orientação' : 'A jornada de origem precisa estar ativa'}</Button>{!canStart && <p className="field-help">Retome a instância na tela de jornadas contínuas ou mantenha-a pausada sem perda.</p>}</Card>
+      <Card title="Abrir o desdobramento" eyebrow="Ativação explícita"><div className="safety-summary"><ShieldCheck/><p>Iniciar não reinicia a missão do elemento e não copia respostas, notas ou destinos anteriores.</p></div><Button disabled={!canStart} onClick={() => start(cycle, selectedVariant.id, continuousTrailCatalogDefinition.version)}>{canStart ? 'Iniciar orientação' : 'A jornada de origem precisa estar ativa'}</Button>{!canStart && <p className="field-help">Retome a instância na tela de jornadas contínuas ou mantenha-a pausada sem perda.</p>}</Card>
     </div>;
   }
 
@@ -69,9 +88,13 @@ export function ContinuousTrailPage() {
   const cycleAllowsProgress = cycle.status === 'active';
   const canAct = cycleAllowsProgress && trail.status === 'active';
   const canComplete = canAct && canCompleteContinuousTrailStage(trail);
+  const variantHistory = getContinuousTrailVariantHistory(trail);
+  const canChangeVariant = canAct && candidateVariantIds.length > 1;
 
   return <div className="page page--continuous-trail"><PageHeader eyebrow="Rastro da Jornada Contínua" title={`${point?.label ?? 'Jornada'} · ${stageLabels[trail.currentStage]}`} description="Escolher uma prática, passar, pausar ou permanecer sem prática são caminhos completos e sem pontuação diferente."/>
     <Card title="Progresso desta instância" eyebrow={`${summary.completed} concluídas · ${summary.passed} passadas`}><div className="continuous-trail-stage-grid">{(['orientation', 'observation', 'review'] as ContinuousTrailStage[]).map((stage) => { const state = trail.stages[stage]; const active = trail.currentStage === stage && trail.status !== 'completed'; return <article key={stage} className={active ? 'continuous-trail-stage continuous-trail-stage--active' : 'continuous-trail-stage'}>{state.result === 'completed' ? <CheckCircle2/> : state.result === 'passed' ? <Sparkles/> : state.result === 'paused' ? <Clock3/> : <Circle/>}<div><strong>{stageLabels[stage]}</strong><small>{state.result}</small></div></article>; })}</div><p className="muted">Instância: <code>{trail.sourceCycleInstanceId}</code></p></Card>
+
+    <Card title="A Variação que Preserva o Núcleo" eyebrow={`Catálogo ${trail.catalogVersion ?? continuousTrailCatalogDefinition.version}`}><div className="continuous-variation-grid"><div><p className="eyebrow">Variante atual</p><h3>{selectedVariant.id}</h3><p>{selectedVariant[trail.currentStage]}</p><div className="continuous-trail-actions"><Button disabled={!canChangeVariant} onClick={() => keepVariant(trail.id, continuousTrailCatalogDefinition.version)}>Manter variante atual</Button><Button variant="secondary" disabled={!canChangeVariant} onClick={() => requestVariant(trail.id, candidateVariantIds, continuousTrailCatalogDefinition.version)}><RefreshCw size={17}/> Solicitar outra variante</Button></div>{!canChangeVariant && trail.status !== 'completed' && <p className="field-help">A rotação fica disponível quando a instância e o Rastro estão ativos.</p>}</div><div><p className="eyebrow">Histórico auditável</p><ol className="continuous-variation-history">{variantHistory.slice().reverse().map((entry) => <li key={`${entry.sequence}-${entry.selectedAt}`}><strong>{entry.variantId}</strong><span>{variantActionLabels[entry.action]} · catálogo {entry.catalogVersion}</span></li>)}</ol></div></div><div className="safety-summary"><ShieldCheck/><p>Solicitar outra variante preserva prática, etapa e resultados. Nenhum conteúdo pessoal participa da rotação.</p></div></Card>
 
     {trail.status !== 'completed' && <Card title={stageLabels[trail.currentStage]} eyebrow={selectedVariant.id}><p className="continuous-trail-prompt">{stagePrompt}</p>{trail.currentStage === 'orientation' && <div className="continuous-trail-practice-grid" role="group" aria-label="Práticas curadas disponíveis">{practices.map((practice) => <button key={practice.id} type="button" disabled={!canAct} aria-pressed={trail.practiceId === practice.id} onClick={() => selectPractice(trail.id, practice.id)}><Circle/><span><strong>{practice.label}</strong><small>{practice.description}</small></span></button>)}<button type="button" disabled={!canAct} aria-pressed={trail.noPractice} onClick={() => chooseNoPractice(trail.id)}><Pause/><span><strong>Permanecer sem prática</strong><small>Continuar ou passar sem escolher uma atividade.</small></span></button></div>}
       {!cycleAllowsProgress && <div className="safety-summary"><Clock3/><p>A instância de origem está {cycle.status}. O Rastro permanece preservado e não pode avançar até uma retomada explícita.</p></div>}
@@ -81,6 +104,6 @@ export function ContinuousTrailPage() {
 
     {trail.status === 'completed' && <Card title={continuousTrailTraceDefinition.label} eyebrow="Componente contínuo criado"><div className="continuous-trail-complete"><CheckCircle2/><div><strong>Orientação, observação e revisão foram encerradas nesta instância.</strong><p>{continuousTrailTraceDefinition.description}</p></div></div><p>{continuousTrailTraceDefinition.rewardPolicy}</p><div className="continuous-trail-actions"><Button variant="secondary" onClick={() => navigate('/temple/continuous-cycles')}>Voltar às jornadas</Button><Button variant="ghost" onClick={() => navigate(point?.route ?? '/temple')}>Abrir {point?.label ?? 'ambiente'}</Button></div></Card>}
 
-    <Card title="Limites do desdobramento" eyebrow="Conteúdo curado"><ul className="simple-list">{continuousTrailRestrictions.map((restriction) => <li key={restriction}>{restriction}</li>)}</ul><div className="safety-summary"><ShieldCheck/><p>O Rastro registra somente o percurso desta instância. Não representa evolução, coerência, cura ou direção espiritual.</p></div></Card>
+    <Card title="Limites do desdobramento" eyebrow="Conteúdo curado"><ul className="simple-list">{[...continuousTrailRestrictions, ...continuousVariationRestrictions].map((restriction) => <li key={restriction}>{restriction}</li>)}</ul><div className="safety-summary"><ShieldCheck/><p>O Rastro registra somente o percurso desta instância. Não representa evolução, coerência, cura ou direção espiritual.</p></div></Card>
   </div>;
 }
