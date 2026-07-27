@@ -4,6 +4,7 @@ import {
   attachContinuousConsistency,
   type ContinuousConsistencySeal
 } from './continuousConsistency';
+import { validateContinuousInertJson } from './continuousInertJson';
 import { inspectContinuousResourceBudget } from './continuousResource';
 
 export interface ContinuousResponseConsent {
@@ -78,7 +79,8 @@ export function buildContinuousResponsePreview(
     'A impressão descritiva permite reconhecer manualmente o pacote sem identificar pessoas.',
     'Nenhuma resposta adicional é necessária.',
     'O arquivo final recebe um selo local de consistência que não autentica identidade ou autoria.',
-    'O arquivo final precisa permanecer dentro do orçamento local de tamanho e complexidade.'
+    'O arquivo final precisa permanecer dentro do orçamento local de tamanho e complexidade.',
+    'O arquivo final contém somente JSON inerte, sem comportamento oculto.'
   ];
   if (record.package.collection.itemCount === 0) {
     notices.push('A origem é uma coleção vazia e permanece válida.');
@@ -136,6 +138,11 @@ export function createContinuousResponseExport(
     },
     ...buildContinuousResponsePreview(record, gesture)
   };
+
+  const inert = validateContinuousInertJson(payload);
+  if (!inert.ok) {
+    return { ok: false, errors: inert.errors.map((error) => `Não foi possível gerar JSON inerte: ${error}`) };
+  }
 
   const resource = inspectContinuousResourceBudget(payload);
   if (!resource.ok) {
