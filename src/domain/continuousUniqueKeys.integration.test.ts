@@ -128,7 +128,7 @@ describe('unicidade de chaves no ciclo compartilhado', () => {
   it('recusa chave escapada equivalente antes do parse', async () => {
     const text = JSON.stringify(sharePayload()).replace(
       '"catalogVersion":"1.0.0"',
-      '"catalogVersion":"1.0.0","\u0063atalogVersion":"2.0.0"'
+      String.raw`"catalogVersion":"1.0.0","\u0063atalogVersion":"2.0.0"`
     );
     const result = await read(text);
     expect(result.ok).toBe(false);
