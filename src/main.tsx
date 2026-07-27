@@ -5,6 +5,7 @@ import { App } from './app/App';
 import { validateContent } from './content/validate';
 import './content/validateContinuousCycle';
 import './content/validateContinuousTheme';
+import './content/validateContinuousThemeCycle';
 import './content/validateContinuousTrail';
 import './content/validateContinuousVariation';
 import './content/validateNewWork';
@@ -44,6 +45,7 @@ import './styles/spirit-chapter.css';
 import './styles/new-work.css';
 import './styles/continuous-cycle.css';
 import './styles/continuous-trail.css';
+import './styles/continuous-theme-cycle.css';
 
 validateContent();
 
