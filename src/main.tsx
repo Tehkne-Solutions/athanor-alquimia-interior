@@ -8,6 +8,7 @@ import './content/validateContinuousConsistency';
 import './content/validateContinuousCycle';
 import './content/validateContinuousMap';
 import './content/validateContinuousReceive';
+import './content/validateContinuousResource';
 import './content/validateContinuousResponse';
 import './content/validateContinuousReturn';
 import './content/validateContinuousShare';
