@@ -1,5 +1,5 @@
 import { useState, type ChangeEvent } from 'react';
-import { Archive, BookOpenText, Eye, FileJson, Inbox, RotateCcw, ShieldCheck, Trash2, Upload } from 'lucide-react';
+import { Archive, BookOpenText, Eye, FileJson, Inbox, MessageCircleReply, RotateCcw, ShieldCheck, Trash2, Upload } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/Button';
 import { Card } from '../components/Card';
@@ -201,6 +201,7 @@ export function ContinuousReceivePage() {
             {selectedRecord.package.items.map((item) => <li key={`${item.position}-${item.kind}-${item.variantId}`}><span>{item.position}</span><div><strong>{itemTitle(item.kind, item.startPoint)}</strong><small>{item.themeId ?? (item.noTheme ? 'Sem tema' : 'Tema desconhecido')} · {item.status}</small></div></li>)}
           </ol>}
           <div className="continuous-receive-actions">
+            <Button variant="secondary" onClick={() => navigate(`/temple/continuous-received/${selectedRecord.id}/respond`)}><MessageCircleReply size={17}/> Preparar resposta opcional</Button>
             {selectedRecord.status === 'active'
               ? <Button variant="ghost" onClick={() => archiveRecord(selectedRecord.id)}><Archive size={17}/> Arquivar cópia</Button>
               : <Button variant="secondary" onClick={() => reactivateRecord(selectedRecord.id)}><RotateCcw size={17}/> Reativar cópia</Button>}

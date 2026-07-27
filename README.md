@@ -42,7 +42,8 @@ Este repositório contém a experiência funcional do Athanor, iniciada pelo ver
 - **8.5 — O Mapa dos Ciclos que Não Hierarquiza:** mapa descritivo, filtros e exportação local;
 - **8.6 — A Coleção que Cresce sem Acumular Valor:** coleções locais sem ranking ou valor por quantidade;
 - **8.7 — A Partilha que Exige Consentimento:** prévia minimizada e arquivo local somente após cinco consentimentos explícitos;
-- **8.8 — A Recepção que Não se Apropria:** validação, sanitização e biblioteca recebida separada, sem mescla com progresso próprio.
+- **8.8 — A Recepção que Não se Apropria:** validação, sanitização e biblioteca recebida separada, sem mescla com progresso próprio;
+- **8.9 — A Resposta que Não Cobra Retorno:** gestos curados ou silêncio, arquivo local opcional e nenhuma expectativa de continuidade.
 
 ## Ciclo validável
 
@@ -59,7 +60,7 @@ Fonte bíblica
 → Nova Obra contínua
 ```
 
-A progressão não mede valor pessoal, espiritual ou emocional. Recusar, pausar, encerrar cedo, manter vazio e preservar desconhecido são estados válidos quando previstos pelo fluxo.
+A progressão não mede valor pessoal, espiritual ou emocional. Recusar, pausar, encerrar cedo, manter vazio, preservar desconhecido e permanecer em silêncio são estados válidos quando previstos pelo fluxo.
 
 ## Stack
 
@@ -99,6 +100,8 @@ A versão atual funciona sem conta e persiste o progresso no próprio dispositiv
 Registros de revisão permanecem locais e opcionais. Exportações de mapas, coleções ou partilhas são iniciadas manualmente. A partilha de coleções gera somente um arquivo local minimizado; o Athanor não envia, publica ou registra o destinatário.
 
 Pacotes recebidos são validados e guardados, quando explicitamente escolhidos, em uma biblioteca local separada. Eles não criam jornadas, não alteram coleções próprias, não confirmam leitura e não registram a identidade de origem.
+
+Respostas são opcionais e usam somente gestos curados. O silêncio não cria registro. Quando escolhido, o arquivo de resposta é gerado localmente, não inclui o conteúdo recebido e declara que nenhum retorno adicional é necessário.
 
 ## Assinatura
 
