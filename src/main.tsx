@@ -7,6 +7,7 @@ import './content/validateContinuousCollection';
 import './content/validateContinuousConsistency';
 import './content/validateContinuousCycle';
 import './content/validateContinuousExactText';
+import './content/validateContinuousExactTime';
 import './content/validateContinuousInertJson';
 import './content/validateContinuousMap';
 import './content/validateContinuousNumericLexeme';

@@ -4,6 +4,7 @@ import {
   attachContinuousConsistency,
   type ContinuousConsistencySeal
 } from './continuousConsistency';
+import { validateContinuousResponseExactTime } from './continuousExactTime';
 import { validateContinuousExactText } from './continuousExactText';
 import { validateContinuousInertJson } from './continuousInertJson';
 import { inspectContinuousResourceBudget } from './continuousResource';
@@ -84,7 +85,8 @@ export function buildContinuousResponsePreview(
     'O arquivo final precisa permanecer dentro do orçamento local de tamanho e complexidade.',
     'O arquivo final contém somente JSON inerte, sem comportamento oculto.',
     'Textos e nomes de campos permanecem Unicode NFC e sem controles invisíveis, sem reescrita automática.',
-    'Nenhuma margem textual externa é removida durante a geração ou a leitura.'
+    'Nenhuma margem textual externa é removida durante a geração ou a leitura.',
+    'O instante de geração usa UTC canônico com milissegundos e nunca é convertido silenciosamente.'
   ];
   if (record.package.collection.itemCount === 0) {
     notices.push('A origem é uma coleção vazia e permanece válida.');
@@ -161,6 +163,11 @@ export function createContinuousResponseExport(
   const exactText = validateContinuousExactText(payload, 'Resposta gerada');
   if (!exactText.ok) {
     return { ok: false, errors: exactText.errors.map((error) => `Não foi possível preservar a margem textual: ${error}`) };
+  }
+
+  const exactTime = validateContinuousResponseExactTime(payload);
+  if (!exactTime.ok) {
+    return { ok: false, errors: exactTime.errors.map((error) => `Não foi possível preservar o instante temporal: ${error}`) };
   }
 
   return {

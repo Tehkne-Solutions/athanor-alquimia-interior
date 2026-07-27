@@ -5,6 +5,7 @@ import { Button } from '../components/Button';
 import { Card } from '../components/Card';
 import { PageHeader } from '../components/PageHeader';
 import { continuousExactTextCatalog } from '../content/continuousExactText';
+import { continuousExactTimeCatalog } from '../content/continuousExactTime';
 import { continuousInertJsonCatalog } from '../content/continuousInertJson';
 import { continuousNumericLexemeCatalog } from '../content/continuousNumericLexeme';
 import { continuousResourceCatalog } from '../content/continuousResource';
@@ -112,6 +113,7 @@ export function ContinuousReturnPage() {
           <li>Texto aceito: Unicode {continuousTextVisibilityCatalog.normalization} v{continuousTextVisibilityCatalog.version}</li>
           <li>Campos extras: recusados · v{continuousStrictContractCatalog.version}</li>
           <li>Margens textuais: exatas · v{continuousExactTextCatalog.version}</li>
+          <li>Tempo: {continuousExactTimeCatalog.format} · v{continuousExactTimeCatalog.version}</li>
           <li>Limite de arquivo: {continuousResourceCatalog.maxFileBytes / 1024} KiB</li>
         </ul>
         <div className="safety-summary"><ShieldCheck/><p>A ausência de arquivo ou de retorno continua sendo um encerramento completo.</p></div>
@@ -125,7 +127,7 @@ export function ContinuousReturnPage() {
           <span>Selecionar JSON da Fase 8.9</span>
           <input type="file" accept="application/json,.json" onChange={handleFile}/>
         </label>
-        <p>Tamanho e texto bruto são limitados primeiro. Depois, chaves únicas, medida numérica, JSON.parse, forma inerte, orçamento, texto visível, selo, versão, contrato estrito, margens exatas e gesto curado são validados sem criar histórico.</p>
+        <p>Tamanho e texto bruto são limitados primeiro. Depois, chaves únicas, medida numérica, JSON.parse, forma inerte, orçamento, texto visível, selo, versão, contrato estrito, margens exatas, tempo UTC canônico e gesto curado são validados sem criar histórico.</p>
       </div>
       {errors.length > 0 && <ul className="continuous-return-errors">{errors.map((error) => <li key={error}>{error}</li>)}</ul>}
     </Card>
