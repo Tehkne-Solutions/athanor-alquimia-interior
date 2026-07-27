@@ -1,6 +1,7 @@
 import { continuousResponseCatalog } from '../content/continuousResponse';
 import { continuousVersionCatalog } from '../content/continuousVersion';
 import { attachContinuousConsistency, verifyContinuousConsistency } from './continuousConsistency';
+import { validateContinuousInertJson } from './continuousInertJson';
 import { inspectContinuousResourceBudget } from './continuousResource';
 import {
   parseContinuousResponseReturn,
@@ -12,6 +13,11 @@ import {
 } from './continuousVersion';
 
 export function parseContinuousResponseReturnWithConsistency(input: unknown): ContinuousReturnResult {
+  const inert = validateContinuousInertJson(input);
+  if (!inert.ok) {
+    return { ok: false, errors: inert.errors.map((error) => `Forma JSON recusada: ${error}`) };
+  }
+
   const resource = inspectContinuousResourceBudget(input);
   if (!resource.ok) {
     return { ok: false, errors: resource.errors.map((error) => `Limite local recusado: ${error}`) };
@@ -34,7 +40,12 @@ export function parseContinuousResponseReturnWithConsistency(input: unknown): Co
   const parsed = parseContinuousResponseReturn(input);
   if (!parsed.ok) return parsed;
 
-  const warnings = [...parsed.warnings, resource.message, compatibility.message];
+  const warnings = [
+    ...parsed.warnings,
+    inert.message,
+    resource.message,
+    compatibility.message
+  ];
   if (compatibility.status === 'supported-legacy') {
     warnings.push('A prévia sanitizada usa a versão atual, sem alterar ou sobrescrever o arquivo recebido.');
   }
