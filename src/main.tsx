@@ -15,6 +15,7 @@ import './content/validateContinuousTheme';
 import './content/validateContinuousThemeCycle';
 import './content/validateContinuousTrail';
 import './content/validateContinuousVariation';
+import './content/validateContinuousVersion';
 import './content/validateNewWork';
 import './styles/global.css';
 import './styles/homologation.css';
