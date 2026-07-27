@@ -6,6 +6,7 @@ export type ContinuousTrailStageResult = 'pending' | 'completed' | 'passed' | 'p
 export type ContinuousTrailStatus = 'active' | 'paused' | 'completed';
 export type ContinuousTrailAdvanceResult = 'completed' | 'passed';
 export type ContinuousTrailVariantAction = 'initial' | 'kept' | 'rotated';
+export type ContinuousTrailThemeAction = 'selected' | 'kept' | 'rotated' | 'cleared' | 'passed_without_theme';
 
 export interface ContinuousTrailStageProgress {
   stage: ContinuousTrailStage;
@@ -21,6 +22,15 @@ export interface ContinuousTrailVariantSelection {
   selectedAt: string;
 }
 
+export interface ContinuousTrailThemeSelection {
+  sequence: number;
+  themeId?: string;
+  noTheme: boolean;
+  action: ContinuousTrailThemeAction;
+  catalogVersion: string;
+  selectedAt: string;
+}
+
 export interface ContinuousTrailInstance {
   id: string;
   sourceCycleInstanceId: string;
@@ -32,6 +42,11 @@ export interface ContinuousTrailInstance {
   catalogVersion?: string;
   variantRotationCount?: number;
   variantHistory?: ContinuousTrailVariantSelection[];
+  themeCatalogVersion?: string;
+  themeId?: string;
+  noTheme?: boolean;
+  themeRotationCount?: number;
+  themeHistory?: ContinuousTrailThemeSelection[];
   status: ContinuousTrailStatus;
   currentStage: ContinuousTrailStage;
   practiceId?: string;
@@ -54,6 +69,7 @@ export interface ContinuousTrailProgress {
 
 const stageOrder: ContinuousTrailStage[] = ['orientation', 'observation', 'review'];
 const legacyCatalogVersion = '1.0.0';
+const defaultThemeCatalogVersion = '1.0.0';
 
 export function createContinuousTrailProgress(createdAt: string): ContinuousTrailProgress {
   return {
@@ -92,6 +108,24 @@ export function selectNextContinuousTrailVariantId(
   return candidateVariantIds[(index + 1) % candidateVariantIds.length];
 }
 
+export function selectNextContinuousTrailThemeId(
+  seed: string,
+  currentThemeId: string,
+  candidateThemeIds: string[],
+  requestCount: number,
+  catalogVersion: string
+): string {
+  if (candidateThemeIds.length === 0) return currentThemeId;
+  if (candidateThemeIds.length === 1) return candidateThemeIds[0];
+  const index = deriveContinuousTrailVariantIndex(
+    `${seed}:theme-catalog:${catalogVersion}:request:${requestCount}`,
+    candidateThemeIds.length
+  );
+  const candidate = candidateThemeIds[index];
+  if (candidate !== currentThemeId) return candidate;
+  return candidateThemeIds[(index + 1) % candidateThemeIds.length];
+}
+
 export function getContinuousTrailVariantHistory(trail: ContinuousTrailInstance): ContinuousTrailVariantSelection[] {
   if (trail.variantHistory?.length) return trail.variantHistory;
   return [{
@@ -101,6 +135,35 @@ export function getContinuousTrailVariantHistory(trail: ContinuousTrailInstance)
     catalogVersion: trail.catalogVersion ?? legacyCatalogVersion,
     selectedAt: trail.startedAt
   }];
+}
+
+export function getContinuousTrailThemeHistory(trail: ContinuousTrailInstance): ContinuousTrailThemeSelection[] {
+  if (trail.themeHistory?.length) return trail.themeHistory;
+  if (trail.themeId) {
+    return [{
+      sequence: 0,
+      themeId: trail.themeId,
+      noTheme: false,
+      action: 'selected',
+      catalogVersion: trail.themeCatalogVersion ?? defaultThemeCatalogVersion,
+      selectedAt: trail.startedAt
+    }];
+  }
+  if (trail.noTheme) {
+    return [{
+      sequence: 0,
+      noTheme: true,
+      action: 'cleared',
+      catalogVersion: trail.themeCatalogVersion ?? defaultThemeCatalogVersion,
+      selectedAt: trail.startedAt
+    }];
+  }
+  return [];
+}
+
+export function isContinuousTrailThemeResolved(trail: ContinuousTrailInstance): boolean {
+  if (trail.themeId || trail.noTheme) return true;
+  return typeof trail.noTheme === 'undefined';
 }
 
 export function findTrailByCycleInstance(
@@ -146,6 +209,10 @@ export function startContinuousTrail(
       catalogVersion,
       selectedAt: startedAt
     }],
+    themeCatalogVersion: defaultThemeCatalogVersion,
+    noTheme: false,
+    themeRotationCount: 0,
+    themeHistory: [],
     status: 'active',
     currentStage: 'orientation',
     noPractice: false,
@@ -188,6 +255,25 @@ function appendVariantSelection(
   return [...history, {
     sequence: history.length,
     variantId,
+    action,
+    catalogVersion,
+    selectedAt
+  }];
+}
+
+function appendThemeSelection(
+  trail: ContinuousTrailInstance,
+  themeId: string | undefined,
+  noTheme: boolean,
+  action: ContinuousTrailThemeAction,
+  catalogVersion: string,
+  selectedAt: string
+): ContinuousTrailThemeSelection[] {
+  const history = getContinuousTrailThemeHistory(trail);
+  return [...history, {
+    sequence: history.length,
+    themeId,
+    noTheme,
     action,
     catalogVersion,
     selectedAt
@@ -240,6 +326,99 @@ export function rotateContinuousTrailVariant(
   }, updatedAt);
 }
 
+export function selectContinuousTrailTheme(
+  progress: ContinuousTrailProgress,
+  trailId: string,
+  themeId: string,
+  catalogVersion: string,
+  updatedAt: string
+): ContinuousTrailProgress {
+  return updateTrail(progress, trailId, (trail) => {
+    if (trail.status !== 'active' || trail.themeId === themeId) return trail;
+    return {
+      ...trail,
+      themeId,
+      noTheme: false,
+      themeCatalogVersion: catalogVersion,
+      themeHistory: appendThemeSelection(trail, themeId, false, 'selected', catalogVersion, updatedAt),
+      updatedAt
+    };
+  }, updatedAt);
+}
+
+export function chooseNoContinuousTrailTheme(
+  progress: ContinuousTrailProgress,
+  trailId: string,
+  catalogVersion: string,
+  updatedAt: string
+): ContinuousTrailProgress {
+  return updateTrail(progress, trailId, (trail) => {
+    if (trail.status !== 'active' || trail.noTheme) return trail;
+    return {
+      ...trail,
+      themeId: undefined,
+      noTheme: true,
+      themeCatalogVersion: catalogVersion,
+      themeHistory: appendThemeSelection(trail, undefined, true, 'cleared', catalogVersion, updatedAt),
+      updatedAt
+    };
+  }, updatedAt);
+}
+
+export function keepContinuousTrailTheme(
+  progress: ContinuousTrailProgress,
+  trailId: string,
+  catalogVersion: string,
+  updatedAt: string
+): ContinuousTrailProgress {
+  return updateTrail(progress, trailId, (trail) => {
+    if (trail.status !== 'active' || !isContinuousTrailThemeResolved(trail)) return trail;
+    return {
+      ...trail,
+      themeCatalogVersion: catalogVersion,
+      themeHistory: appendThemeSelection(
+        trail,
+        trail.themeId,
+        Boolean(trail.noTheme),
+        'kept',
+        catalogVersion,
+        updatedAt
+      ),
+      updatedAt
+    };
+  }, updatedAt);
+}
+
+export function rotateContinuousTrailTheme(
+  progress: ContinuousTrailProgress,
+  trailId: string,
+  candidateThemeIds: string[],
+  catalogVersion: string,
+  updatedAt: string
+): ContinuousTrailProgress {
+  return updateTrail(progress, trailId, (trail) => {
+    if (trail.status !== 'active' || !trail.themeId || candidateThemeIds.length < 2) return trail;
+    const requestCount = (trail.themeRotationCount ?? 0) + 1;
+    const nextThemeId = selectNextContinuousTrailThemeId(
+      trail.contentSeed,
+      trail.themeId,
+      candidateThemeIds,
+      requestCount,
+      catalogVersion
+    );
+    if (nextThemeId === trail.themeId) return trail;
+    return {
+      ...trail,
+      themeId: nextThemeId,
+      noTheme: false,
+      themeCatalogVersion: catalogVersion,
+      themeRotationCount: requestCount,
+      themeHistory: appendThemeSelection(trail, nextThemeId, false, 'rotated', catalogVersion, updatedAt),
+      updatedAt
+    };
+  }, updatedAt);
+}
+
 export function selectContinuousTrailPractice(
   progress: ContinuousTrailProgress,
   trailId: string,
@@ -263,7 +442,9 @@ export function chooseNoContinuousTrailPractice(
 
 export function canCompleteContinuousTrailStage(trail: ContinuousTrailInstance): boolean {
   if (trail.status !== 'active') return false;
-  if (trail.currentStage === 'orientation') return Boolean(trail.practiceId || trail.noPractice);
+  if (trail.currentStage === 'orientation') {
+    return Boolean(trail.practiceId || trail.noPractice) && isContinuousTrailThemeResolved(trail);
+  }
   return true;
 }
 
@@ -277,7 +458,9 @@ export function advanceContinuousTrail(
     if (trail.status !== 'active') return trail;
     if (result === 'completed' && !canCompleteContinuousTrailStage(trail)) return trail;
 
-    const currentIndex = stageOrder.indexOf(trail.currentStage);
+    const themeWasResolved = isContinuousTrailThemeResolved(trail);
+    const shouldResolvePassedTheme = trail.currentStage === 'orientation' && result === 'passed' && !themeWasResolved;
+    const themeCatalogVersion = trail.themeCatalogVersion ?? defaultThemeCatalogVersion;
     const stages = {
       ...trail.stages,
       [trail.currentStage]: {
@@ -286,10 +469,23 @@ export function advanceContinuousTrail(
         completedAt: updatedAt
       }
     };
+    const themePatch = shouldResolvePassedTheme ? {
+      noTheme: true,
+      themeCatalogVersion,
+      themeHistory: appendThemeSelection(
+        trail,
+        undefined,
+        true,
+        'passed_without_theme',
+        themeCatalogVersion,
+        updatedAt
+      )
+    } : {};
 
     if (trail.currentStage === 'review') {
       return {
         ...trail,
+        ...themePatch,
         stages,
         status: 'completed',
         continuousTrailTraceCreated: true,
@@ -300,8 +496,9 @@ export function advanceContinuousTrail(
 
     return {
       ...trail,
+      ...themePatch,
       stages,
-      currentStage: stageOrder[currentIndex + 1],
+      currentStage: stageOrder[stageOrder.indexOf(trail.currentStage) + 1],
       updatedAt
     };
   }, updatedAt);
