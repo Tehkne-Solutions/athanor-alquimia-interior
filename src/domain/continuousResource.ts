@@ -166,7 +166,13 @@ export async function readContinuousJsonFile(
   const sizeResult = validateContinuousFileSize(file.size, limits);
   if (!sizeResult.ok) return sizeResult;
 
-  const text = await file.text();
+  let text: string;
+  try {
+    text = await file.text();
+  } catch {
+    return { ok: false, errors: ['Não foi possível ler o arquivo local.'] };
+  }
+
   const textResult = validateContinuousRawText(text, limits);
   if (!textResult.ok) return textResult;
 
