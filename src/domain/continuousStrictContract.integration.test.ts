@@ -110,8 +110,7 @@ describe('contrato estrito no ciclo compartilhado', () => {
       ...original,
       consistency: { ...original.consistency, certificate: 'inventado' }
     };
-    const resealed = attachContinuousConsistency(changed);
-    const result = parseContinuousCollectionShareWithConsistency(resealed);
+    const result = parseContinuousCollectionShareWithConsistency(changed);
     expect(result.ok).toBe(false);
     if (result.ok) return;
     expect(result.errors.join(' ')).toMatch(/consistency.*certificate/i);
