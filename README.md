@@ -48,7 +48,8 @@ Este repositório contém a experiência funcional do Athanor, iniciada pelo ver
 - **8.11 — A Conferência que Não Promete Autenticidade:** selo local de consistência para detectar alterações sem afirmar identidade, autoria ou segurança criptográfica;
 - **8.12 — A Versão que Não Reescreve o Passado:** matriz SemVer explícita, sem downgrade ou migração silenciosa de formatos desconhecidos;
 - **8.13 — A Medida que Protege sem Julgar o Conteúdo:** orçamento local de bytes, texto, profundidade e complexidade antes de checksum, versão e sanitização;
-- **8.14 — A Forma que Não Esconde Comportamento:** validação de JSON inerte, sem funções, acessores, protótipos especiais, arrays esparsos ou chaves reservadas.
+- **8.14 — A Forma que Não Esconde Comportamento:** validação de JSON inerte, sem funções, acessores, protótipos especiais, arrays esparsos ou chaves reservadas;
+- **8.15 — A Palavra que Não se Disfarça:** Unicode NFC obrigatório e recusa de controles invisíveis ou bidirecionais, sem reescrita silenciosa.
 
 ## Ciclo validável
 
@@ -65,7 +66,7 @@ Fonte bíblica
 → Nova Obra contínua
 ```
 
-A progressão não mede valor pessoal, espiritual ou emocional. Recusar, pausar, encerrar cedo, manter vazio, preservar desconhecido, permanecer em silêncio, descartar um retorno, usar arquivo legado, interromper uma versão incompatível, recusar uma estrutura acima do orçamento técnico ou rejeitar uma forma não inerte são estados válidos quando previstos pelo fluxo.
+A progressão não mede valor pessoal, espiritual ou emocional. Recusar, pausar, encerrar cedo, manter vazio, preservar desconhecido, permanecer em silêncio, descartar um retorno, usar arquivo legado, interromper uma versão incompatível, recusar uma estrutura acima do orçamento técnico, rejeitar uma forma não inerte ou interromper texto Unicode ambíguo são estados válidos quando previstos pelo fluxo.
 
 ## Stack
 
@@ -117,6 +118,8 @@ A versão declarada de cada pacote também precisa coincidir com uma matriz SemV
 Antes de qualquer checksum ou versão, o Athanor aplica um orçamento técnico local. Arquivos grandes demais não são lidos; estruturas profundas ou extensas são interrompidas sem truncamento, reparo automático, persistência da recusa ou julgamento do conteúdo.
 
 Depois do `JSON.parse` e antes do orçamento estrutural, os valores também precisam permanecer JSON inerte. Funções, getters, setters, símbolos, protótipos especiais, arrays esparsos e chaves reservadas são recusados sem execução, conversão automática ou registro da tentativa.
+
+Depois do orçamento e antes do checksum, textos e nomes de campos precisam estar em Unicode NFC e não podem conter controles invisíveis, direção bidirecional, pares substitutos inválidos, não caracteres ou `U+FFFD`. O Athanor recusa sem normalizar, traduzir ou reescrever o arquivo.
 
 ## Assinatura
 
