@@ -10,12 +10,14 @@ import {
   continuousReceiveConsentSteps,
   continuousReceiveRestrictions
 } from '../content/continuousReceive';
+import { continuousResourceCatalog } from '../content/continuousResource';
 import {
   findReceivedByFingerprint,
   findReceivedCollection,
   type ContinuousReceiveSuccess
 } from '../domain/continuousReceive';
 import { parseContinuousCollectionShareWithConsistency } from '../domain/continuousReceiveConsistency';
+import { readContinuousJsonFile } from '../domain/continuousResource';
 import { useContinuousReceivedStore } from '../state/useContinuousReceivedStore';
 
 interface ReceiveConsent {
@@ -79,17 +81,19 @@ export function ContinuousReceivePage() {
     setMessage(undefined);
     resetCandidate();
     if (!file) return;
-    try {
-      const parsedJson: unknown = JSON.parse(await file.text());
-      const result = parseContinuousCollectionShareWithConsistency(parsedJson);
-      if (!result.ok) {
-        setErrors(result.errors);
-        return;
-      }
-      setCandidate(result);
-    } catch {
-      setErrors(['Não foi possível ler o arquivo JSON.']);
+
+    const readResult = await readContinuousJsonFile(file);
+    if (!readResult.ok) {
+      setErrors(readResult.errors);
+      return;
     }
+
+    const result = parseContinuousCollectionShareWithConsistency(readResult.value);
+    if (!result.ok) {
+      setErrors(result.errors);
+      return;
+    }
+    setCandidate(result);
   };
 
   const toggleConsent = (field: keyof ReceiveConsent) => {
@@ -135,7 +139,7 @@ export function ContinuousReceivePage() {
           <li>Schema aceito: {continuousReceiveCatalog.acceptedSchema}</li>
           <li>Biblioteca: separada e local</li>
           <li>Mescla com jornadas: não</li>
-          <li>Identidade de origem: não solicitada</li>
+          <li>Limite de arquivo: {continuousResourceCatalog.maxFileBytes / 1024} KiB</li>
         </ul>
         <div className="safety-summary"><ShieldCheck/><p>Selecionar ou descartar um arquivo não envia confirmação e não registra recusa.</p></div>
       </Card>
@@ -148,7 +152,7 @@ export function ContinuousReceivePage() {
           <span>Selecionar pacote JSON da Fase 8.7</span>
           <input type="file" accept="application/json,.json" onChange={handleFile}/>
         </label>
-        <p>Somente arquivos com schema, política, autoria e transmissão oficiais são aceitos. Selos presentes também precisam corresponder ao conteúdo.</p>
+        <p>O tamanho é conferido antes da leitura. Depois, estrutura, selo, versão, schema e conteúdo curado são validados nesta ordem.</p>
       </div>
       {errors.length > 0 && <ul className="continuous-receive-errors">{errors.map((error) => <li key={error}>{error}</li>)}</ul>}
     </Card>
