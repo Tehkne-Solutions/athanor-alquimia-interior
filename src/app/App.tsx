@@ -8,6 +8,7 @@ import { CharacterPage } from '../pages/CharacterPage';
 import { ClassificationPage } from '../pages/ClassificationPage';
 import { CodexPage } from '../pages/CodexPage';
 import { ContinuousCyclePage } from '../pages/ContinuousCyclePage';
+import { ContinuousMapPage } from '../pages/ContinuousMapPage';
 import { ContinuousThemeCyclePage } from '../pages/ContinuousThemeCyclePage';
 import { ContinuousTrailPage } from '../pages/ContinuousTrailPage';
 import { CraftingPage } from '../pages/CraftingPage';
@@ -95,6 +96,7 @@ export function App() {
       <Route path="/temple/spirit-sanctuary" element={<SpiritSanctuaryPage/>}/>
       <Route path="/temple/new-work" element={<NewWorkPage/>}/>
       <Route path="/temple/continuous-cycles" element={<ContinuousCyclePage/>}/>
+      <Route path="/temple/continuous-map" element={<ContinuousMapPage/>}/>
       <Route path="/temple/continuous-cycles/:instanceId/trail" element={<ContinuousTrailPage/>}/>
       <Route path="/temple/continuous-cycles/:instanceId/trail/theme-cycle" element={<ContinuousThemeCyclePage/>}/>
       <Route path="/mission/thread-that-gathers" element={<SpiritThreadPage/>}/>
