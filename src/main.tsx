@@ -13,6 +13,7 @@ import './content/validateContinuousResource';
 import './content/validateContinuousResponse';
 import './content/validateContinuousReturn';
 import './content/validateContinuousShare';
+import './content/validateContinuousTextVisibility';
 import './content/validateContinuousTheme';
 import './content/validateContinuousThemeCycle';
 import './content/validateContinuousTrail';
