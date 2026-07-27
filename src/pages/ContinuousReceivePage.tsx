@@ -13,6 +13,7 @@ import {
   continuousReceiveRestrictions
 } from '../content/continuousReceive';
 import { continuousResourceCatalog } from '../content/continuousResource';
+import { continuousStrictContractCatalog } from '../content/continuousStrictContract';
 import { continuousTextVisibilityCatalog } from '../content/continuousTextVisibility';
 import { continuousUniqueKeysCatalog } from '../content/continuousUniqueKeys';
 import {
@@ -145,6 +146,7 @@ export function ContinuousReceivePage() {
           <li>Números: medida decimal preservada · v{continuousNumericLexemeCatalog.version}</li>
           <li>Forma aceita: JSON inerte v{continuousInertJsonCatalog.version}</li>
           <li>Texto aceito: Unicode {continuousTextVisibilityCatalog.normalization} v{continuousTextVisibilityCatalog.version}</li>
+          <li>Campos extras: recusados · v{continuousStrictContractCatalog.version}</li>
           <li>Limite de arquivo: {continuousResourceCatalog.maxFileBytes / 1024} KiB</li>
         </ul>
         <div className="safety-summary"><ShieldCheck/><p>Selecionar ou descartar um arquivo não envia confirmação e não registra recusa.</p></div>
@@ -158,7 +160,7 @@ export function ContinuousReceivePage() {
           <span>Selecionar pacote JSON da Fase 8.7</span>
           <input type="file" accept="application/json,.json" onChange={handleFile}/>
         </label>
-        <p>Tamanho e texto bruto são limitados primeiro. Depois, chaves únicas, medida numérica, JSON.parse, forma inerte, orçamento estrutural, texto visível, selo, versão, schema e conteúdo curado são validados nessa ordem.</p>
+        <p>Tamanho e texto bruto são limitados primeiro. Depois, chaves únicas, medida numérica, JSON.parse, forma inerte, orçamento, texto visível, selo, versão, contrato estrito, schema e conteúdo curado são validados nessa ordem.</p>
       </div>
       {errors.length > 0 && <ul className="continuous-receive-errors">{errors.map((error) => <li key={error}>{error}</li>)}</ul>}
     </Card>

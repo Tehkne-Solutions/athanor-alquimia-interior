@@ -7,6 +7,7 @@ import {
   parseContinuousResponseReturn,
   type ContinuousReturnResult
 } from './continuousReturn';
+import { validateContinuousResponseStrictContract } from './continuousStrictContract';
 import { validateContinuousTextVisibility } from './continuousTextVisibility';
 import {
   assessContinuousCatalogVersion,
@@ -43,6 +44,11 @@ export function parseContinuousResponseReturnWithConsistency(input: unknown): Co
     return { ok: false, errors: [`Versão recusada: ${compatibility.message}`] };
   }
 
+  const strictContract = validateContinuousResponseStrictContract(input);
+  if (!strictContract.ok) {
+    return { ok: false, errors: strictContract.errors.map((error) => `Contrato recusado: ${error}`) };
+  }
+
   const parsed = parseContinuousResponseReturn(input);
   if (!parsed.ok) return parsed;
 
@@ -51,7 +57,8 @@ export function parseContinuousResponseReturnWithConsistency(input: unknown): Co
     inert.message,
     resource.message,
     visibleText.message,
-    compatibility.message
+    compatibility.message,
+    strictContract.message
   ];
   if (compatibility.status === 'supported-legacy') {
     warnings.push('A prévia sanitizada usa a versão atual, sem alterar ou sobrescrever o arquivo recebido.');
