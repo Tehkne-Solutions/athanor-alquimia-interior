@@ -11,6 +11,7 @@ import {
   type ContinuousReceiveResult
 } from './continuousReceive';
 import { inspectContinuousResourceBudget } from './continuousResource';
+import { validateContinuousShareStrictContract } from './continuousStrictContract';
 import { validateContinuousTextVisibility } from './continuousTextVisibility';
 import {
   assessContinuousCatalogVersion,
@@ -47,6 +48,11 @@ export function parseContinuousCollectionShareWithConsistency(input: unknown): C
     return { ok: false, errors: [`Versão recusada: ${compatibility.message}`] };
   }
 
+  const strictContract = validateContinuousShareStrictContract(input);
+  if (!strictContract.ok) {
+    return { ok: false, errors: strictContract.errors.map((error) => `Contrato recusado: ${error}`) };
+  }
+
   const parsed = parseContinuousCollectionShare(input);
   if (!parsed.ok) return parsed;
 
@@ -59,7 +65,8 @@ export function parseContinuousCollectionShareWithConsistency(input: unknown): C
     inert.message,
     resource.message,
     visibleText.message,
-    compatibility.message
+    compatibility.message,
+    strictContract.message
   ];
   if (compatibility.status === 'supported-legacy') {
     warnings.push('A cópia sanitizada usa a versão atual, sem alterar ou sobrescrever o arquivo recebido.');
