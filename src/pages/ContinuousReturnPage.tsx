@@ -4,12 +4,14 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/Button';
 import { Card } from '../components/Card';
 import { PageHeader } from '../components/PageHeader';
+import { continuousResourceCatalog } from '../content/continuousResource';
 import {
   continuousReturnBiblicalUnit,
   continuousReturnCatalog,
   continuousReturnConsentSteps,
   continuousReturnRestrictions
 } from '../content/continuousReturn';
+import { readContinuousJsonFile } from '../domain/continuousResource';
 import {
   completeContinuousReturnReview,
   emptyContinuousReturnConsent,
@@ -45,17 +47,19 @@ export function ContinuousReturnPage() {
     clearCandidate();
     setMessage(undefined);
     if (!file) return;
-    try {
-      const parsedJson: unknown = JSON.parse(await file.text());
-      const result = parseContinuousResponseReturnWithConsistency(parsedJson);
-      if (!result.ok) {
-        setErrors(result.errors);
-        return;
-      }
-      setCandidate(result);
-    } catch {
-      setErrors(['Não foi possível ler o arquivo JSON.']);
+
+    const readResult = await readContinuousJsonFile(file);
+    if (!readResult.ok) {
+      setErrors(readResult.errors);
+      return;
     }
+
+    const result = parseContinuousResponseReturnWithConsistency(readResult.value);
+    if (!result.ok) {
+      setErrors(result.errors);
+      return;
+    }
+    setCandidate(result);
   };
 
   const toggleConsent = (field: keyof ContinuousReturnConsent) => {
@@ -98,7 +102,7 @@ export function ContinuousReturnPage() {
           <li>Schema aceito: {continuousReturnCatalog.acceptedSchema}</li>
           <li>Modo: prévia local transitória</li>
           <li>Histórico persistente: não</li>
-          <li>Origem reaberta: não</li>
+          <li>Limite de arquivo: {continuousResourceCatalog.maxFileBytes / 1024} KiB</li>
         </ul>
         <div className="safety-summary"><ShieldCheck/><p>A ausência de arquivo ou de retorno continua sendo um encerramento completo.</p></div>
       </Card>
@@ -111,7 +115,7 @@ export function ContinuousReturnPage() {
           <span>Selecionar JSON da Fase 8.9</span>
           <input type="file" accept="application/json,.json" onChange={handleFile}/>
         </label>
-        <p>Somente respostas oficiais, curadas e sem rastreamento são aceitas. Selos presentes também precisam corresponder ao conteúdo.</p>
+        <p>O tamanho é conferido antes da leitura. Depois, estrutura, selo, versão e gesto curado são validados sem criar histórico.</p>
       </div>
       {errors.length > 0 && <ul className="continuous-return-errors">{errors.map((error) => <li key={error}>{error}</li>)}</ul>}
     </Card>
