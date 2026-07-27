@@ -93,11 +93,12 @@ export function parseContinuousResponseReturn(input: unknown): ContinuousReturnR
   if (!isRecord(input.gesture)) {
     errors.push('Gesto de resposta ausente ou inválido.');
   } else {
-    if (!exportableGestureIds.includes(input.gesture.id as ContinuousResponseGestureId)) {
+    const gesture = input.gesture;
+    if (!exportableGestureIds.includes(gesture.id as ContinuousResponseGestureId)) {
       errors.push('Gesto de resposta não reconhecido ou não exportável.');
     } else {
-      const catalogGesture = continuousResponseGestures.find((gesture) => gesture.id === input.gesture.id);
-      if (!catalogGesture || input.gesture.label !== catalogGesture.label || input.gesture.statement !== catalogGesture.statement) {
+      const catalogGesture = continuousResponseGestures.find((entry) => entry.id === gesture.id);
+      if (!catalogGesture || gesture.label !== catalogGesture.label || gesture.statement !== catalogGesture.statement) {
         errors.push('O gesto recebido não corresponde ao catálogo curado.');
       }
     }
