@@ -1,5 +1,5 @@
 import { useMemo, useState, type ChangeEvent } from 'react';
-import { Archive, ArrowDown, ArrowUp, BookOpenText, FolderOpen, Import, RotateCcw, Share2, ShieldCheck, Trash2 } from 'lucide-react';
+import { Archive, ArrowDown, ArrowUp, BookOpenText, FolderOpen, Import, Inbox, RotateCcw, Share2, ShieldCheck, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/Button';
 import { Card } from '../components/Card';
@@ -113,6 +113,7 @@ export function ContinuousCollectionPage() {
           <li>Partilha: arquivo local com consentimento explícito</li>
         </ul>
         <div className="safety-summary"><ShieldCheck/><p>Uma coleção vazia possui o mesmo valor de uma coleção preenchida.</p></div>
+        <div className="continuous-collection-actions"><Button variant="secondary" onClick={() => navigate('/temple/continuous-received')}><Inbox size={17}/> Biblioteca recebida</Button></div>
       </Card>
     </div>
 
@@ -128,7 +129,7 @@ export function ContinuousCollectionPage() {
 
     {registry.collections.length === 0 ? <Card title="Nenhuma coleção criada" eyebrow="Sem obrigação de preencher">
       <p>Escolha um modelo somente quando desejar. O mapa e todas as jornadas permanecem disponíveis sem coleções.</p>
-      <Button variant="secondary" onClick={() => navigate('/temple/continuous-map')}>Abrir mapa dos ciclos</Button>
+      <div className="continuous-collection-actions"><Button variant="secondary" onClick={() => navigate('/temple/continuous-map')}>Abrir mapa dos ciclos</Button><Button variant="secondary" onClick={() => navigate('/temple/continuous-received')}><Inbox size={17}/> Receber partilha</Button></div>
     </Card> : <>
       <Card title="2. Escolher uma coleção" eyebrow={`${registry.collections.length} registros locais`}>
         <div className="continuous-collection-selector" role="group" aria-label="Coleções disponíveis">
@@ -150,6 +151,7 @@ export function ContinuousCollectionPage() {
             ? <Button variant="ghost" onClick={() => archiveCollection(selectedCollection.id)}><Archive size={17}/> Arquivar coleção</Button>
             : <Button variant="secondary" onClick={() => reactivateCollection(selectedCollection.id)}><RotateCcw size={17}/> Reativar coleção</Button>}
           <Button variant="secondary" onClick={() => navigate(`/temple/continuous-collections/${selectedCollection.id}/share`)}><Share2 size={17}/> Preparar partilha</Button>
+          <Button variant="secondary" onClick={() => navigate('/temple/continuous-received')}><Inbox size={17}/> Receber partilha</Button>
           <Button variant="ghost" onClick={() => navigate('/temple/continuous-map')}>Consultar mapa</Button>
         </div>
 
@@ -200,7 +202,7 @@ export function ContinuousCollectionPage() {
 
     <Card title="Limites das coleções" eyebrow="Sem valor acumulado">
       <ul className="simple-list">{continuousCollectionRestrictions.map((restriction) => <li key={restriction}>{restriction}</li>)}</ul>
-      <div className="continuous-collection-actions"><Button variant="secondary" onClick={() => navigate('/temple/continuous-map')}>Voltar ao mapa</Button><Button variant="ghost" onClick={() => navigate('/temple')}>Voltar ao Átrio</Button></div>
+      <div className="continuous-collection-actions"><Button variant="secondary" onClick={() => navigate('/temple/continuous-map')}>Voltar ao mapa</Button><Button variant="secondary" onClick={() => navigate('/temple/continuous-received')}><Inbox size={17}/> Biblioteca recebida</Button><Button variant="ghost" onClick={() => navigate('/temple')}>Voltar ao Átrio</Button></div>
     </Card>
   </div>;
 }
