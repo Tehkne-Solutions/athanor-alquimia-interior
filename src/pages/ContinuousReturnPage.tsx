@@ -14,10 +14,10 @@ import {
   completeContinuousReturnReview,
   emptyContinuousReturnConsent,
   hasExplicitContinuousReturnConsent,
-  parseContinuousResponseReturn,
   type ContinuousReturnConsent,
   type ContinuousReturnSuccess
 } from '../domain/continuousReturn';
+import { parseContinuousResponseReturnWithConsistency } from '../domain/continuousReturnConsistency';
 
 const consentFieldByStep = {
   file: 'file',
@@ -47,7 +47,7 @@ export function ContinuousReturnPage() {
     if (!file) return;
     try {
       const parsedJson: unknown = JSON.parse(await file.text());
-      const result = parseContinuousResponseReturn(parsedJson);
+      const result = parseContinuousResponseReturnWithConsistency(parsedJson);
       if (!result.ok) {
         setErrors(result.errors);
         return;
@@ -111,7 +111,7 @@ export function ContinuousReturnPage() {
           <span>Selecionar JSON da Fase 8.9</span>
           <input type="file" accept="application/json,.json" onChange={handleFile}/>
         </label>
-        <p>Somente respostas oficiais, curadas e sem rastreamento são aceitas.</p>
+        <p>Somente respostas oficiais, curadas e sem rastreamento são aceitas. Selos presentes também precisam corresponder ao conteúdo.</p>
       </div>
       {errors.length > 0 && <ul className="continuous-return-errors">{errors.map((error) => <li key={error}>{error}</li>)}</ul>}
     </Card>
