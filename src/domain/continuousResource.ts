@@ -1,5 +1,6 @@
 import { validateContinuousInertJson } from './continuousInertJson';
 import { validateContinuousTextVisibility } from './continuousTextVisibility';
+import { inspectContinuousJsonUniqueKeys } from './continuousUniqueKeys';
 
 export interface ContinuousResourceLimits {
   maxFileBytes: number;
@@ -178,6 +179,14 @@ export async function readContinuousJsonFile(
 
   const textResult = validateContinuousRawText(text, limits);
   if (!textResult.ok) return textResult;
+
+  const uniqueKeys = inspectContinuousJsonUniqueKeys(text);
+  if (!uniqueKeys.ok) {
+    if (uniqueKeys.kind === 'syntax') {
+      return { ok: false, errors: ['Não foi possível interpretar o arquivo como JSON.'] };
+    }
+    return { ok: false, errors: uniqueKeys.errors.map((error) => `Chave JSON recusada: ${error}`) };
+  }
 
   let value: unknown;
   try {
