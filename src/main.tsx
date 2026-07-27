@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { App } from './app/App';
 import { validateContent } from './content/validate';
+import './content/validateContinuousCollection';
 import './content/validateContinuousCycle';
 import './content/validateContinuousMap';
 import './content/validateContinuousTheme';
@@ -48,6 +49,7 @@ import './styles/continuous-cycle.css';
 import './styles/continuous-trail.css';
 import './styles/continuous-theme-cycle.css';
 import './styles/continuous-map.css';
+import './styles/continuous-collection.css';
 
 validateContent();
 
