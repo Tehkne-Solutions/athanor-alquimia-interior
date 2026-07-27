@@ -9,12 +9,18 @@ import {
   parseContinuousCollectionShare,
   type ContinuousReceiveResult
 } from './continuousReceive';
+import { inspectContinuousResourceBudget } from './continuousResource';
 import {
   assessContinuousCatalogVersion,
   readContinuousCatalogVersion
 } from './continuousVersion';
 
 export function parseContinuousCollectionShareWithConsistency(input: unknown): ContinuousReceiveResult {
+  const resource = inspectContinuousResourceBudget(input);
+  if (!resource.ok) {
+    return { ok: false, errors: resource.errors.map((error) => `Limite local recusado: ${error}`) };
+  }
+
   const verification = verifyContinuousConsistency(input);
   if (verification.status === 'invalid' || verification.status === 'unsupported') {
     return { ok: false, errors: [`Selo de consistência recusado: ${verification.message}`] };
@@ -36,7 +42,7 @@ export function parseContinuousCollectionShareWithConsistency(input: unknown): C
     ...parsed.package,
     catalogVersion: continuousShareCatalog.version
   });
-  const warnings = [...parsed.warnings, compatibility.message];
+  const warnings = [...parsed.warnings, resource.message, compatibility.message];
   if (compatibility.status === 'supported-legacy') {
     warnings.push('A cópia sanitizada usa a versão atual, sem alterar ou sobrescrever o arquivo recebido.');
   }

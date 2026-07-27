@@ -5,6 +5,7 @@ import {
   attachContinuousConsistency,
   type ContinuousConsistencySeal
 } from './continuousConsistency';
+import { inspectContinuousResourceBudget } from './continuousResource';
 
 export interface ContinuousShareConsent {
   collection: boolean;
@@ -123,7 +124,8 @@ export function buildContinuousSharePreview(
   const notices = [
     'A ordem é preservada somente como organização manual, sem prioridade implícita.',
     'O pacote não contém IDs internos de jornadas, Rastros, ciclos ou coleções.',
-    'O arquivo final recebe um selo local de consistência que não autentica identidade ou autoria.'
+    'O arquivo final recebe um selo local de consistência que não autentica identidade ou autoria.',
+    'O arquivo final precisa permanecer dentro do orçamento local de tamanho e complexidade.'
   ];
   if (!options.includeDates) notices.push('Datas foram omitidas.');
   if (collection.items.length === 0) notices.push('Esta coleção está vazia e continua válida para exportação.');
@@ -170,6 +172,11 @@ export function createContinuousCollectionShareExport(
     },
     ...buildContinuousSharePreview(collection, options)
   };
+
+  const resource = inspectContinuousResourceBudget(payload);
+  if (!resource.ok) {
+    return { ok: false, errors: resource.errors.map((error) => `Não foi possível gerar o arquivo: ${error}`) };
+  }
 
   return {
     ok: true,
