@@ -13,7 +13,8 @@ collection.itemCount === items.length
 items[index].position === index + 1
 includeDates === false → sem occurredAt/completedAt
 completedAt presente → occurredAt presente
-occurredAt <= completedAt\.occurredAt <= generatedAt
+occurredAt <= completedAt
+occurredAt <= generatedAt
 completedAt <= generatedAt
 ```
 
