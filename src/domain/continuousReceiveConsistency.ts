@@ -11,6 +11,7 @@ import {
   type ContinuousReceiveResult
 } from './continuousReceive';
 import { inspectContinuousResourceBudget } from './continuousResource';
+import { validateContinuousTextVisibility } from './continuousTextVisibility';
 import {
   assessContinuousCatalogVersion,
   readContinuousCatalogVersion
@@ -25,6 +26,11 @@ export function parseContinuousCollectionShareWithConsistency(input: unknown): C
   const resource = inspectContinuousResourceBudget(input);
   if (!resource.ok) {
     return { ok: false, errors: resource.errors.map((error) => `Limite local recusado: ${error}`) };
+  }
+
+  const visibleText = validateContinuousTextVisibility(input);
+  if (!visibleText.ok) {
+    return { ok: false, errors: visibleText.errors.map((error) => `Texto recusado: ${error}`) };
   }
 
   const verification = verifyContinuousConsistency(input);
@@ -52,6 +58,7 @@ export function parseContinuousCollectionShareWithConsistency(input: unknown): C
     ...parsed.warnings,
     inert.message,
     resource.message,
+    visibleText.message,
     compatibility.message
   ];
   if (compatibility.status === 'supported-legacy') {
