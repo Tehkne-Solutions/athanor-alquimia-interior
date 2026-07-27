@@ -4,6 +4,7 @@ import {
   advanceContinuousTrail,
   canCompleteContinuousTrailStage,
   chooseNoContinuousTrailPractice,
+  chooseNoContinuousTrailTheme,
   createContinuousTrailProgress,
   deriveContinuousTrailVariantIndex,
   findTrailByCycleInstance,
@@ -65,7 +66,7 @@ describe('continuousTrail', () => {
     expect(findTrailByCycleInstance(second, 'cycle-instance-1')?.id).toBe('trail-1');
   });
 
-  it('exige prática ou ausência explícita para concluir a orientação', () => {
+  it('exige prática e escolha temática para concluir a orientação', () => {
     const progress = started();
     const trail = progress.trails[0];
     expect(canCompleteContinuousTrailStage(trail)).toBe(false);
@@ -77,6 +78,7 @@ describe('continuousTrail', () => {
     let progress = started();
     const id = progress.trails[0].id;
     progress = selectContinuousTrailPractice(progress, id, 'water-name-tone', now);
+    progress = chooseNoContinuousTrailTheme(progress, id, '1.0.0', now);
     progress = advanceContinuousTrail(progress, id, 'completed', now);
     expect(progress.trails[0].currentStage).toBe('observation');
     progress = advanceContinuousTrail(progress, id, 'completed', now);
@@ -86,12 +88,14 @@ describe('continuousTrail', () => {
     expect(progress.trails[0].continuousTrailTraceCreated).toBe(true);
   });
 
-  it('permite permanecer sem prática e ainda concluir a orientação', () => {
+  it('permite permanecer sem prática e sem tema e ainda concluir a orientação', () => {
     let progress = started();
     const id = progress.trails[0].id;
     progress = chooseNoContinuousTrailPractice(progress, id, now);
+    progress = chooseNoContinuousTrailTheme(progress, id, '1.0.0', now);
     progress = advanceContinuousTrail(progress, id, 'completed', now);
     expect(progress.trails[0].noPractice).toBe(true);
+    expect(progress.trails[0].noTheme).toBe(true);
     expect(progress.trails[0].currentStage).toBe('observation');
   });
 
@@ -110,12 +114,14 @@ describe('continuousTrail', () => {
     let progress = started();
     const id = progress.trails[0].id;
     progress = selectContinuousTrailPractice(progress, id, 'water-name-tone', now);
+    progress = chooseNoContinuousTrailTheme(progress, id, '1.0.0', now);
     progress = pauseContinuousTrail(progress, id, now);
     expect(progress.trails[0].status).toBe('paused');
     expect(progress.trails[0].stages.orientation.result).toBe('paused');
     progress = resumeContinuousTrail(progress, id, now);
     expect(progress.trails[0].status).toBe('active');
     expect(progress.trails[0].practiceId).toBe('water-name-tone');
+    expect(progress.trails[0].noTheme).toBe(true);
     expect(progress.trails[0].stages.orientation.result).toBe('pending');
   });
 
