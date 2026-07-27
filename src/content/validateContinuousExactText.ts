@@ -43,7 +43,7 @@ if (!continuousExactTextRestrictions.some((restriction) => /não executa getters
   throw new Error('A Fase 8.19 precisa impedir execução de getters.');
 }
 
-if (!continuousExactTextRestrictions.some((restriction) => /não usa trim/i.test(restriction))) {
+if (!continuousExactTextRestrictions.some((restriction) => /não usa(?:m)? trim/i.test(restriction))) {
   throw new Error('A Fase 8.19 precisa remover trim dos parsers.');
 }
 
