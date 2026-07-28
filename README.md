@@ -57,7 +57,8 @@ Este repositório contém a experiência funcional do Athanor, iniciada pelo ver
 - **8.20 — O Tempo que Não se Converte em Silêncio:** instantes UTC canônicos, sem offset, fuso implícito, data impossível ou normalização silenciosa;
 - **8.21 — A Sequência que Não se Inverte em Silêncio:** quantidades, posições, política de datas e cronologia interna precisam concordar antes do domínio;
 - **8.22 — A Natureza que Não Troca de Lugar em Silêncio:** tema, pacote, tipo, estado e encerramento precisam permanecer compatíveis entre si;
-- **8.23 — A Referência que Não Aponta para o Vazio em Silêncio:** modelos, temas, variantes, pacotes e gestos precisam existir nos catálogos locais compatíveis.
+- **8.23 — A Referência que Não Aponta para o Vazio em Silêncio:** modelos, temas, variantes, pacotes e gestos precisam existir nos catálogos locais compatíveis;
+- **8.24 — O Aviso que Não Troca de Sentido em Silêncio:** avisos obrigatórios, condições, unicidade e ordem precisam corresponder ao catálogo editorial local.
 
 ## Ciclo validável
 
@@ -74,7 +75,7 @@ Fonte bíblica
 → Nova Obra contínua
 ```
 
-A progressão não mede valor pessoal, espiritual ou emocional. Recusar, pausar, encerrar cedo, manter vazio, preservar desconhecido, permanecer em silêncio, descartar um retorno, usar arquivo legado, interromper uma versão incompatível, recusar uma estrutura acima do orçamento técnico, rejeitar uma forma não inerte, interromper texto Unicode ambíguo, recusar chaves repetidas, impedir uma mudança numérica silenciosa, interromper campos desconhecidos, recusar margens textuais externas, interromper um instante temporal não canônico, rejeitar campos relacionados contraditórios, impedir a mistura de naturezas incompatíveis ou recusar uma referência inexistente são estados válidos quando previstos pelo fluxo.
+A progressão não mede valor pessoal, espiritual ou emocional. Recusar, pausar, encerrar cedo, manter vazio, preservar desconhecido, permanecer em silêncio, descartar um retorno, usar arquivo legado, interromper uma versão incompatível, recusar uma estrutura acima do orçamento técnico, rejeitar uma forma não inerte, interromper texto Unicode ambíguo, recusar chaves repetidas, impedir uma mudança numérica silenciosa, interromper campos desconhecidos, recusar margens textuais externas, interromper um instante temporal não canônico, rejeitar campos relacionados contraditórios, impedir a mistura de naturezas incompatíveis, recusar uma referência inexistente ou interromper um aviso divergente são estados válidos quando previstos pelo fluxo.
 
 ## Stack
 
@@ -144,6 +145,8 @@ Depois do formato temporal, a partilha precisa manter relações coerentes: `ite
 Depois das relações gerais, os campos discriminados precisam respeitar sua natureza: tema explícito exclui `noTheme`, identificador e rótulo de pacote viajam juntos, Rastros não carregam campos exclusivos de ciclos, encerramento antecipado exige ciclo incompleto e estado concluído não mantém pendências.
 
 Depois da compatibilidade dos campos, referências fornecidas precisam existir nos catálogos embarcados e aceitar o mesmo elemento, tema e tipo. IDs e rótulos divergentes são recusados sem aproximação, substituição ou busca externa; a ausência de `themeId` com `noTheme: false` continua sendo tema desconhecido válido.
+
+Depois das referências catalogadas, a lista `notices` precisa conter somente avisos curados, obrigatórios, únicos e na ordem canônica. Condições deriváveis de datas e quantidade precisam concordar com o pacote; o aviso de registros não vinculados permanece opcional porque `linked` não atravessa a minimização.
 
 ## Assinatura
 

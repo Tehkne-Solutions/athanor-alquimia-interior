@@ -1,6 +1,7 @@
 import type { ContinuousCollection, ContinuousCollectionItemReference } from './continuousCollection';
 import type { ContinuousMapItemKind, ContinuousMapStatus } from './continuousMap';
 import type { NewWorkStartPoint } from './continuousJourney';
+import { validateContinuousShareCanonicalNotices } from './continuousCanonicalNotice';
 import { validateContinuousShareCatalogReferences } from './continuousCatalogReference';
 import {
   attachContinuousConsistency,
@@ -225,6 +226,11 @@ export function createContinuousCollectionShareExport(
   const catalogReferences = validateContinuousShareCatalogReferences(payload);
   if (!catalogReferences.ok) {
     return { ok: false, errors: catalogReferences.errors.map((error) => `Não foi possível preservar a referência catalogada: ${error}`) };
+  }
+
+  const canonicalNotices = validateContinuousShareCanonicalNotices(payload);
+  if (!canonicalNotices.ok) {
+    return { ok: false, errors: canonicalNotices.errors.map((error) => `Não foi possível preservar os avisos canônicos: ${error}`) };
   }
 
   return {

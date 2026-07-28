@@ -1,5 +1,6 @@
 import { continuousShareCatalog } from '../content/continuousShare';
 import { continuousVersionCatalog } from '../content/continuousVersion';
+import { validateContinuousShareCanonicalNotices } from './continuousCanonicalNotice';
 import { validateContinuousShareCatalogReferences } from './continuousCatalogReference';
 import {
   attachContinuousConsistency,
@@ -83,6 +84,11 @@ export function parseContinuousCollectionShareWithConsistency(input: unknown): C
     return { ok: false, errors: catalogReferences.errors.map((error) => `Referência recusada: ${error}`) };
   }
 
+  const canonicalNotices = validateContinuousShareCanonicalNotices(input);
+  if (!canonicalNotices.ok) {
+    return { ok: false, errors: canonicalNotices.errors.map((error) => `Aviso recusado: ${error}`) };
+  }
+
   const parsed = parseContinuousCollectionShare(input);
   if (!parsed.ok) return parsed;
 
@@ -101,7 +107,8 @@ export function parseContinuousCollectionShareWithConsistency(input: unknown): C
     exactTime.message,
     exactRelation.message,
     fieldCompatibility.message,
-    catalogReferences.message
+    catalogReferences.message,
+    canonicalNotices.message
   ];
   if (compatibility.status === 'supported-legacy') {
     warnings.push('A cópia sanitizada usa a versão atual, sem alterar ou sobrescrever o arquivo recebido.');

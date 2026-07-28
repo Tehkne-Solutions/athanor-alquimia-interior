@@ -1,5 +1,6 @@
 import { continuousResponseCatalog } from '../content/continuousResponse';
 import { continuousVersionCatalog } from '../content/continuousVersion';
+import { validateContinuousResponseCanonicalNotices } from './continuousCanonicalNotice';
 import { validateContinuousResponseCatalogReferences } from './continuousCatalogReference';
 import { attachContinuousConsistency, verifyContinuousConsistency } from './continuousConsistency';
 import { validateContinuousResponseExactRelation } from './continuousExactRelation';
@@ -79,6 +80,11 @@ export function parseContinuousResponseReturnWithConsistency(input: unknown): Co
     return { ok: false, errors: catalogReferences.errors.map((error) => `Referência recusada: ${error}`) };
   }
 
+  const canonicalNotices = validateContinuousResponseCanonicalNotices(input);
+  if (!canonicalNotices.ok) {
+    return { ok: false, errors: canonicalNotices.errors.map((error) => `Aviso recusado: ${error}`) };
+  }
+
   const parsed = parseContinuousResponseReturn(input);
   if (!parsed.ok) return parsed;
 
@@ -93,7 +99,8 @@ export function parseContinuousResponseReturnWithConsistency(input: unknown): Co
     exactTime.message,
     exactRelation.message,
     fieldCompatibility.message,
-    catalogReferences.message
+    catalogReferences.message,
+    canonicalNotices.message
   ];
   if (compatibility.status === 'supported-legacy') {
     warnings.push('A prévia sanitizada usa a versão atual, sem alterar ou sobrescrever o arquivo recebido.');
