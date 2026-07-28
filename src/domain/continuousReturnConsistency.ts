@@ -4,6 +4,7 @@ import { attachContinuousConsistency, verifyContinuousConsistency } from './cont
 import { validateContinuousResponseExactRelation } from './continuousExactRelation';
 import { validateContinuousResponseExactTime } from './continuousExactTime';
 import { validateContinuousExactText } from './continuousExactText';
+import { validateContinuousResponseFieldCompatibility } from './continuousFieldCompatibility';
 import { validateContinuousInertJson } from './continuousInertJson';
 import { inspectContinuousResourceBudget } from './continuousResource';
 import {
@@ -67,6 +68,11 @@ export function parseContinuousResponseReturnWithConsistency(input: unknown): Co
     return { ok: false, errors: exactRelation.errors.map((error) => `Relação recusada: ${error}`) };
   }
 
+  const fieldCompatibility = validateContinuousResponseFieldCompatibility(input);
+  if (!fieldCompatibility.ok) {
+    return { ok: false, errors: fieldCompatibility.errors.map((error) => `Compatibilidade recusada: ${error}`) };
+  }
+
   const parsed = parseContinuousResponseReturn(input);
   if (!parsed.ok) return parsed;
 
@@ -79,7 +85,8 @@ export function parseContinuousResponseReturnWithConsistency(input: unknown): Co
     strictContract.message,
     exactText.message,
     exactTime.message,
-    exactRelation.message
+    exactRelation.message,
+    fieldCompatibility.message
   ];
   if (compatibility.status === 'supported-legacy') {
     warnings.push('A prévia sanitizada usa a versão atual, sem alterar ou sobrescrever o arquivo recebido.');
