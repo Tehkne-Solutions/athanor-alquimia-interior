@@ -1,10 +1,15 @@
 import { continuousReceivedIdentityPolicy } from '../content/continuousReceivedIdentity';
 import type { ContinuousMapItemKind, ContinuousMapStatus } from './continuousMap';
 import type { NewWorkStartPoint } from './continuousJourney';
+import { isCanonicalContinuousUtcInstant } from './continuousExactTime';
 import {
   areContinuousSharePackagesEquivalent,
   fingerprintContinuousSharePackage
 } from './continuousFingerprintEquivalence';
+import {
+  validateContinuousReceivedActionTime,
+  validateContinuousReceivedRegistryChronology
+} from './continuousReceivedChronology';
 import type {
   ContinuousCollectionShareExport,
   ContinuousShareItem,
@@ -12,6 +17,7 @@ import type {
 } from './continuousShare';
 
 export { fingerprintContinuousSharePackage } from './continuousFingerprintEquivalence';
+export { validateContinuousReceivedRegistryChronology } from './continuousReceivedChronology';
 
 export type ContinuousReceivedStatus = 'active' | 'archived';
 
@@ -47,7 +53,7 @@ export interface ContinuousReceiveFailure {
 
 export type ContinuousReceiveResult = ContinuousReceiveSuccess | ContinuousReceiveFailure;
 
-export type ContinuousReceivedKeepStatus = 'kept' | 'equivalent' | 'disambiguated' | 'invalid';
+export type ContinuousReceivedKeepStatus = 'kept' | 'equivalent' | 'disambiguated' | 'stale' | 'invalid';
 
 export interface ContinuousReceivedKeepResult {
   registry: ContinuousReceivedRegistry;
@@ -58,7 +64,13 @@ export interface ContinuousReceivedKeepResult {
   message: string;
 }
 
-export type ContinuousReceivedMutationStatus = 'updated' | 'unchanged' | 'missing' | 'ambiguous' | 'invalid';
+export type ContinuousReceivedMutationStatus =
+  | 'updated'
+  | 'unchanged'
+  | 'missing'
+  | 'ambiguous'
+  | 'stale'
+  | 'invalid';
 
 export interface ContinuousReceivedMutationResult {
   registry: ContinuousReceivedRegistry;
@@ -92,7 +104,10 @@ function isPositiveInteger(value: unknown): value is number {
   return typeof value === 'number' && Number.isInteger(value) && value > 0;
 }
 
-function parsePassageSummary(value: unknown, index: number): { value?: ContinuousShareItem['passageSummary']; errors: string[] } {
+function parsePassageSummary(
+  value: unknown,
+  index: number
+): { value?: ContinuousShareItem['passageSummary']; errors: string[] } {
   if (!isRecord(value)) return { errors: [`Item ${index + 1}: resumo de passagens inválido.`] };
   const errors: string[] = [];
   if (!isNonNegativeInteger(value.completed)) errors.push(`Item ${index + 1}: passagens concluídas inválidas.`);
@@ -192,7 +207,13 @@ export function parseContinuousCollectionShare(input: unknown): ContinuousReceiv
   if (!Array.isArray(input.notices) || !input.notices.every((notice) => isString(notice))) {
     errors.push('Avisos de segurança ausentes ou inválidos.');
   }
-  if (errors.length > 0 || !isRecord(input.collection) || !isRecord(input.options) || !Array.isArray(input.items) || !isRecord(input.provenance)) {
+  if (
+    errors.length > 0 ||
+    !isRecord(input.collection) ||
+    !isRecord(input.options) ||
+    !Array.isArray(input.items) ||
+    !isRecord(input.provenance)
+  ) {
     return { ok: false, errors };
   }
 
@@ -248,6 +269,9 @@ export function createContinuousReceivedRegistry(
   catalogVersion: string,
   createdAt: string
 ): ContinuousReceivedRegistry {
+  if (!isCanonicalContinuousUtcInstant(createdAt)) {
+    throw new RangeError('A criação da biblioteca exige instante UTC canônico YYYY-MM-DDTHH:mm:ss.sssZ.');
+  }
   return {
     id: 'continuous_received_registry_v1',
     catalogVersion,
@@ -328,6 +352,21 @@ function cloneReceivedPackage(packageValue: ContinuousCollectionShareExport): Co
   };
 }
 
+function invalidKeepTime(
+  registry: ContinuousReceivedRegistry,
+  requestedId: string,
+  receivedAt: string
+): ContinuousReceivedKeepResult | undefined {
+  const time = validateContinuousReceivedActionTime(registry, receivedAt);
+  if (time.status === 'valid') return undefined;
+  return {
+    registry,
+    status: time.status,
+    requestedId,
+    message: time.message
+  };
+}
+
 export function keepReceivedCollectionWithIdentity(
   registry: ContinuousReceivedRegistry,
   input: { id: string; package: ContinuousCollectionShareExport },
@@ -341,6 +380,9 @@ export function keepReceivedCollectionWithIdentity(
       message: 'Identificador candidato e instante de recebimento são obrigatórios.'
     };
   }
+
+  const invalidTime = invalidKeepTime(registry, input.id, receivedAt);
+  if (invalidTime) return invalidTime;
 
   const equivalent = findEquivalentReceivedCollection(registry, input.package);
   if (equivalent) {
@@ -407,6 +449,24 @@ export function keepReceivedCollection(
   return keepReceivedCollectionWithIdentity(registry, input, receivedAt).registry;
 }
 
+function timeMutationFailure(
+  registry: ContinuousReceivedRegistry,
+  recordId: string,
+  matchedRecords: number,
+  updatedAt: string,
+  record?: ContinuousReceivedCollection
+): ContinuousReceivedMutationResult | undefined {
+  const time = validateContinuousReceivedActionTime(registry, updatedAt, record);
+  if (time.status === 'valid') return undefined;
+  return {
+    registry,
+    status: time.status,
+    recordId,
+    matchedRecords,
+    message: time.message
+  };
+}
+
 function mutateReceivedCollectionWithIdentity(
   registry: ContinuousReceivedRegistry,
   recordId: string,
@@ -422,6 +482,9 @@ function mutateReceivedCollectionWithIdentity(
       message: 'Identificador local e instante da ação são obrigatórios.'
     };
   }
+
+  const registryTime = timeMutationFailure(registry, recordId, 0, updatedAt);
+  if (registryTime?.status === 'invalid') return registryTime;
 
   const matches = findReceivedAllById(registry, recordId);
   if (matches.length === 0) {
@@ -444,6 +507,9 @@ function mutateReceivedCollectionWithIdentity(
   }
 
   const current = matches[0];
+  const timeFailure = timeMutationFailure(registry, recordId, 1, updatedAt, current);
+  if (timeFailure) return timeFailure;
+
   const updated = updater(current);
   if (updated === current) {
     return {
@@ -519,6 +585,26 @@ export function removeReceivedCollectionWithIdentity(
     };
   }
 
+  const registryChronology = validateContinuousReceivedRegistryChronology(registry);
+  if (!registryChronology.ok) {
+    return {
+      registry,
+      status: 'invalid',
+      recordId,
+      matchedRecords: 0,
+      message: `A biblioteca local possui cronologia incoerente: ${registryChronology.errors[0]}`
+    };
+  }
+  if (!isCanonicalContinuousUtcInstant(updatedAt)) {
+    return {
+      registry,
+      status: 'invalid',
+      recordId,
+      matchedRecords: 0,
+      message: 'O instante da remoção precisa usar YYYY-MM-DDTHH:mm:ss.sssZ em UTC.'
+    };
+  }
+
   const matches = findReceivedAllById(registry, recordId);
   if (matches.length === 0) {
     return {
@@ -540,6 +626,9 @@ export function removeReceivedCollectionWithIdentity(
   }
 
   const target = matches[0];
+  const timeFailure = timeMutationFailure(registry, recordId, 1, updatedAt, target);
+  if (timeFailure) return timeFailure;
+
   return {
     registry: {
       ...registry,
