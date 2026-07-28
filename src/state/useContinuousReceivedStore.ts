@@ -2,32 +2,44 @@ import { create } from 'zustand';
 import { createJSONStorage, persist } from 'zustand/middleware';
 import { continuousReceiveCatalog } from '../content/continuousReceive';
 import {
-  archiveReceivedCollection,
   createContinuousReceivedRegistry,
-  findReceivedByFingerprint,
-  fingerprintContinuousSharePackage,
-  keepReceivedCollection,
-  reactivateReceivedCollection,
-  removeReceivedCollection,
+  type ContinuousReceivedKeepStatus,
+  type ContinuousReceivedMutationStatus,
   type ContinuousReceivedRegistry
 } from '../domain/continuousReceive';
 import type { ContinuousCollectionShareExport } from '../domain/continuousShare';
 import { idbStateStorage } from '../storage/idbStorage';
+import {
+  archiveContinuousReceivedRecordFromStore,
+  keepContinuousReceivedPackageFromStore,
+  reactivateContinuousReceivedRecordFromStore,
+  removeContinuousReceivedRecordFromStore
+} from './continuousReceivedStoreAdapter';
 
 const now = () => new Date().toISOString();
 
 export interface KeepReceivedResult {
-  id: string;
+  id?: string;
   duplicate: boolean;
+  status: ContinuousReceivedKeepStatus;
+  changed: boolean;
+  message: string;
+}
+
+export interface MutateReceivedResult {
+  status: ContinuousReceivedMutationStatus;
+  matchedRecords: number;
+  changed: boolean;
+  message: string;
 }
 
 interface ContinuousReceivedStoreState {
   schemaVersion: number;
   registry: ContinuousReceivedRegistry;
   keepPackage: (value: ContinuousCollectionShareExport) => KeepReceivedResult;
-  archiveRecord: (recordId: string) => void;
-  reactivateRecord: (recordId: string) => void;
-  removeRecord: (recordId: string) => void;
+  archiveRecord: (recordId: string) => MutateReceivedResult;
+  reactivateRecord: (recordId: string) => MutateReceivedResult;
+  removeRecord: (recordId: string) => MutateReceivedResult;
   reset: () => void;
 }
 
@@ -39,24 +51,55 @@ export const useContinuousReceivedStore = create<ContinuousReceivedStoreState>()
       schemaVersion: 1,
       registry: initialRegistry(),
       keepPackage: (value) => {
-        const fingerprint = fingerprintContinuousSharePackage(value);
-        const existing = findReceivedByFingerprint(get().registry, fingerprint);
-        if (existing) return { id: existing.id, duplicate: true };
-        const id = crypto.randomUUID();
-        set((state) => ({
-          registry: keepReceivedCollection(state.registry, { id, package: value }, now())
-        }));
-        return { id, duplicate: false };
+        const current = get().registry;
+        const result = keepContinuousReceivedPackageFromStore(
+          current,
+          value,
+          crypto.randomUUID(),
+          now()
+        );
+        if (result.changed) set({ registry: result.registry });
+        return {
+          id: result.id,
+          duplicate: result.duplicate,
+          status: result.status,
+          changed: result.changed,
+          message: result.message
+        };
       },
-      archiveRecord: (recordId) => set((state) => ({
-        registry: archiveReceivedCollection(state.registry, recordId, now())
-      })),
-      reactivateRecord: (recordId) => set((state) => ({
-        registry: reactivateReceivedCollection(state.registry, recordId, now())
-      })),
-      removeRecord: (recordId) => set((state) => ({
-        registry: removeReceivedCollection(state.registry, recordId, now())
-      })),
+      archiveRecord: (recordId) => {
+        const current = get().registry;
+        const result = archiveContinuousReceivedRecordFromStore(current, recordId, now());
+        if (result.changed) set({ registry: result.registry });
+        return {
+          status: result.status,
+          matchedRecords: result.matchedRecords,
+          changed: result.changed,
+          message: result.message
+        };
+      },
+      reactivateRecord: (recordId) => {
+        const current = get().registry;
+        const result = reactivateContinuousReceivedRecordFromStore(current, recordId, now());
+        if (result.changed) set({ registry: result.registry });
+        return {
+          status: result.status,
+          matchedRecords: result.matchedRecords,
+          changed: result.changed,
+          message: result.message
+        };
+      },
+      removeRecord: (recordId) => {
+        const current = get().registry;
+        const result = removeContinuousReceivedRecordFromStore(current, recordId, now());
+        if (result.changed) set({ registry: result.registry });
+        return {
+          status: result.status,
+          matchedRecords: result.matchedRecords,
+          changed: result.changed,
+          message: result.message
+        };
+      },
       reset: () => set({ registry: initialRegistry() })
     }),
     {
