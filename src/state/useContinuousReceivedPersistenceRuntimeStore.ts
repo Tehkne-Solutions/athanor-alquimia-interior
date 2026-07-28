@@ -4,16 +4,20 @@ export type ContinuousReceivedPersistenceRuntimeStatus =
   | 'idle'
   | 'writing'
   | 'confirmed'
-  | 'failed';
+  | 'failed'
+  | 'conflict';
 
 interface ContinuousReceivedPersistenceRuntimeState {
   status: ContinuousReceivedPersistenceRuntimeStatus;
   operation?: string;
   message?: string;
   issues: string[];
+  expectedPersistedValue: string | null;
+  hydrate: (persistedValue: string | null) => void;
   begin: (operation: string) => void;
-  confirm: (message: string) => void;
+  confirm: (message: string, persistedValue: string) => void;
   fail: (error: unknown) => void;
+  conflict: () => void;
   clear: () => void;
 }
 
@@ -27,17 +31,26 @@ export const useContinuousReceivedPersistenceRuntimeStore = create<ContinuousRec
   operation: undefined,
   message: undefined,
   issues: [],
+  expectedPersistedValue: null,
+  hydrate: (persistedValue) => set({
+    status: 'idle',
+    operation: undefined,
+    message: undefined,
+    issues: [],
+    expectedPersistedValue: persistedValue
+  }),
   begin: (operation) => set({
     status: 'writing',
     operation,
-    message: 'A alteração está sendo gravada na memória local.',
+    message: 'A alteração está sendo conferida e gravada na memória local.',
     issues: []
   }),
-  confirm: (message) => set({
+  confirm: (message, persistedValue) => set({
     status: 'confirmed',
     operation: undefined,
     message,
-    issues: []
+    issues: [],
+    expectedPersistedValue: persistedValue
   }),
   fail: (error) => {
     const detail = errorMessage(error);
@@ -48,10 +61,17 @@ export const useContinuousReceivedPersistenceRuntimeStore = create<ContinuousRec
       issues: [detail]
     });
   },
-  clear: () => set({
+  conflict: () => set({
+    status: 'conflict',
+    operation: undefined,
+    message: 'A memória persistida mudou em outra aba ou sessão. A alteração local não foi aplicada nem mesclada.',
+    issues: ['Recarregue a página para examinar novamente a versão mais recente antes de decidir outra ação.']
+  }),
+  clear: () => set((state) => ({
     status: 'idle',
     operation: undefined,
     message: undefined,
-    issues: []
-  })
+    issues: [],
+    expectedPersistedValue: state.expectedPersistedValue
+  }))
 }));
