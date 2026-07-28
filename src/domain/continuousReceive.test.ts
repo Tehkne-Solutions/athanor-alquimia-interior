@@ -20,6 +20,8 @@ import {
 const createdAt = '2026-07-27T16:00:00.000Z';
 const generatedAt = '2026-07-27T17:00:00.000Z';
 const receivedAt = '2026-07-27T18:00:00.000Z';
+const archivedAt = '2026-07-27T19:00:00.000Z';
+const reactivatedAt = '2026-07-27T20:00:00.000Z';
 
 function mapItem(overrides: Partial<ContinuousMapItem> = {}): ContinuousMapItem {
   return {
@@ -172,8 +174,8 @@ describe('recepção de coleções sem apropriação', () => {
     expect(parsed.ok).toBe(true);
     if (!parsed.ok) return;
     const kept = keepReceivedCollection(registry(), { id: 'received-1', package: parsed.package }, receivedAt);
-    const archived = archiveReceivedCollection(kept, 'received-1', generatedAt);
-    const reactivated = reactivateReceivedCollection(archived, 'received-1', receivedAt);
+    const archived = archiveReceivedCollection(kept, 'received-1', archivedAt);
+    const reactivated = reactivateReceivedCollection(archived, 'received-1', reactivatedAt);
     expect(archived.records[0].status).toBe('archived');
     expect(reactivated.records[0].status).toBe('active');
     expect(reactivated.records[0].package.items).toEqual(parsed.package.items);
@@ -185,7 +187,7 @@ describe('recepção de coleções sem apropriação', () => {
     expect(parsed.ok).toBe(true);
     if (!parsed.ok) return;
     const kept = keepReceivedCollection(registry(), { id: 'received-1', package: parsed.package }, receivedAt);
-    const removed = removeReceivedCollection(kept, 'received-1', generatedAt);
+    const removed = removeReceivedCollection(kept, 'received-1', archivedAt);
     expect(removed.records).toEqual([]);
     expect(source.collection.label).toBe('Água, memória e apoio');
   });
