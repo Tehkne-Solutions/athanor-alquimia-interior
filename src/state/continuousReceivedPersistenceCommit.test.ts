@@ -14,14 +14,17 @@ function lifecycle() {
     begin: vi.fn(),
     confirm: vi.fn(),
     fail: vi.fn(),
+    conflict: vi.fn(),
     clear: vi.fn()
   };
 }
 
+const confirmedWrite = async () => ({ status: 'confirmed' as const, persistedValue: '{"confirmed":true}' });
+
 describe('commit confirmado da biblioteca recebida', () => {
   it('não chama a ação nem a escrita durante outra gravação', async () => {
     const action = vi.fn(() => ({ changed: true, registry: registry(t1), message: 'Alterado.' }));
-    const write = vi.fn(async () => undefined);
+    const write = vi.fn(confirmedWrite);
     const apply = vi.fn();
     const result = await executeContinuousReceivedConfirmedPersistence(
       'writing',
@@ -38,10 +41,26 @@ describe('commit confirmado da biblioteca recebida', () => {
     expect(apply).not.toHaveBeenCalled();
   });
 
+  it('bloqueia nova ação depois de conflito sem chamar o domínio', async () => {
+    const action = vi.fn(() => ({ changed: true, registry: registry(t1), message: 'Alterado.' }));
+    const write = vi.fn(confirmedWrite);
+    const result = await executeContinuousReceivedConfirmedPersistence(
+      'conflict',
+      'guardar cópia',
+      action,
+      write,
+      vi.fn(),
+      lifecycle()
+    );
+    expect(result).toMatchObject({ executed: false, status: 'persistence-conflict' });
+    expect(action).not.toHaveBeenCalled();
+    expect(write).not.toHaveBeenCalled();
+  });
+
   it('não inicia transação quando o domínio não mudou', async () => {
     const current = registry();
     const action = vi.fn(() => ({ changed: false, registry: current, message: 'Sem mudança.' }));
-    const write = vi.fn(async () => undefined);
+    const write = vi.fn(confirmedWrite);
     const apply = vi.fn();
     const hooks = lifecycle();
     const result = await executeContinuousReceivedConfirmedPersistence(
@@ -68,9 +87,13 @@ describe('commit confirmado da biblioteca recebida', () => {
       begin: vi.fn(() => events.push('begin')),
       confirm: vi.fn(() => events.push('confirm')),
       fail: vi.fn(() => events.push('fail')),
+      conflict: vi.fn(() => events.push('conflict')),
       clear: vi.fn(() => events.push('clear'))
     };
-    const write = vi.fn(async () => { events.push('write'); });
+    const write = vi.fn(async () => {
+      events.push('write');
+      return { status: 'confirmed' as const, persistedValue: 'next-envelope' };
+    });
     const apply = vi.fn(() => events.push('apply'));
     const result = await executeContinuousReceivedConfirmedPersistence(
       'idle',
@@ -86,11 +109,14 @@ describe('commit confirmado da biblioteca recebida', () => {
     expect(events).toEqual(['begin', 'write', 'apply', 'confirm']);
     expect(write).toHaveBeenCalledWith(next);
     expect(apply).toHaveBeenCalledWith(next);
+    expect(hooks.confirm).toHaveBeenCalledWith(expect.stringMatching(/confirmada/i), 'next-envelope');
   });
 
   it('aguarda uma escrita pendente antes de aplicar', async () => {
     let release!: () => void;
-    const pending = new Promise<void>((resolve) => { release = resolve; });
+    const pending = new Promise<{ status: 'confirmed'; persistedValue: string }>((resolve) => {
+      release = () => resolve({ status: 'confirmed', persistedValue: 'next-envelope' });
+    });
     const apply = vi.fn();
     const execution = executeContinuousReceivedConfirmedPersistence(
       'idle',
@@ -105,6 +131,24 @@ describe('commit confirmado da biblioteca recebida', () => {
     release();
     await execution;
     expect(apply).toHaveBeenCalledTimes(1);
+  });
+
+  it('preserva runtime e memória externa quando detecta conflito', async () => {
+    const apply = vi.fn();
+    const hooks = lifecycle();
+    const result = await executeContinuousReceivedConfirmedPersistence(
+      'idle',
+      'remover cópia',
+      () => ({ changed: true, registry: registry(t1), message: 'Cópia removida.' }),
+      async () => ({ status: 'conflict' as const }),
+      apply,
+      hooks
+    );
+    expect(result).toMatchObject({ executed: false, status: 'persistence-conflict', changed: false });
+    expect(apply).not.toHaveBeenCalled();
+    expect(hooks.conflict).toHaveBeenCalledTimes(1);
+    expect(hooks.fail).not.toHaveBeenCalled();
+    expect(hooks.confirm).not.toHaveBeenCalled();
   });
 
   it('preserva o runtime quando a IndexedDB recusa a escrita', async () => {
@@ -122,16 +166,16 @@ describe('commit confirmado da biblioteca recebida', () => {
     expect(result).toMatchObject({ status: 'persistence-failed', changed: false });
     expect(apply).not.toHaveBeenCalled();
     expect(hooks.fail).toHaveBeenCalledTimes(1);
-    expect(hooks.confirm).not.toHaveBeenCalled();
+    expect(hooks.conflict).not.toHaveBeenCalled();
   });
 
-  it('permite nova tentativa depois de um estado failed', async () => {
+  it('permite nova tentativa depois de falha comum', async () => {
     const apply = vi.fn();
     const result = await executeContinuousReceivedConfirmedPersistence(
       'failed',
       'guardar cópia',
       () => ({ changed: true, registry: registry(t1), message: 'Cópia guardada.' }),
-      async () => undefined,
+      confirmedWrite,
       apply,
       lifecycle()
     );
