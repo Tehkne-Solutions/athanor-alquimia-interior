@@ -1,3 +1,4 @@
+import { continuousReceivedIdentityPolicy } from '../content/continuousReceivedIdentity';
 import type { ContinuousMapItemKind, ContinuousMapStatus } from './continuousMap';
 import type { NewWorkStartPoint } from './continuousJourney';
 import {
@@ -45,6 +46,27 @@ export interface ContinuousReceiveFailure {
 }
 
 export type ContinuousReceiveResult = ContinuousReceiveSuccess | ContinuousReceiveFailure;
+
+export type ContinuousReceivedKeepStatus = 'kept' | 'equivalent' | 'disambiguated' | 'invalid';
+
+export interface ContinuousReceivedKeepResult {
+  registry: ContinuousReceivedRegistry;
+  status: ContinuousReceivedKeepStatus;
+  requestedId: string;
+  storedId?: string;
+  record?: ContinuousReceivedCollection;
+  message: string;
+}
+
+export type ContinuousReceivedMutationStatus = 'updated' | 'unchanged' | 'missing' | 'ambiguous' | 'invalid';
+
+export interface ContinuousReceivedMutationResult {
+  registry: ContinuousReceivedRegistry;
+  status: ContinuousReceivedMutationStatus;
+  recordId: string;
+  matchedRecords: number;
+  message: string;
+}
 
 const startPoints: NewWorkStartPoint[] = ['word', 'water', 'fire', 'earth', 'spirit', 'rest'];
 const itemKinds: ContinuousMapItemKind[] = ['trail', 'theme-cycle'];
@@ -235,11 +257,19 @@ export function createContinuousReceivedRegistry(
   };
 }
 
+export function findReceivedAllById(
+  registry: ContinuousReceivedRegistry,
+  recordId: string
+): ContinuousReceivedCollection[] {
+  return registry.records.filter((record) => record.id === recordId);
+}
+
 export function findReceivedCollection(
   registry: ContinuousReceivedRegistry,
   recordId: string
 ): ContinuousReceivedCollection | undefined {
-  return registry.records.find((record) => record.id === recordId);
+  const matches = findReceivedAllById(registry, recordId);
+  return matches.length === 1 ? matches[0] : undefined;
 }
 
 export function findReceivedAllByFingerprint(
@@ -265,51 +295,187 @@ export function findEquivalentReceivedCollection(
     .find((record) => areContinuousSharePackagesEquivalent(record.package, packageValue));
 }
 
+export function allocateContinuousReceivedRecordId(
+  registry: ContinuousReceivedRegistry,
+  requestedId: string
+): string | undefined {
+  if (!requestedId) return undefined;
+  if (findReceivedAllById(registry, requestedId).length === 0) return requestedId;
+
+  for (
+    let suffix = continuousReceivedIdentityPolicy.firstSuffix;
+    suffix <= continuousReceivedIdentityPolicy.maxSuffix;
+    suffix += 1
+  ) {
+    const candidate = `${requestedId}${continuousReceivedIdentityPolicy.separator}${suffix}`;
+    if (findReceivedAllById(registry, candidate).length === 0) return candidate;
+  }
+
+  return undefined;
+}
+
+function cloneReceivedPackage(packageValue: ContinuousCollectionShareExport): ContinuousCollectionShareExport {
+  return {
+    ...packageValue,
+    provenance: { ...packageValue.provenance },
+    collection: { ...packageValue.collection },
+    options: { ...packageValue.options },
+    items: packageValue.items.map((item) => ({
+      ...item,
+      passageSummary: { ...item.passageSummary }
+    })),
+    notices: [...packageValue.notices]
+  };
+}
+
+export function keepReceivedCollectionWithIdentity(
+  registry: ContinuousReceivedRegistry,
+  input: { id: string; package: ContinuousCollectionShareExport },
+  receivedAt: string
+): ContinuousReceivedKeepResult {
+  if (!input.id || !receivedAt) {
+    return {
+      registry,
+      status: 'invalid',
+      requestedId: input.id,
+      message: 'Identificador candidato e instante de recebimento são obrigatórios.'
+    };
+  }
+
+  const equivalent = findEquivalentReceivedCollection(registry, input.package);
+  if (equivalent) {
+    return {
+      registry,
+      status: 'equivalent',
+      requestedId: input.id,
+      storedId: equivalent.id,
+      record: equivalent,
+      message: 'A cópia equivalente já existe e foi preservada sem duplicação.'
+    };
+  }
+
+  const storedId = allocateContinuousReceivedRecordId(registry, input.id);
+  if (!storedId) {
+    return {
+      registry,
+      status: 'invalid',
+      requestedId: input.id,
+      message: 'Não foi possível alocar um identificador local único dentro do limite previsto.'
+    };
+  }
+
+  const record: ContinuousReceivedCollection = {
+    id: storedId,
+    fingerprint: fingerprintContinuousSharePackage(input.package),
+    status: 'active',
+    package: cloneReceivedPackage(input.package),
+    receivedAt,
+    updatedAt: receivedAt
+  };
+  const nextRegistry: ContinuousReceivedRegistry = {
+    ...registry,
+    records: [...registry.records, record],
+    updatedAt: receivedAt
+  };
+
+  if (storedId === input.id) {
+    return {
+      registry: nextRegistry,
+      status: 'kept',
+      requestedId: input.id,
+      storedId,
+      record,
+      message: 'A cópia foi guardada com o identificador local solicitado.'
+    };
+  }
+
+  return {
+    registry: nextRegistry,
+    status: 'disambiguated',
+    requestedId: input.id,
+    storedId,
+    record,
+    message: `O identificador local já existia; a cópia foi preservada como ${storedId}.`
+  };
+}
+
 export function keepReceivedCollection(
   registry: ContinuousReceivedRegistry,
   input: { id: string; package: ContinuousCollectionShareExport },
   receivedAt: string
 ): ContinuousReceivedRegistry {
-  if (!input.id || !receivedAt) return registry;
-  const fingerprint = fingerprintContinuousSharePackage(input.package);
-  if (findEquivalentReceivedCollection(registry, input.package)) return registry;
-  const record: ContinuousReceivedCollection = {
-    id: input.id,
-    fingerprint,
-    status: 'active',
-    package: {
-      ...input.package,
-      provenance: { ...input.package.provenance },
-      collection: { ...input.package.collection },
-      options: { ...input.package.options },
-      items: input.package.items.map((item) => ({
-        ...item,
-        passageSummary: { ...item.passageSummary }
-      })),
-      notices: [...input.package.notices]
-    },
-    receivedAt,
-    updatedAt: receivedAt
-  };
-  return {
-    ...registry,
-    records: [...registry.records, record],
-    updatedAt: receivedAt
-  };
+  return keepReceivedCollectionWithIdentity(registry, input, receivedAt).registry;
 }
 
-function updateReceived(
+function mutateReceivedCollectionWithIdentity(
   registry: ContinuousReceivedRegistry,
   recordId: string,
   updatedAt: string,
   updater: (record: ContinuousReceivedCollection) => ContinuousReceivedCollection
-): ContinuousReceivedRegistry {
-  if (!findReceivedCollection(registry, recordId)) return registry;
+): ContinuousReceivedMutationResult {
+  if (!recordId || !updatedAt) {
+    return {
+      registry,
+      status: 'invalid',
+      recordId,
+      matchedRecords: 0,
+      message: 'Identificador local e instante da ação são obrigatórios.'
+    };
+  }
+
+  const matches = findReceivedAllById(registry, recordId);
+  if (matches.length === 0) {
+    return {
+      registry,
+      status: 'missing',
+      recordId,
+      matchedRecords: 0,
+      message: 'Nenhuma cópia local corresponde ao identificador informado.'
+    };
+  }
+  if (matches.length > 1) {
+    return {
+      registry,
+      status: 'ambiguous',
+      recordId,
+      matchedRecords: matches.length,
+      message: 'O identificador local é ambíguo; nenhuma cópia foi alterada.'
+    };
+  }
+
+  const current = matches[0];
+  const updated = updater(current);
+  if (updated === current) {
+    return {
+      registry,
+      status: 'unchanged',
+      recordId,
+      matchedRecords: 1,
+      message: 'A cópia já estava no estado solicitado.'
+    };
+  }
+
   return {
-    ...registry,
-    records: registry.records.map((record) => record.id === recordId ? updater(record) : record),
-    updatedAt
+    registry: {
+      ...registry,
+      records: registry.records.map((record) => record === current ? updated : record),
+      updatedAt
+    },
+    status: 'updated',
+    recordId,
+    matchedRecords: 1,
+    message: 'A ação foi aplicada somente à cópia local identificada.'
   };
+}
+
+export function archiveReceivedCollectionWithIdentity(
+  registry: ContinuousReceivedRegistry,
+  recordId: string,
+  archivedAt: string
+): ContinuousReceivedMutationResult {
+  return mutateReceivedCollectionWithIdentity(registry, recordId, archivedAt, (record) => record.status === 'archived'
+    ? record
+    : { ...record, status: 'archived', archivedAt, updatedAt: archivedAt });
 }
 
 export function archiveReceivedCollection(
@@ -317,9 +483,17 @@ export function archiveReceivedCollection(
   recordId: string,
   archivedAt: string
 ): ContinuousReceivedRegistry {
-  return updateReceived(registry, recordId, archivedAt, (record) => record.status === 'archived'
+  return archiveReceivedCollectionWithIdentity(registry, recordId, archivedAt).registry;
+}
+
+export function reactivateReceivedCollectionWithIdentity(
+  registry: ContinuousReceivedRegistry,
+  recordId: string,
+  updatedAt: string
+): ContinuousReceivedMutationResult {
+  return mutateReceivedCollectionWithIdentity(registry, recordId, updatedAt, (record) => record.status === 'active'
     ? record
-    : { ...record, status: 'archived', archivedAt, updatedAt: archivedAt });
+    : { ...record, status: 'active', archivedAt: undefined, updatedAt });
 }
 
 export function reactivateReceivedCollection(
@@ -327,9 +501,56 @@ export function reactivateReceivedCollection(
   recordId: string,
   updatedAt: string
 ): ContinuousReceivedRegistry {
-  return updateReceived(registry, recordId, updatedAt, (record) => record.status === 'active'
-    ? record
-    : { ...record, status: 'active', archivedAt: undefined, updatedAt });
+  return reactivateReceivedCollectionWithIdentity(registry, recordId, updatedAt).registry;
+}
+
+export function removeReceivedCollectionWithIdentity(
+  registry: ContinuousReceivedRegistry,
+  recordId: string,
+  updatedAt: string
+): ContinuousReceivedMutationResult {
+  if (!recordId || !updatedAt) {
+    return {
+      registry,
+      status: 'invalid',
+      recordId,
+      matchedRecords: 0,
+      message: 'Identificador local e instante da remoção são obrigatórios.'
+    };
+  }
+
+  const matches = findReceivedAllById(registry, recordId);
+  if (matches.length === 0) {
+    return {
+      registry,
+      status: 'missing',
+      recordId,
+      matchedRecords: 0,
+      message: 'Nenhuma cópia local corresponde ao identificador informado.'
+    };
+  }
+  if (matches.length > 1) {
+    return {
+      registry,
+      status: 'ambiguous',
+      recordId,
+      matchedRecords: matches.length,
+      message: 'O identificador local é ambíguo; nenhuma cópia foi removida.'
+    };
+  }
+
+  const target = matches[0];
+  return {
+    registry: {
+      ...registry,
+      records: registry.records.filter((record) => record !== target),
+      updatedAt
+    },
+    status: 'updated',
+    recordId,
+    matchedRecords: 1,
+    message: 'Somente a cópia local identificada foi removida.'
+  };
 }
 
 export function removeReceivedCollection(
@@ -337,10 +558,5 @@ export function removeReceivedCollection(
   recordId: string,
   updatedAt: string
 ): ContinuousReceivedRegistry {
-  if (!findReceivedCollection(registry, recordId)) return registry;
-  return {
-    ...registry,
-    records: registry.records.filter((record) => record.id !== recordId),
-    updatedAt
-  };
+  return removeReceivedCollectionWithIdentity(registry, recordId, updatedAt).registry;
 }
