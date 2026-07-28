@@ -19,6 +19,7 @@ import './content/validateContinuousNumericLexeme';
 import './content/validateContinuousReceive';
 import './content/validateContinuousReceivedChronology';
 import './content/validateContinuousReceivedIdentity';
+import './content/validateContinuousReceivedSnapshot';
 import './content/validateContinuousResource';
 import './content/validateContinuousResponse';
 import './content/validateContinuousReturn';
