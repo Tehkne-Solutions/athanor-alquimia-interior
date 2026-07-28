@@ -80,7 +80,6 @@ function collectionWithItems(count: number): ContinuousCollection {
     catalogVersion: '1.0.0',
     status: 'completed' as const,
     rawStatus: 'completed',
-    depth: 1,
     endedEarly: false,
     passageSummary: { completed: 1, passed: 0, pending: 0 },
     occurredAt: generatedAt,
