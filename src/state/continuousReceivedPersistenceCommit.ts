@@ -1,7 +1,10 @@
 import type { ContinuousReceivedRegistry } from '../domain/continuousReceive';
 import type { ContinuousReceivedPersistenceRuntimeStatus } from './useContinuousReceivedPersistenceRuntimeStore';
 
-export type ContinuousReceivedPersistenceBlockStatus = 'writing' | 'persistence-failed';
+export type ContinuousReceivedPersistenceBlockStatus =
+  | 'writing'
+  | 'persistence-failed'
+  | 'persistence-conflict';
 
 export interface ContinuousReceivedRegistryChange {
   changed: boolean;
@@ -9,16 +12,21 @@ export interface ContinuousReceivedRegistryChange {
   message: string;
 }
 
+export type ContinuousReceivedPersistenceWriteResult =
+  | { status: 'confirmed'; persistedValue: string }
+  | { status: 'conflict' };
+
 export interface ContinuousReceivedPersistenceLifecycle {
   begin: (operation: string) => void;
-  confirm: (message: string) => void;
+  confirm: (message: string, persistedValue: string) => void;
   fail: (error: unknown) => void;
+  conflict: () => void;
   clear: () => void;
 }
 
 export interface ContinuousReceivedPersistenceBlocked {
   executed: false;
-  status: 'writing';
+  status: 'writing' | 'persistence-conflict';
   changed: false;
   message: string;
 }
@@ -56,7 +64,7 @@ export async function executeContinuousReceivedConfirmedPersistence<
   runtimeStatus: ContinuousReceivedPersistenceRuntimeStatus,
   operation: string,
   action: () => T,
-  write: (registry: ContinuousReceivedRegistry) => Promise<void>,
+  write: (registry: ContinuousReceivedRegistry) => Promise<ContinuousReceivedPersistenceWriteResult>,
   apply: (registry: ContinuousReceivedRegistry) => void,
   lifecycle: ContinuousReceivedPersistenceLifecycle
 ): Promise<ContinuousReceivedPersistenceExecution<T>> {
@@ -66,6 +74,15 @@ export async function executeContinuousReceivedConfirmedPersistence<
       status: 'writing',
       changed: false,
       message: 'Outra alteração da biblioteca ainda está sendo gravada. A nova ação não foi executada nem enfileirada.'
+    };
+  }
+
+  if (runtimeStatus === 'conflict') {
+    return {
+      executed: false,
+      status: 'persistence-conflict',
+      changed: false,
+      message: 'A memória persistida mudou desde a hidratação. Recarregue a página antes de decidir outra alteração.'
     };
   }
 
@@ -82,7 +99,19 @@ export async function executeContinuousReceivedConfirmedPersistence<
 
   lifecycle.begin(operation);
   try {
-    await write(value.registry);
+    const written = await write(value.registry);
+    if (written.status === 'conflict') {
+      lifecycle.conflict();
+      return {
+        executed: false,
+        status: 'persistence-conflict',
+        changed: false,
+        message: 'Outra aba ou sessão alterou a memória local. A biblioteca desta sessão foi preservada e nenhuma versão foi escolhida ou mesclada automaticamente.'
+      };
+    }
+
+    apply(value.registry);
+    lifecycle.confirm(`${value.message} Gravação local confirmada.`, written.persistedValue);
   } catch (error) {
     lifecycle.fail(error);
     return {
@@ -93,8 +122,6 @@ export async function executeContinuousReceivedConfirmedPersistence<
     };
   }
 
-  apply(value.registry);
-  lifecycle.confirm(`${value.message} Gravação local confirmada.`);
   return {
     executed: true,
     persistence: 'confirmed',
