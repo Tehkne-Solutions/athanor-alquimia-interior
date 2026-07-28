@@ -63,7 +63,8 @@ Este repositório contém a experiência funcional do Athanor, iniciada pelo ver
 - **8.26 — O Identificador que Não Alcança Duas Cópias em Silêncio:** IDs locais são únicos e ações por identificador ambíguo não alteram nenhuma cópia;
 - **8.27 — O Relógio que Não Anda para Trás em Silêncio:** criação, recebimento e mutações locais usam UTC canônico e nunca regridem o último estado conhecido;
 - **8.28 — A Cópia que Não Continua Presa ao Original em Silêncio:** entradas, consultas, resultados e versões sucessivas usam snapshots defensivos sem referências mutáveis compartilhadas;
-- **8.29 — A Impressão Guardada que Não Aponta para Outro Conteúdo em Silêncio:** a impressão persistida é recalculada antes das decisões locais e divergências bloqueiam a operação sem reparo automático.
+- **8.29 — A Impressão Guardada que Não Aponta para Outro Conteúdo em Silêncio:** a impressão persistida é recalculada antes das decisões locais e divergências bloqueiam a operação sem reparo automático;
+- **8.30 — A Versão da Biblioteca que Não Guarda Outro Catálogo em Silêncio:** a identidade local, a versão da biblioteca e a versão de cada pacote precisam corresponder ao mesmo catálogo atual.
 
 ## Ciclo validável
 
@@ -80,7 +81,7 @@ Fonte bíblica
 → Nova Obra contínua
 ```
 
-A progressão não mede valor pessoal, espiritual ou emocional. Recusar, pausar, encerrar cedo, manter vazio, preservar desconhecido, permanecer em silêncio, descartar um retorno, usar arquivo legado, interromper uma versão incompatível, recusar uma estrutura acima do orçamento técnico, rejeitar uma forma não inerte, interromper texto Unicode ambíguo, recusar chaves repetidas, impedir uma mudança numérica silenciosa, interromper campos desconhecidos, recusar margens textuais externas, interromper um instante temporal não canônico, rejeitar campos relacionados contraditórios, impedir a mistura de naturezas incompatíveis, recusar uma referência inexistente, interromper um aviso divergente, preservar duas cópias com a mesma impressão, interromper uma ação sobre ID local ambíguo, recusar um relógio local regressivo, manter uma cópia desvinculada de sua entrada ou bloquear uma impressão persistida divergente são estados válidos quando previstos pelo fluxo.
+A progressão não mede valor pessoal, espiritual ou emocional. Recusar, pausar, encerrar cedo, manter vazio, preservar desconhecido, permanecer em silêncio, descartar um retorno, usar arquivo legado, interromper uma versão incompatível, recusar uma estrutura acima do orçamento técnico, rejeitar uma forma não inerte, interromper texto Unicode ambíguo, recusar chaves repetidas, impedir uma mudança numérica silenciosa, interromper campos desconhecidos, recusar margens textuais externas, interromper um instante temporal não canônico, rejeitar campos relacionados contraditórios, impedir a mistura de naturezas incompatíveis, recusar uma referência inexistente, interromper um aviso divergente, preservar duas cópias com a mesma impressão, interromper uma ação sobre ID local ambíguo, recusar um relógio local regressivo, manter uma cópia desvinculada de sua entrada, bloquear uma impressão persistida divergente ou preservar uma biblioteca de outro catálogo sem reinterpretá-la são estados válidos quando previstos pelo fluxo.
 
 ## Stack
 
@@ -164,6 +165,8 @@ A cronologia da biblioteca recebida usa somente instantes UTC canônicos. Criaç
 A biblioteca recebida também cria snapshots defensivos. O pacote de entrada, o registro devolvido, as consultas e as novas versões não compartilham objetos aninhados mutáveis; operações recusadas continuam devolvendo exatamente a instância original.
 
 Antes de deduplicar ou alterar a biblioteca, cada `record.fingerprint` é recalculado pelo mesmo escopo histórico. Formato inválido, divergência ou pacote não mensurável bloqueiam a operação sem substituir a impressão nem reescrever o pacote. `generatedAt`, `notices` e `consistency` permanecem fora desse escopo para preservar compatibilidade.
+
+A biblioteca recebida também precisa manter uma única identidade e um único catálogo. `continuous_received_registry_v1`, a versão atual `1.0.0` e cada `package.catalogVersion` precisam concordar; versões malformadas, futuras, antigas sem migração ou misturadas bloqueiam criação, inserção e mutações sem promoção, downgrade ou reparo automático.
 
 ## Assinatura
 
