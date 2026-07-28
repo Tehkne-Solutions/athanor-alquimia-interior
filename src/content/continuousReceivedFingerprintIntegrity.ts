@@ -1,4 +1,4 @@
-import type { ProvenanceNote } from '../domain/types';
+import type { ProvenanceEntry } from '../domain/types';
 
 export const continuousReceivedFingerprintIntegrityBiblicalUnit = {
   id: 'proverb_continuous_received_fingerprint_integrity_v1',
@@ -14,7 +14,7 @@ export const continuousReceivedFingerprintIntegrityBiblicalUnit = {
     class: 'BIB',
     explanation: 'Provérbios 16:11 orienta a coerência da medida sem transformar a impressão local em prova de autoria.',
     sourceLabel: 'Provérbios 16:11'
-  }] satisfies ProvenanceNote[]
+  }] satisfies ProvenanceEntry[]
 } as const;
 
 export const continuousReceivedFingerprintIntegrityPolicy = {
