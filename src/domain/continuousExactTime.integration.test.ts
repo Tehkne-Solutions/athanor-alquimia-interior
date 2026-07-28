@@ -30,8 +30,8 @@ const responseConsent = {
 
 function mapItem(overrides: Partial<ContinuousMapItem> = {}): ContinuousMapItem {
   return {
-    id: 'trail-local',
-    kind: 'trail',
+    id: 'cycle-local',
+    kind: 'theme-cycle',
     sourceTrailId: 'source-trail',
     sourceCycleInstanceId: 'source-cycle',
     startPoint: 'water',

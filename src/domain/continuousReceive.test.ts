@@ -23,8 +23,8 @@ const receivedAt = '2026-07-27T18:00:00.000Z';
 
 function mapItem(overrides: Partial<ContinuousMapItem> = {}): ContinuousMapItem {
   return {
-    id: 'private-trail-id',
-    kind: 'trail',
+    id: 'private-cycle-id',
+    kind: 'theme-cycle',
     sourceTrailId: 'private-source-trail',
     sourceCycleInstanceId: 'private-source-cycle',
     startPoint: 'water',

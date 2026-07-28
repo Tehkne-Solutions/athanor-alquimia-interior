@@ -8,6 +8,7 @@ import {
 import { validateContinuousShareExactRelation } from './continuousExactRelation';
 import { validateContinuousShareExactTime } from './continuousExactTime';
 import { validateContinuousExactText } from './continuousExactText';
+import { validateContinuousShareFieldCompatibility } from './continuousFieldCompatibility';
 import { validateContinuousInertJson } from './continuousInertJson';
 import { inspectContinuousResourceBudget } from './continuousResource';
 import { validateContinuousTextVisibility } from './continuousTextVisibility';
@@ -135,7 +136,8 @@ export function buildContinuousSharePreview(
     'Textos e nomes de campos permanecem Unicode NFC e sem controles invisíveis, sem reescrita automática.',
     'Nenhuma margem textual externa é removida durante a geração ou a leitura.',
     'Instantes temporais usam UTC canônico com milissegundos e nunca são convertidos silenciosamente.',
-    'Quantidade, posições, política de datas e cronologia precisam concordar antes do download.'
+    'Quantidade, posições, política de datas e cronologia precisam concordar antes do download.',
+    'Tema, pacote, tipo, estado e encerramento precisam permanecer compatíveis entre si.'
   ];
   if (!options.includeDates) notices.push('Datas foram omitidas.');
   if (collection.items.length === 0) notices.push('Esta coleção está vazia e continua válida para exportação.');
@@ -211,6 +213,11 @@ export function createContinuousCollectionShareExport(
   const exactRelation = validateContinuousShareExactRelation(payload);
   if (!exactRelation.ok) {
     return { ok: false, errors: exactRelation.errors.map((error) => `Não foi possível preservar a sequência: ${error}`) };
+  }
+
+  const fieldCompatibility = validateContinuousShareFieldCompatibility(payload);
+  if (!fieldCompatibility.ok) {
+    return { ok: false, errors: fieldCompatibility.errors.map((error) => `Não foi possível preservar a natureza dos campos: ${error}`) };
   }
 
   return {

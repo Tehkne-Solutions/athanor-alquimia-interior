@@ -7,6 +7,7 @@ import {
 import { validateContinuousResponseExactRelation } from './continuousExactRelation';
 import { validateContinuousResponseExactTime } from './continuousExactTime';
 import { validateContinuousExactText } from './continuousExactText';
+import { validateContinuousResponseFieldCompatibility } from './continuousFieldCompatibility';
 import { validateContinuousInertJson } from './continuousInertJson';
 import { inspectContinuousResourceBudget } from './continuousResource';
 import { validateContinuousTextVisibility } from './continuousTextVisibility';
@@ -88,7 +89,8 @@ export function buildContinuousResponsePreview(
     'Textos e nomes de campos permanecem Unicode NFC e sem controles invisíveis, sem reescrita automática.',
     'Nenhuma margem textual externa é removida durante a geração ou a leitura.',
     'O instante de geração usa UTC canônico com milissegundos e nunca é convertido silenciosamente.',
-    'A resposta não acrescenta relações temporais além do instante de geração canônico.'
+    'A resposta não acrescenta relações temporais além do instante de geração canônico.',
+    'O pacote de resposta atual não possui discriminantes opcionais adicionais a reconciliar.'
   ];
   if (record.package.collection.itemCount === 0) {
     notices.push('A origem é uma coleção vazia e permanece válida.');
@@ -175,6 +177,11 @@ export function createContinuousResponseExport(
   const exactRelation = validateContinuousResponseExactRelation(payload);
   if (!exactRelation.ok) {
     return { ok: false, errors: exactRelation.errors.map((error) => `Não foi possível preservar a relação interna: ${error}`) };
+  }
+
+  const fieldCompatibility = validateContinuousResponseFieldCompatibility(payload);
+  if (!fieldCompatibility.ok) {
+    return { ok: false, errors: fieldCompatibility.errors.map((error) => `Não foi possível preservar a natureza dos campos: ${error}`) };
   }
 
   return {
