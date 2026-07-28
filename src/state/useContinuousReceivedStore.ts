@@ -10,28 +10,35 @@ import {
 import type { ContinuousCollectionShareExport } from '../domain/continuousShare';
 import { idbStateStorage } from '../storage/idbStorage';
 import {
-  hydrateContinuousReceivedPersistedState,
-  type ContinuousReceivedHydrationStatus
+  hydrateContinuousReceivedPersistedState
 } from './continuousReceivedHydration';
+import {
+  executeContinuousReceivedHydrationGatedAction,
+  type ContinuousReceivedHydrationBlockStatus
+} from './continuousReceivedHydrationGate';
 import {
   archiveContinuousReceivedRecordFromStore,
   keepContinuousReceivedPackageFromStore,
   reactivateContinuousReceivedRecordFromStore,
   removeContinuousReceivedRecordFromStore
 } from './continuousReceivedStoreAdapter';
+import { useContinuousReceivedHydrationRuntimeStore } from './useContinuousReceivedHydrationRuntimeStore';
 
 const now = () => new Date().toISOString();
+
+export type KeepReceivedResultStatus = ContinuousReceivedKeepStatus | ContinuousReceivedHydrationBlockStatus;
+export type MutateReceivedResultStatus = ContinuousReceivedMutationStatus | ContinuousReceivedHydrationBlockStatus;
 
 export interface KeepReceivedResult {
   id?: string;
   duplicate: boolean;
-  status: ContinuousReceivedKeepStatus;
+  status: KeepReceivedResultStatus;
   changed: boolean;
   message: string;
 }
 
 export interface MutateReceivedResult {
-  status: ContinuousReceivedMutationStatus;
+  status: MutateReceivedResultStatus;
   matchedRecords: number;
   changed: boolean;
   message: string;
@@ -40,9 +47,6 @@ export interface MutateReceivedResult {
 interface ContinuousReceivedStoreState {
   schemaVersion: number;
   registry: ContinuousReceivedRegistry;
-  hydrationStatus: ContinuousReceivedHydrationStatus | 'initial';
-  hydrationMessage?: string;
-  hydrationIssues: string[];
   keepPackage: (value: ContinuousCollectionShareExport) => KeepReceivedResult;
   archiveRecord: (recordId: string) => MutateReceivedResult;
   reactivateRecord: (recordId: string) => MutateReceivedResult;
@@ -52,22 +56,32 @@ interface ContinuousReceivedStoreState {
 
 const initialRegistry = () => createContinuousReceivedRegistry(continuousReceiveCatalog.version, now());
 
+function blockedKeep(status: ContinuousReceivedHydrationBlockStatus, message: string): KeepReceivedResult {
+  return { duplicate: false, status, changed: false, message };
+}
+
+function blockedMutation(status: ContinuousReceivedHydrationBlockStatus, message: string): MutateReceivedResult {
+  return { status, matchedRecords: 0, changed: false, message };
+}
+
 export const useContinuousReceivedStore = create<ContinuousReceivedStoreState>()(
   persist(
     (set, get) => ({
       schemaVersion: 1,
       registry: initialRegistry(),
-      hydrationStatus: 'initial',
-      hydrationMessage: undefined,
-      hydrationIssues: [],
       keepPackage: (value) => {
-        const current = get().registry;
-        const result = keepContinuousReceivedPackageFromStore(
-          current,
-          value,
-          crypto.randomUUID(),
-          now()
-        );
+        const runtimeStatus = useContinuousReceivedHydrationRuntimeStore.getState().status;
+        const execution = executeContinuousReceivedHydrationGatedAction(runtimeStatus, () => {
+          const current = get().registry;
+          return keepContinuousReceivedPackageFromStore(
+            current,
+            value,
+            crypto.randomUUID(),
+            now()
+          );
+        });
+        if (!execution.executed) return blockedKeep(execution.gate.status, execution.gate.message);
+        const result = execution.value;
         if (result.changed) set({ registry: result.registry });
         return {
           id: result.id,
@@ -78,8 +92,12 @@ export const useContinuousReceivedStore = create<ContinuousReceivedStoreState>()
         };
       },
       archiveRecord: (recordId) => {
-        const current = get().registry;
-        const result = archiveContinuousReceivedRecordFromStore(current, recordId, now());
+        const runtimeStatus = useContinuousReceivedHydrationRuntimeStore.getState().status;
+        const execution = executeContinuousReceivedHydrationGatedAction(runtimeStatus, () =>
+          archiveContinuousReceivedRecordFromStore(get().registry, recordId, now())
+        );
+        if (!execution.executed) return blockedMutation(execution.gate.status, execution.gate.message);
+        const result = execution.value;
         if (result.changed) set({ registry: result.registry });
         return {
           status: result.status,
@@ -89,8 +107,12 @@ export const useContinuousReceivedStore = create<ContinuousReceivedStoreState>()
         };
       },
       reactivateRecord: (recordId) => {
-        const current = get().registry;
-        const result = reactivateContinuousReceivedRecordFromStore(current, recordId, now());
+        const runtimeStatus = useContinuousReceivedHydrationRuntimeStore.getState().status;
+        const execution = executeContinuousReceivedHydrationGatedAction(runtimeStatus, () =>
+          reactivateContinuousReceivedRecordFromStore(get().registry, recordId, now())
+        );
+        if (!execution.executed) return blockedMutation(execution.gate.status, execution.gate.message);
+        const result = execution.value;
         if (result.changed) set({ registry: result.registry });
         return {
           status: result.status,
@@ -100,8 +122,12 @@ export const useContinuousReceivedStore = create<ContinuousReceivedStoreState>()
         };
       },
       removeRecord: (recordId) => {
-        const current = get().registry;
-        const result = removeContinuousReceivedRecordFromStore(current, recordId, now());
+        const runtimeStatus = useContinuousReceivedHydrationRuntimeStore.getState().status;
+        const execution = executeContinuousReceivedHydrationGatedAction(runtimeStatus, () =>
+          removeContinuousReceivedRecordFromStore(get().registry, recordId, now())
+        );
+        if (!execution.executed) return blockedMutation(execution.gate.status, execution.gate.message);
+        const result = execution.value;
         if (result.changed) set({ registry: result.registry });
         return {
           status: result.status,
@@ -110,12 +136,13 @@ export const useContinuousReceivedStore = create<ContinuousReceivedStoreState>()
           message: result.message
         };
       },
-      reset: () => set({
-        registry: initialRegistry(),
-        hydrationStatus: 'empty',
-        hydrationMessage: 'A biblioteca recebida foi reiniciada localmente.',
-        hydrationIssues: []
-      })
+      reset: () => {
+        const runtime = useContinuousReceivedHydrationRuntimeStore.getState();
+        const execution = executeContinuousReceivedHydrationGatedAction(runtime.status, () => initialRegistry());
+        if (!execution.executed) return;
+        set({ registry: execution.value });
+        runtime.markEmpty('A biblioteca recebida foi reiniciada localmente por uma ação explícita.');
+      }
     }),
     {
       name: 'athanor-continuous-received-state',
@@ -126,14 +153,15 @@ export const useContinuousReceivedStore = create<ContinuousReceivedStoreState>()
           persistedState,
           currentState.registry
         );
+        useContinuousReceivedHydrationRuntimeStore.getState().accept(hydration);
         return {
           ...currentState,
           schemaVersion: hydration.schemaVersion,
-          registry: hydration.registry,
-          hydrationStatus: hydration.status,
-          hydrationMessage: hydration.message,
-          hydrationIssues: hydration.issues
+          registry: hydration.registry
         };
+      },
+      onRehydrateStorage: () => (_state, error) => {
+        if (error) useContinuousReceivedHydrationRuntimeStore.getState().fail(error);
       }
     }
   )
