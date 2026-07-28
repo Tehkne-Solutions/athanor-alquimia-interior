@@ -85,7 +85,7 @@ function collection(): ContinuousCollection {
         sourceCycleInstanceId: 'cycle-source',
         startPoint: 'word',
         noTheme: true,
-        variantId: 'word-v1',
+        variantId: 'word-trail-v1',
         catalogVersion: '1.0.0',
         status: 'completed',
         rawStatus: 'completed',

@@ -1,5 +1,6 @@
 import { continuousShareCatalog } from '../content/continuousShare';
 import { continuousVersionCatalog } from '../content/continuousVersion';
+import { validateContinuousShareCatalogReferences } from './continuousCatalogReference';
 import {
   attachContinuousConsistency,
   verifyContinuousConsistency
@@ -77,6 +78,11 @@ export function parseContinuousCollectionShareWithConsistency(input: unknown): C
     return { ok: false, errors: fieldCompatibility.errors.map((error) => `Compatibilidade recusada: ${error}`) };
   }
 
+  const catalogReferences = validateContinuousShareCatalogReferences(input);
+  if (!catalogReferences.ok) {
+    return { ok: false, errors: catalogReferences.errors.map((error) => `Referência recusada: ${error}`) };
+  }
+
   const parsed = parseContinuousCollectionShare(input);
   if (!parsed.ok) return parsed;
 
@@ -94,7 +100,8 @@ export function parseContinuousCollectionShareWithConsistency(input: unknown): C
     exactText.message,
     exactTime.message,
     exactRelation.message,
-    fieldCompatibility.message
+    fieldCompatibility.message,
+    catalogReferences.message
   ];
   if (compatibility.status === 'supported-legacy') {
     warnings.push('A cópia sanitizada usa a versão atual, sem alterar ou sobrescrever o arquivo recebido.');

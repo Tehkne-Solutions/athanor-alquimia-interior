@@ -1,6 +1,7 @@
 import type { ContinuousCollection, ContinuousCollectionItemReference } from './continuousCollection';
 import type { ContinuousMapItemKind, ContinuousMapStatus } from './continuousMap';
 import type { NewWorkStartPoint } from './continuousJourney';
+import { validateContinuousShareCatalogReferences } from './continuousCatalogReference';
 import {
   attachContinuousConsistency,
   type ContinuousConsistencySeal
@@ -137,7 +138,8 @@ export function buildContinuousSharePreview(
     'Nenhuma margem textual externa é removida durante a geração ou a leitura.',
     'Instantes temporais usam UTC canônico com milissegundos e nunca são convertidos silenciosamente.',
     'Quantidade, posições, política de datas e cronologia precisam concordar antes do download.',
-    'Tema, pacote, tipo, estado e encerramento precisam permanecer compatíveis entre si.'
+    'Tema, pacote, tipo, estado e encerramento precisam permanecer compatíveis entre si.',
+    'Modelo, tema, variante e pacote precisam existir nos catálogos locais compatíveis.'
   ];
   if (!options.includeDates) notices.push('Datas foram omitidas.');
   if (collection.items.length === 0) notices.push('Esta coleção está vazia e continua válida para exportação.');
@@ -218,6 +220,11 @@ export function createContinuousCollectionShareExport(
   const fieldCompatibility = validateContinuousShareFieldCompatibility(payload);
   if (!fieldCompatibility.ok) {
     return { ok: false, errors: fieldCompatibility.errors.map((error) => `Não foi possível preservar a natureza dos campos: ${error}`) };
+  }
+
+  const catalogReferences = validateContinuousShareCatalogReferences(payload);
+  if (!catalogReferences.ok) {
+    return { ok: false, errors: catalogReferences.errors.map((error) => `Não foi possível preservar a referência catalogada: ${error}`) };
   }
 
   return {

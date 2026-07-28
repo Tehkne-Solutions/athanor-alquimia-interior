@@ -19,11 +19,11 @@ function mapItem(overrides: Partial<ContinuousMapItem> = {}): ContinuousMapItem 
     sourceTrailId: 'source-trail-private-id',
     sourceCycleInstanceId: 'source-cycle-private-id',
     startPoint: 'spirit',
-    themeId: 'theme-trust',
+    themeId: 'theme-support',
     noTheme: false,
-    variantId: 'spirit-v1',
-    packageId: 'package-spirit',
-    packageLabel: 'Espírito e síntese possível',
+    variantId: 'spirit-trail-v1',
+    packageId: 'package-support-bridge',
+    packageLabel: 'Ponte do Apoio Disponível',
     catalogVersion: '1.0.0',
     status: 'completed',
     rawStatus: 'completed',
@@ -109,7 +109,7 @@ describe('partilha consentida de coleções', () => {
   it('preserva ordem sem criar ranking ou pontuação', () => {
     const preview = buildContinuousSharePreview(collection([
       mapItem(),
-      mapItem({ id: 'cycle-2', variantId: 'spirit-v2' })
+      mapItem({ id: 'cycle-2', variantId: 'spirit-trail-v2' })
     ]), { includeDates: false });
     expect(preview.items.map((item) => item.position)).toEqual([1, 2]);
     expect(JSON.stringify(preview)).not.toMatch(/score|rank|reward|streak|importance/i);

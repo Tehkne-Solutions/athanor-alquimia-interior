@@ -76,7 +76,7 @@ function collectionWithItems(count: number): ContinuousCollection {
     sourceCycleInstanceId: 'cycle-source',
     startPoint: 'word' as const,
     noTheme: true,
-    variantId: 'word-v1',
+    variantId: 'word-trail-v1',
     catalogVersion: '1.0.0',
     status: 'completed' as const,
     rawStatus: 'completed',
