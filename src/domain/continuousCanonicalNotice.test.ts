@@ -70,7 +70,7 @@ describe('avisos canônicos da partilha', () => {
   });
 
   it('recusa mudança da ordem canônica', () => {
-    const notices = [...continuousShareMandatoryNotices];
+    const notices: string[] = [...continuousShareMandatoryNotices];
     [notices[0], notices[1]] = [notices[1], notices[0]];
     notices.push(continuousShareConditionalNotices.datesOmitted);
     const result = validateContinuousShareCanonicalNotices(share(notices));
@@ -176,7 +176,7 @@ describe('avisos canônicos da resposta', () => {
   });
 
   it('recusa ordem divergente na resposta', () => {
-    const notices = [...continuousResponseMandatoryNotices];
+    const notices: string[] = [...continuousResponseMandatoryNotices];
     [notices[2], notices[3]] = [notices[3], notices[2]];
     const result = validateContinuousResponseCanonicalNotices(response(notices));
     expect(result.ok).toBe(false);
