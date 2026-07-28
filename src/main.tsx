@@ -12,6 +12,7 @@ import './content/validateContinuousExactRelation';
 import './content/validateContinuousExactText';
 import './content/validateContinuousExactTime';
 import './content/validateContinuousFieldCompatibility';
+import './content/validateContinuousFingerprintEquivalence';
 import './content/validateContinuousInertJson';
 import './content/validateContinuousMap';
 import './content/validateContinuousNumericLexeme';
