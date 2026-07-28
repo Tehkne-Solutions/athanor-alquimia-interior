@@ -41,7 +41,7 @@ z.array(z.string().min(1)).min(15).parse(continuousCatalogReferenceRestrictions)
 if (!continuousCatalogReferenceRestrictions.some((restriction) => /tema desconhecido válido/i.test(restriction))) {
   throw new Error('A Fase 8.23 precisa preservar o estado explícito de tema desconhecido.');
 }
-if (!continuousCatalogReferenceRestrictions.some((restriction) => /não é substituído/i.test(restriction))) {
+if (!continuousCatalogReferenceRestrictions.some((restriction) => /substituído por opção aproximada/i.test(restriction))) {
   throw new Error('A Fase 8.23 precisa negar substituição aproximada de IDs.');
 }
 if (!continuousCatalogReferenceRestrictions.some((restriction) => /rótulo divergente/i.test(restriction))) {
