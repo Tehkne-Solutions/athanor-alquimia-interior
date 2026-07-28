@@ -41,7 +41,9 @@ function validateRecord(
   registry: ContinuousReceivedRegistry,
   record: ContinuousReceivedCollection,
   index: number,
-  errors: string[]
+  errors: string[],
+  registryCreatedValid: boolean,
+  registryUpdatedValid: boolean
 ): void {
   const base = `$.records[${index}]`;
   const receivedValid = validateInstant(errors, record.receivedAt, `${base}.receivedAt`);
@@ -50,13 +52,13 @@ function validateRecord(
     ? false
     : validateInstant(errors, record.archivedAt, `${base}.archivedAt`);
 
-  if (receivedValid && epoch(record.receivedAt) < epoch(registry.createdAt)) {
+  if (registryCreatedValid && receivedValid && epoch(record.receivedAt) < epoch(registry.createdAt)) {
     push(errors, `${base}.receivedAt: recebimento anterior à criação da biblioteca local.`);
   }
   if (receivedValid && updatedValid && epoch(record.updatedAt) < epoch(record.receivedAt)) {
     push(errors, `${base}.updatedAt: atualização anterior ao recebimento.`);
   }
-  if (updatedValid && epoch(record.updatedAt) > epoch(registry.updatedAt)) {
+  if (registryUpdatedValid && updatedValid && epoch(record.updatedAt) > epoch(registry.updatedAt)) {
     push(errors, `${base}.updatedAt: estado posterior ao updatedAt da biblioteca.`);
   }
 
@@ -83,7 +85,9 @@ export function validateContinuousReceivedRegistryChronology(
     push(errors, '$.updatedAt: atualização da biblioteca anterior à própria criação.');
   }
 
-  registry.records.forEach((record, index) => validateRecord(registry, record, index, errors));
+  registry.records.forEach((record, index) => {
+    validateRecord(registry, record, index, errors, createdValid, updatedValid);
+  });
 
   return errors.length > 0
     ? { ok: false, errors }
