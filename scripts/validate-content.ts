@@ -23,6 +23,7 @@ try {
   await import('../src/content/validateContinuousExactText');
   await import('../src/content/validateContinuousExactTime');
   await import('../src/content/validateContinuousExactRelation');
+  await import('../src/content/validateContinuousFieldCompatibility');
   console.log('Conteúdo Athanor validado com sucesso.');
 } catch (error) {
   console.error('Falha na validação editorial:');
