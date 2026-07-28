@@ -1,5 +1,6 @@
 import type { ContinuousReceivedCollection } from './continuousReceive';
 import type { ContinuousResponseGesture } from '../content/continuousResponse';
+import { validateContinuousResponseCatalogReferences } from './continuousCatalogReference';
 import {
   attachContinuousConsistency,
   type ContinuousConsistencySeal
@@ -90,7 +91,8 @@ export function buildContinuousResponsePreview(
     'Nenhuma margem textual externa é removida durante a geração ou a leitura.',
     'O instante de geração usa UTC canônico com milissegundos e nunca é convertido silenciosamente.',
     'A resposta não acrescenta relações temporais além do instante de geração canônico.',
-    'O pacote de resposta atual não possui discriminantes opcionais adicionais a reconciliar.'
+    'O pacote de resposta atual não possui discriminantes opcionais adicionais a reconciliar.',
+    'O gesto, o rótulo e a declaração precisam corresponder exatamente ao catálogo local exportável.'
   ];
   if (record.package.collection.itemCount === 0) {
     notices.push('A origem é uma coleção vazia e permanece válida.');
@@ -182,6 +184,11 @@ export function createContinuousResponseExport(
   const fieldCompatibility = validateContinuousResponseFieldCompatibility(payload);
   if (!fieldCompatibility.ok) {
     return { ok: false, errors: fieldCompatibility.errors.map((error) => `Não foi possível preservar a natureza dos campos: ${error}`) };
+  }
+
+  const catalogReferences = validateContinuousResponseCatalogReferences(payload);
+  if (!catalogReferences.ok) {
+    return { ok: false, errors: catalogReferences.errors.map((error) => `Não foi possível preservar a referência catalogada: ${error}`) };
   }
 
   return {
