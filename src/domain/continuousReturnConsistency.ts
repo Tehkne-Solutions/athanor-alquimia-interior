@@ -7,6 +7,7 @@ import { validateContinuousResponseExactRelation } from './continuousExactRelati
 import { validateContinuousResponseExactTime } from './continuousExactTime';
 import { validateContinuousExactText } from './continuousExactText';
 import { validateContinuousResponseFieldCompatibility } from './continuousFieldCompatibility';
+import { validateContinuousResponseFingerprint } from './continuousFingerprintEquivalence';
 import { validateContinuousInertJson } from './continuousInertJson';
 import { inspectContinuousResourceBudget } from './continuousResource';
 import {
@@ -80,6 +81,11 @@ export function parseContinuousResponseReturnWithConsistency(input: unknown): Co
     return { ok: false, errors: catalogReferences.errors.map((error) => `Referência recusada: ${error}`) };
   }
 
+  const fingerprint = validateContinuousResponseFingerprint(input);
+  if (!fingerprint.ok) {
+    return { ok: false, errors: fingerprint.errors.map((error) => `Impressão recusada: ${error}`) };
+  }
+
   const canonicalNotices = validateContinuousResponseCanonicalNotices(input);
   if (!canonicalNotices.ok) {
     return { ok: false, errors: canonicalNotices.errors.map((error) => `Aviso recusado: ${error}`) };
@@ -100,6 +106,7 @@ export function parseContinuousResponseReturnWithConsistency(input: unknown): Co
     exactRelation.message,
     fieldCompatibility.message,
     catalogReferences.message,
+    fingerprint.message,
     canonicalNotices.message
   ];
   if (compatibility.status === 'supported-legacy') {
