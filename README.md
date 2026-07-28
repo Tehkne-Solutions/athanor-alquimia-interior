@@ -69,7 +69,8 @@ Este repositório contém a experiência funcional do Athanor, iniciada pelo ver
 - **8.32 — A Memória Persistida que Não Entra no Presente em Silêncio:** a hidratação revalida envelope, pacotes e invariantes antes de adotar a biblioteca guardada, sem apagar ou migrar recusas automaticamente;
 - **8.33 — A Ação que Não Chega Antes da Memória em Silêncio:** inserções e mutações aguardam a hidratação terminar e nunca são enfileiradas ou repetidas automaticamente;
 - **8.34 — A Escrita que Não se Declara Concluída Antes da Memória em Silêncio:** a IndexedDB confirma o próximo snapshot antes de o runtime mudar ou a interface anunciar sucesso;
-- **8.35 — A Escrita que Não Apaga Outra Aba em Silêncio:** cada substituição compara atomicamente a memória atual com o valor bruto hidratado e preserva conflitos sem merge automático.
+- **8.35 — A Escrita que Não Apaga Outra Aba em Silêncio:** cada substituição compara atomicamente a memória atual com o valor bruto hidratado e preserva conflitos sem merge automático;
+- **8.36 — A Releitura que Não Escolhe uma Versão em Silêncio:** depois de um conflito, a memória atual pode ser relida explicitamente e adotada somente após a hidratação completa, sem repetir a ação interrompida.
 
 ## Ciclo validável
 
@@ -86,7 +87,7 @@ Fonte bíblica
 → Nova Obra contínua
 ```
 
-A progressão não mede valor pessoal, espiritual ou emocional. Recusar, pausar, encerrar cedo, manter vazio, preservar desconhecido, permanecer em silêncio, descartar um retorno, usar arquivo legado, interromper uma versão incompatível, recusar uma estrutura acima do orçamento técnico, rejeitar uma forma não inerte, interromper texto Unicode ambíguo, recusar chaves repetidas, impedir uma mudança numérica silenciosa, interromper campos desconhecidos, recusar margens textuais externas, interromper um instante temporal não canônico, rejeitar campos relacionados contraditórios, impedir a mistura de naturezas incompatíveis, recusar uma referência inexistente, interromper um aviso divergente, preservar duas cópias com a mesma impressão, interromper uma ação sobre ID local ambíguo, recusar um relógio local regressivo, manter uma cópia desvinculada de sua entrada, bloquear uma impressão persistida divergente, preservar uma biblioteca de outro catálogo sem reinterpretá-la, impedir que a fachada descarte uma cópia antes da comparação canônica, recusar uma memória persistida antes da hidratação, aguardar a hidratação antes de agir, preservar o runtime quando a escrita local falha ou interromper uma escrita iniciada sobre memória alterada por outra aba são estados válidos quando previstos pelo fluxo.
+A progressão não mede valor pessoal, espiritual ou emocional. Recusar, pausar, encerrar cedo, manter vazio, preservar desconhecido, permanecer em silêncio, descartar um retorno, usar arquivo legado, interromper uma versão incompatível, recusar uma estrutura acima do orçamento técnico, rejeitar uma forma não inerte, interromper texto Unicode ambíguo, recusar chaves repetidas, impedir uma mudança numérica silenciosa, interromper campos desconhecidos, recusar margens textuais externas, interromper um instante temporal não canônico, rejeitar campos relacionados contraditórios, impedir a mistura de naturezas incompatíveis, recusar uma referência inexistente, interromper um aviso divergente, preservar duas cópias com a mesma impressão, interromper uma ação sobre ID local ambíguo, recusar um relógio local regressivo, manter uma cópia desvinculada de sua entrada, bloquear uma impressão persistida divergente, preservar uma biblioteca de outro catálogo sem reinterpretá-la, impedir que a fachada descarte uma cópia antes da comparação canônica, recusar uma memória persistida antes da hidratação, aguardar a hidratação antes de agir, preservar o runtime quando a escrita local falha, interromper uma escrita iniciada sobre memória alterada por outra aba ou reler explicitamente a memória sem repetir a ação interrompida são estados válidos quando previstos pelo fluxo.
 
 ## Stack
 
@@ -182,6 +183,8 @@ Enquanto a IndexedDB ainda está sendo examinada, a store persistida não aceita
 Depois da hidratação, uma mudança aprovada pelo domínio é gravada explicitamente no envelope conhecido antes de substituir o snapshot ativo. Durante `writing`, outra mutação é bloqueada sem fila; se a transação falhar, o runtime anterior permanece intacto e a interface recebe `persistence-failed` em vez de sucesso.
 
 Antes de cada substituição, o Athanor compara na mesma transação `readwrite` o valor bruto atual com o texto recebido na hidratação ou na última escrita confirmada. Se outra aba tiver alterado, removido ou substituído a memória, a operação retorna `persistence-conflict`, preserva as duas versões existentes e bloqueia novas mutações até uma nova hidratação explícita.
+
+Depois de um conflito, a pessoa pode escolher `Examinar memória atual`. O Athanor relê a chave sem escrever, valida novamente o envelope e a biblioteca e adota apenas uma memória aceita ou uma ausência confirmada. Memória recusada ou indisponível preserva o snapshot anterior e mantém o bloqueio; a ação interrompida nunca é repetida automaticamente.
 
 ## Assinatura
 
