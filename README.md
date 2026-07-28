@@ -56,7 +56,8 @@ Este repositório contém a experiência funcional do Athanor, iniciada pelo ver
 - **8.19 — A Margem que Não se Apaga em Silêncio:** espaços e quebras nas extremidades são recusados, sem `trim()` ou correção automática dos textos;
 - **8.20 — O Tempo que Não se Converte em Silêncio:** instantes UTC canônicos, sem offset, fuso implícito, data impossível ou normalização silenciosa;
 - **8.21 — A Sequência que Não se Inverte em Silêncio:** quantidades, posições, política de datas e cronologia interna precisam concordar antes do domínio;
-- **8.22 — A Natureza que Não Troca de Lugar em Silêncio:** tema, pacote, tipo, estado e encerramento precisam permanecer compatíveis entre si.
+- **8.22 — A Natureza que Não Troca de Lugar em Silêncio:** tema, pacote, tipo, estado e encerramento precisam permanecer compatíveis entre si;
+- **8.23 — A Referência que Não Aponta para o Vazio em Silêncio:** modelos, temas, variantes, pacotes e gestos precisam existir nos catálogos locais compatíveis.
 
 ## Ciclo validável
 
@@ -73,7 +74,7 @@ Fonte bíblica
 → Nova Obra contínua
 ```
 
-A progressão não mede valor pessoal, espiritual ou emocional. Recusar, pausar, encerrar cedo, manter vazio, preservar desconhecido, permanecer em silêncio, descartar um retorno, usar arquivo legado, interromper uma versão incompatível, recusar uma estrutura acima do orçamento técnico, rejeitar uma forma não inerte, interromper texto Unicode ambíguo, recusar chaves repetidas, impedir uma mudança numérica silenciosa, interromper campos desconhecidos, recusar margens textuais externas, interromper um instante temporal não canônico, rejeitar campos relacionados contraditórios ou impedir a mistura de naturezas incompatíveis são estados válidos quando previstos pelo fluxo.
+A progressão não mede valor pessoal, espiritual ou emocional. Recusar, pausar, encerrar cedo, manter vazio, preservar desconhecido, permanecer em silêncio, descartar um retorno, usar arquivo legado, interromper uma versão incompatível, recusar uma estrutura acima do orçamento técnico, rejeitar uma forma não inerte, interromper texto Unicode ambíguo, recusar chaves repetidas, impedir uma mudança numérica silenciosa, interromper campos desconhecidos, recusar margens textuais externas, interromper um instante temporal não canônico, rejeitar campos relacionados contraditórios, impedir a mistura de naturezas incompatíveis ou recusar uma referência inexistente são estados válidos quando previstos pelo fluxo.
 
 ## Stack
 
@@ -141,6 +142,8 @@ Depois das margens exatas, campos temporais conhecidos precisam usar `YYYY-MM-DD
 Depois do formato temporal, a partilha precisa manter relações coerentes: `itemCount` corresponde à lista, posições são sequenciais, datas respeitam `includeDates`, conclusão exige ocorrência, conclusão não antecede ocorrência e nenhum instante interno pode ultrapassar `generatedAt`. O relógio atual não participa da validação.
 
 Depois das relações gerais, os campos discriminados precisam respeitar sua natureza: tema explícito exclui `noTheme`, identificador e rótulo de pacote viajam juntos, Rastros não carregam campos exclusivos de ciclos, encerramento antecipado exige ciclo incompleto e estado concluído não mantém pendências.
+
+Depois da compatibilidade dos campos, referências fornecidas precisam existir nos catálogos embarcados e aceitar o mesmo elemento, tema e tipo. IDs e rótulos divergentes são recusados sem aproximação, substituição ou busca externa; a ausência de `themeId` com `noTheme: false` continua sendo tema desconhecido válido.
 
 ## Assinatura
 
