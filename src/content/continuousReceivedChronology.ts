@@ -11,7 +11,7 @@ export const continuousReceivedChronologyBiblicalUnit: BiblicalUnit = {
   provenance: [{
     id: 'provenance_continuous_received_chronology_v1',
     label: 'Referência bíblica explícita',
-    class: 'biblical-explicit',
+    class: 'BIB',
     explanation: 'Eclesiastes 3:11 sustenta a atenção ao tempo sem prometer domínio sobre sua totalidade.',
     sourceLabel: 'Eclesiastes 3:11'
   }]
