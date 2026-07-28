@@ -61,7 +61,8 @@ Este repositório contém a experiência funcional do Athanor, iniciada pelo ver
 - **8.24 — O Aviso que Não Troca de Sentido em Silêncio:** avisos obrigatórios, condições, unicidade e ordem precisam corresponder ao catálogo editorial local;
 - **8.25 — A Impressão que Não Decide Sozinha em Silêncio:** a impressão agrupa candidatos, mas somente a equivalência canônica decide duplicação; colisões preservam todas as cópias;
 - **8.26 — O Identificador que Não Alcança Duas Cópias em Silêncio:** IDs locais são únicos e ações por identificador ambíguo não alteram nenhuma cópia;
-- **8.27 — O Relógio que Não Anda para Trás em Silêncio:** criação, recebimento e mutações locais usam UTC canônico e nunca regridem o último estado conhecido.
+- **8.27 — O Relógio que Não Anda para Trás em Silêncio:** criação, recebimento e mutações locais usam UTC canônico e nunca regridem o último estado conhecido;
+- **8.28 — A Cópia que Não Continua Presa ao Original em Silêncio:** entradas, consultas, resultados e versões sucessivas usam snapshots defensivos sem referências mutáveis compartilhadas.
 
 ## Ciclo validável
 
@@ -78,7 +79,7 @@ Fonte bíblica
 → Nova Obra contínua
 ```
 
-A progressão não mede valor pessoal, espiritual ou emocional. Recusar, pausar, encerrar cedo, manter vazio, preservar desconhecido, permanecer em silêncio, descartar um retorno, usar arquivo legado, interromper uma versão incompatível, recusar uma estrutura acima do orçamento técnico, rejeitar uma forma não inerte, interromper texto Unicode ambíguo, recusar chaves repetidas, impedir uma mudança numérica silenciosa, interromper campos desconhecidos, recusar margens textuais externas, interromper um instante temporal não canônico, rejeitar campos relacionados contraditórios, impedir a mistura de naturezas incompatíveis, recusar uma referência inexistente, interromper um aviso divergente, preservar duas cópias com a mesma impressão, interromper uma ação sobre ID local ambíguo ou recusar um relógio local regressivo são estados válidos quando previstos pelo fluxo.
+A progressão não mede valor pessoal, espiritual ou emocional. Recusar, pausar, encerrar cedo, manter vazio, preservar desconhecido, permanecer em silêncio, descartar um retorno, usar arquivo legado, interromper uma versão incompatível, recusar uma estrutura acima do orçamento técnico, rejeitar uma forma não inerte, interromper texto Unicode ambíguo, recusar chaves repetidas, impedir uma mudança numérica silenciosa, interromper campos desconhecidos, recusar margens textuais externas, interromper um instante temporal não canônico, rejeitar campos relacionados contraditórios, impedir a mistura de naturezas incompatíveis, recusar uma referência inexistente, interromper um aviso divergente, preservar duas cópias com a mesma impressão, interromper uma ação sobre ID local ambíguo, recusar um relógio local regressivo ou manter uma cópia desvinculada de sua entrada são estados válidos quando previstos pelo fluxo.
 
 ## Stack
 
@@ -158,6 +159,8 @@ A deduplicação da biblioteca nunca depende somente da impressão. `generatedAt
 Os IDs usados pela biblioteca recebida são apenas endereços locais. Uma cópia distinta que solicita um ID ocupado recebe o primeiro sufixo disponível, enquanto uma biblioteca legada com IDs duplicados permanece intacta e não aceita arquivamento, reativação ou remoção por um identificador ambíguo.
 
 A cronologia da biblioteca recebida usa somente instantes UTC canônicos. Criação, recebimento, arquivamento, reativação e remoção não podem anteceder o último estado local; o relógio declarado dentro do pacote permanece separado e não é usado para julgar a origem.
+
+A biblioteca recebida também cria snapshots defensivos. O pacote de entrada, o registro devolvido, as consultas e as novas versões não compartilham objetos aninhados mutáveis; operações recusadas continuam devolvendo exatamente a instância original.
 
 ## Assinatura
 
