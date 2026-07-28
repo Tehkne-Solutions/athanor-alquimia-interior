@@ -22,6 +22,7 @@ import './content/validateContinuousReceivedChronology';
 import './content/validateContinuousReceivedFingerprintIntegrity';
 import './content/validateContinuousReceivedIdentity';
 import './content/validateContinuousReceivedSnapshot';
+import './content/validateContinuousReceivedStoreDelegation';
 import './content/validateContinuousResource';
 import './content/validateContinuousResponse';
 import './content/validateContinuousReturn';
