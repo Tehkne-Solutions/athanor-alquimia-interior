@@ -4,6 +4,7 @@ import { continuousResponseGestures } from '../content/continuousResponse';
 import { continuousThemes } from '../content/continuousTheme';
 import { continuousThemeCyclePackages } from '../content/continuousThemeCycle';
 import { continuousTrailVariants } from '../content/continuousTrail';
+import type { NewWorkStartPoint } from './continuousJourney';
 
 export interface ContinuousCatalogReferenceSuccess {
   ok: true;
@@ -19,8 +20,15 @@ export interface ContinuousCatalogReferenceFailure {
 
 export type ContinuousCatalogReferenceResult = ContinuousCatalogReferenceSuccess | ContinuousCatalogReferenceFailure;
 
+const knownStartPoints: NewWorkStartPoint[] = ['word', 'water', 'fire', 'earth', 'spirit', 'rest'];
+
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function readStartPoint(value: unknown): NewWorkStartPoint | undefined {
+  if (typeof value !== 'string') return undefined;
+  return knownStartPoints.includes(value as NewWorkStartPoint) ? value as NewWorkStartPoint : undefined;
 }
 
 function report(errors: string[], message: string): void {
@@ -62,7 +70,7 @@ export function validateContinuousShareCatalogReferences(input: unknown): Contin
   input.items.forEach((candidate, index) => {
     if (!isRecord(candidate)) return;
     const path = `$.items[${index}]`;
-    const startPoint = typeof candidate.startPoint === 'string' ? candidate.startPoint : undefined;
+    const startPoint = readStartPoint(candidate.startPoint);
     const kind = typeof candidate.kind === 'string' ? candidate.kind : undefined;
     const themeId = typeof candidate.themeId === 'string' ? candidate.themeId : undefined;
     const noTheme = candidate.noTheme === true;
@@ -75,7 +83,7 @@ export function validateContinuousShareCatalogReferences(input: unknown): Contin
         report(errors, `${path}.themeId: tema informado não existe no catálogo local atual.`);
       } else {
         knownTheme = true;
-        if (startPoint !== undefined && !theme.startPoints.includes(startPoint as never)) {
+        if (startPoint !== undefined && !theme.startPoints.includes(startPoint)) {
           report(errors, `${path}.themeId: tema não aceita o elemento declarado.`);
         }
       }
@@ -100,7 +108,7 @@ export function validateContinuousShareCatalogReferences(input: unknown): Contin
         if (typeof candidate.packageLabel === 'string' && candidate.packageLabel !== cyclePackage.label) {
           report(errors, `${path}.packageLabel: rótulo não corresponde ao pacote catalogado.`);
         }
-        if (startPoint !== undefined && !cyclePackage.startPoints.includes(startPoint as never)) {
+        if (startPoint !== undefined && !cyclePackage.startPoints.includes(startPoint)) {
           report(errors, `${path}.packageId: pacote não aceita o elemento declarado.`);
         }
         const expectedTheme = noTheme || themeId === undefined ? 'no-theme' : themeId;
