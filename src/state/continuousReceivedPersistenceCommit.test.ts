@@ -13,7 +13,8 @@ function lifecycle() {
   return {
     begin: vi.fn(),
     confirm: vi.fn(),
-    fail: vi.fn()
+    fail: vi.fn(),
+    clear: vi.fn()
   };
 }
 
@@ -44,7 +45,7 @@ describe('commit confirmado da biblioteca recebida', () => {
     const apply = vi.fn();
     const hooks = lifecycle();
     const result = await executeContinuousReceivedConfirmedPersistence(
-      'idle',
+      'failed',
       'arquivar cópia',
       action,
       write,
@@ -57,6 +58,7 @@ describe('commit confirmado da biblioteca recebida', () => {
     expect(write).not.toHaveBeenCalled();
     expect(apply).not.toHaveBeenCalled();
     expect(hooks.begin).not.toHaveBeenCalled();
+    expect(hooks.clear).toHaveBeenCalledTimes(1);
   });
 
   it('grava antes de aplicar o próximo snapshot no runtime', async () => {
@@ -65,7 +67,8 @@ describe('commit confirmado da biblioteca recebida', () => {
     const hooks = {
       begin: vi.fn(() => events.push('begin')),
       confirm: vi.fn(() => events.push('confirm')),
-      fail: vi.fn(() => events.push('fail'))
+      fail: vi.fn(() => events.push('fail')),
+      clear: vi.fn(() => events.push('clear'))
     };
     const write = vi.fn(async () => { events.push('write'); });
     const apply = vi.fn(() => events.push('apply'));
