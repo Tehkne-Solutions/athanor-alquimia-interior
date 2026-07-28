@@ -71,6 +71,10 @@ function legacyRecord(id: string, label: string): ContinuousReceivedCollection {
   return kept.record;
 }
 
+function legacyRegistry(records: ContinuousReceivedCollection[]): ContinuousReceivedRegistry {
+  return { ...registry(), records, updatedAt: receivedAt };
+}
+
 describe('identidade local da biblioteca recebida', () => {
   it('preserva exatamente um identificador livre', () => {
     expect(allocateContinuousReceivedRecordId(registry(), 'received-local')).toBe('received-local');
@@ -128,7 +132,7 @@ describe('identidade local da biblioteca recebida', () => {
   it('diferencia ausência de ambiguidade legada', () => {
     const first = legacyRecord('legacy-shared', 'Primeira');
     const second = { ...legacyRecord('legacy-other', 'Segunda'), id: 'legacy-shared' };
-    const legacy: ContinuousReceivedRegistry = { ...registry(), records: [first, second] };
+    const legacy = legacyRegistry([first, second]);
     expect(findReceivedAllById(legacy, 'legacy-shared')).toHaveLength(2);
     expect(findReceivedCollection(legacy, 'legacy-shared')).toBeUndefined();
     expect(archiveReceivedCollectionWithIdentity(legacy, 'missing', updatedAt).status).toBe('missing');
@@ -138,7 +142,7 @@ describe('identidade local da biblioteca recebida', () => {
   it('não arquiva nenhuma cópia quando o ID legado é ambíguo', () => {
     const first = legacyRecord('legacy-shared', 'Primeira');
     const second = { ...legacyRecord('legacy-other', 'Segunda'), id: 'legacy-shared' };
-    const legacy: ContinuousReceivedRegistry = { ...registry(), records: [first, second] };
+    const legacy = legacyRegistry([first, second]);
     const result = archiveReceivedCollectionWithIdentity(legacy, 'legacy-shared', updatedAt);
     expect(result.status).toBe('ambiguous');
     expect(result.matchedRecords).toBe(2);
@@ -150,7 +154,7 @@ describe('identidade local da biblioteca recebida', () => {
   it('não remove nenhuma cópia quando o ID legado é ambíguo', () => {
     const first = legacyRecord('legacy-shared', 'Primeira');
     const second = { ...legacyRecord('legacy-other', 'Segunda'), id: 'legacy-shared' };
-    const legacy: ContinuousReceivedRegistry = { ...registry(), records: [first, second] };
+    const legacy = legacyRegistry([first, second]);
     const result = removeReceivedCollectionWithIdentity(legacy, 'legacy-shared', updatedAt);
     expect(result.status).toBe('ambiguous');
     expect(result.registry.records).toHaveLength(2);
