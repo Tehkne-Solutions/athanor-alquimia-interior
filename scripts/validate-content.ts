@@ -24,6 +24,7 @@ try {
   await import('../src/content/validateContinuousExactTime');
   await import('../src/content/validateContinuousExactRelation');
   await import('../src/content/validateContinuousFieldCompatibility');
+  await import('../src/content/validateContinuousCatalogReference');
   console.log('Conteúdo Athanor validado com sucesso.');
 } catch (error) {
   console.error('Falha na validação editorial:');
