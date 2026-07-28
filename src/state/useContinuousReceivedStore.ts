@@ -90,7 +90,8 @@ function persistenceLifecycle() {
   return {
     begin: runtime.begin,
     confirm: runtime.confirm,
-    fail: runtime.fail
+    fail: runtime.fail,
+    clear: runtime.clear
   };
 }
 
