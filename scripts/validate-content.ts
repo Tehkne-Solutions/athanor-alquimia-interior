@@ -37,6 +37,7 @@ try {
   await import('../src/content/validateContinuousReceivedHydrationGate');
   await import('../src/content/validateContinuousReceivedPersistenceCommit');
   await import('../src/content/validateContinuousReceivedPersistenceConflict');
+  await import('../src/content/validateContinuousReceivedExplicitRehydration');
   console.log('Conteúdo Athanor validado com sucesso.');
 } catch (error) {
   console.error('Falha na validação editorial:');

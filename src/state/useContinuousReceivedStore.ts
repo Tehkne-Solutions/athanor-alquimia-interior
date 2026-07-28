@@ -8,6 +8,11 @@ import {
   type ContinuousReceivedRegistry
 } from '../domain/continuousReceive';
 import type { ContinuousCollectionShareExport } from '../domain/continuousShare';
+import { idbStateStorage } from '../storage/idbStorage';
+import {
+  executeContinuousReceivedExplicitRehydration,
+  type ContinuousReceivedExplicitRehydrationResult
+} from './continuousReceivedExplicitRehydration';
 import {
   hydrateContinuousReceivedPersistedState
 } from './continuousReceivedHydration';
@@ -59,6 +64,8 @@ export interface MutateReceivedResult {
   message: string;
 }
 
+export type RefreshReceivedResult = ContinuousReceivedExplicitRehydrationResult;
+
 interface ContinuousReceivedStoreState {
   schemaVersion: number;
   registry: ContinuousReceivedRegistry;
@@ -66,6 +73,7 @@ interface ContinuousReceivedStoreState {
   archiveRecord: (recordId: string) => Promise<MutateReceivedResult>;
   reactivateRecord: (recordId: string) => Promise<MutateReceivedResult>;
   removeRecord: (recordId: string) => Promise<MutateReceivedResult>;
+  refreshAfterConflict: () => Promise<RefreshReceivedResult>;
   reset: () => Promise<MutateReceivedResult>;
 }
 
@@ -226,6 +234,23 @@ export const useContinuousReceivedStore = create<ContinuousReceivedStoreState>()
           changed: result.changed,
           message: confirmedMessage(result.message, execution.persistence === 'confirmed')
         };
+      },
+      refreshAfterConflict: async () => {
+        const hydrationRuntime = useContinuousReceivedHydrationRuntimeStore.getState();
+        const persistenceRuntime = useContinuousReceivedPersistenceRuntimeStore.getState();
+        return executeContinuousReceivedExplicitRehydration(
+          persistenceRuntime.status,
+          get().registry,
+          initialRegistry,
+          () => idbStateStorage.getItem(CONTINUOUS_RECEIVED_STORAGE_KEY),
+          (registry) => set({ registry }),
+          {
+            begin: hydrationRuntime.beginExplicitReread,
+            accept: hydrationRuntime.accept,
+            fail: hydrationRuntime.fail,
+            adoptPersistedValue: persistenceRuntime.hydrate
+          }
+        );
       },
       reset: async () => {
         const hydrationRuntime = useContinuousReceivedHydrationRuntimeStore.getState();

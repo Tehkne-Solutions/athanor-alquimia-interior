@@ -19,6 +19,7 @@ import './content/validateContinuousNumericLexeme';
 import './content/validateContinuousReceive';
 import './content/validateContinuousReceivedCatalogVersion';
 import './content/validateContinuousReceivedChronology';
+import './content/validateContinuousReceivedExplicitRehydration';
 import './content/validateContinuousReceivedFingerprintIntegrity';
 import './content/validateContinuousReceivedHydration';
 import './content/validateContinuousReceivedHydrationGate';
