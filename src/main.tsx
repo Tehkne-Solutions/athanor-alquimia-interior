@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { App } from './app/App';
 import { validateContent } from './content/validate';
+import './content/validateContinuousCatalogReference';
 import './content/validateContinuousCollection';
 import './content/validateContinuousConsistency';
 import './content/validateContinuousCycle';
