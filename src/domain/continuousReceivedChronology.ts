@@ -1,5 +1,6 @@
 import { continuousReceivedChronologyPolicy } from '../content/continuousReceivedChronology';
 import { isCanonicalContinuousUtcInstant } from './continuousExactTime';
+import { validateContinuousReceivedCatalogVersion } from './continuousReceivedCatalogVersion';
 import { validateContinuousReceivedFingerprintIntegrity } from './continuousReceivedFingerprintIntegrity';
 import type { ContinuousReceivedCollection, ContinuousReceivedRegistry } from './continuousReceive';
 
@@ -95,11 +96,16 @@ export function validateContinuousReceivedRegistryChronology(
     fingerprints.errors.forEach((error) => push(errors, error));
   }
 
+  const catalog = validateContinuousReceivedCatalogVersion(registry);
+  if (!catalog.ok) {
+    catalog.errors.forEach((error) => push(errors, error));
+  }
+
   return errors.length > 0
     ? { ok: false, errors }
     : {
       ok: true,
-      message: 'A cronologia local permanece UTC e monotônica, e cada impressão corresponde ao próprio pacote.'
+      message: 'A biblioteca permanece cronológica, cada impressão corresponde ao pacote e todos os registros usam o mesmo catálogo atual.'
     };
 }
 
