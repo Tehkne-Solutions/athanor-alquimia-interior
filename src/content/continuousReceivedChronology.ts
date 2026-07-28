@@ -1,4 +1,4 @@
-import type { BiblicalUnit, ContentRestriction } from '../domain/types';
+import type { BiblicalUnit } from '../domain/types';
 
 export const continuousReceivedChronologyBiblicalUnit: BiblicalUnit = {
   id: 'proverb_continuous_received_chronology_v1',
@@ -28,7 +28,7 @@ export const continuousReceivedChronologyPolicy = {
   maxReportedIssues: 20
 } as const;
 
-export const continuousReceivedChronologyRestrictions: ContentRestriction[] = [
+export const continuousReceivedChronologyRestrictions = [
   'createdAt, receivedAt, updatedAt e archivedAt precisam usar UTC canônico com milissegundos.',
   'updatedAt do registro nunca pode anteceder createdAt.',
   'receivedAt nunca pode anteceder a criação da biblioteca local.',
