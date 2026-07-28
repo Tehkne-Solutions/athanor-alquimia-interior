@@ -13,6 +13,7 @@ export interface ContinuousReceivedPersistenceLifecycle {
   begin: (operation: string) => void;
   confirm: (message: string) => void;
   fail: (error: unknown) => void;
+  clear: () => void;
 }
 
 export interface ContinuousReceivedPersistenceBlocked {
@@ -70,6 +71,7 @@ export async function executeContinuousReceivedConfirmedPersistence<
 
   const value = action();
   if (!value.changed) {
+    lifecycle.clear();
     return {
       executed: true,
       persistence: 'not-needed',
