@@ -6,6 +6,7 @@ interface ContinuousReceivedHydrationRuntimeState {
   status: ContinuousReceivedHydrationRuntimeStatus;
   message?: string;
   issues: string[];
+  beginExplicitReread: () => void;
   accept: (result: ContinuousReceivedHydrationResult) => void;
   fail: (error: unknown) => void;
   markEmpty: (message: string) => void;
@@ -20,6 +21,11 @@ export const useContinuousReceivedHydrationRuntimeStore = create<ContinuousRecei
   status: 'initial',
   message: 'A memória local da biblioteca recebida está sendo examinada.',
   issues: [],
+  beginExplicitReread: () => set({
+    status: 'initial',
+    message: 'A memória local mais recente está sendo relida por uma escolha explícita.',
+    issues: []
+  }),
   accept: (result) => set({
     status: result.status,
     message: result.message,
