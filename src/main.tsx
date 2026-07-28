@@ -20,6 +20,7 @@ import './content/validateContinuousReceive';
 import './content/validateContinuousReceivedCatalogVersion';
 import './content/validateContinuousReceivedChronology';
 import './content/validateContinuousReceivedFingerprintIntegrity';
+import './content/validateContinuousReceivedHydration';
 import './content/validateContinuousReceivedIdentity';
 import './content/validateContinuousReceivedSnapshot';
 import './content/validateContinuousReceivedStoreDelegation';
