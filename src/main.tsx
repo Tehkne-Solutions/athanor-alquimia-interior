@@ -17,6 +17,7 @@ import './content/validateContinuousInertJson';
 import './content/validateContinuousMap';
 import './content/validateContinuousNumericLexeme';
 import './content/validateContinuousReceive';
+import './content/validateContinuousReceivedChronology';
 import './content/validateContinuousReceivedIdentity';
 import './content/validateContinuousResource';
 import './content/validateContinuousResponse';
