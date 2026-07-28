@@ -92,8 +92,10 @@ describe('integridade da impressão armazenada', () => {
 
   it('recusa pacote que não pode ser medido deterministicamente', () => {
     const registry = registryWithOne();
-    const cyclic = registry.records[0].package as ContinuousCollectionShareExport & { cycle?: unknown };
-    cyclic.cycle = cyclic;
+    const collection = registry.records[0].package.collection as typeof registry.records[0]['package']['collection'] & {
+      cycle?: unknown;
+    };
+    collection.cycle = collection;
     const result = validateContinuousReceivedFingerprintIntegrity(registry);
     expect(result.ok).toBe(false);
     if (result.ok) return;
