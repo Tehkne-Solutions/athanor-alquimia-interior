@@ -23,6 +23,10 @@ export type ContinuousReceivedHydrationGateResult =
   | ContinuousReceivedHydrationGateReady
   | ContinuousReceivedHydrationGateBlocked;
 
+export type ContinuousReceivedHydrationExecution<T> =
+  | { executed: true; gate: ContinuousReceivedHydrationGateReady; value: T }
+  | { executed: false; gate: ContinuousReceivedHydrationGateBlocked };
+
 export function inspectContinuousReceivedHydrationGate(
   status: ContinuousReceivedHydrationRuntimeStatus
 ): ContinuousReceivedHydrationGateResult {
@@ -47,4 +51,13 @@ export function inspectContinuousReceivedHydrationGate(
     status: 'ready',
     message: 'A hidratação foi concluída e a biblioteca pode receber uma decisão explícita.'
   };
+}
+
+export function executeContinuousReceivedHydrationGatedAction<T>(
+  status: ContinuousReceivedHydrationRuntimeStatus,
+  action: () => T
+): ContinuousReceivedHydrationExecution<T> {
+  const gate = inspectContinuousReceivedHydrationGate(status);
+  if (!gate.ready) return { executed: false, gate };
+  return { executed: true, gate, value: action() };
 }
