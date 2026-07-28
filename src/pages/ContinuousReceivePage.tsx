@@ -14,18 +14,20 @@ import {
   continuousReceiveConsentSteps,
   continuousReceiveRestrictions
 } from '../content/continuousReceive';
+import { continuousReceivedStoreDelegationPolicy } from '../content/continuousReceivedStoreDelegation';
 import { continuousResourceCatalog } from '../content/continuousResource';
 import { continuousStrictContractCatalog } from '../content/continuousStrictContract';
 import { continuousTextVisibilityCatalog } from '../content/continuousTextVisibility';
 import { continuousUniqueKeysCatalog } from '../content/continuousUniqueKeys';
 import {
-  findReceivedByFingerprint,
+  findEquivalentReceivedCollection,
+  findReceivedAllByFingerprint,
   findReceivedCollection,
   type ContinuousReceiveSuccess
 } from '../domain/continuousReceive';
 import { parseContinuousCollectionShareWithConsistency } from '../domain/continuousReceiveConsistency';
 import { readContinuousJsonFile } from '../domain/continuousResource';
-import { useContinuousReceivedStore } from '../state/useContinuousReceivedStore';
+import { useContinuousReceivedStore, type MutateReceivedResult } from '../state/useContinuousReceivedStore';
 
 interface ReceiveConsent {
   file: boolean;
@@ -73,7 +75,13 @@ export function ContinuousReceivePage() {
     registry,
     selectedRecordId ?? registry.records[0]?.id ?? ''
   );
-  const duplicateRecord = candidate ? findReceivedByFingerprint(registry, candidate.fingerprint) : undefined;
+  const equivalentRecord = candidate
+    ? findEquivalentReceivedCollection(registry, candidate.package)
+    : undefined;
+  const fingerprintCandidates = candidate
+    ? findReceivedAllByFingerprint(registry, candidate.fingerprint)
+    : [];
+  const fingerprintCollision = Boolean(candidate && !equivalentRecord && fingerprintCandidates.length > 0);
   const ready = allConsentsChecked(consent);
 
   const resetCandidate = () => {
@@ -115,17 +123,39 @@ export function ContinuousReceivePage() {
       return;
     }
     const result = keepPackage(candidate.package);
+    if (result.status === 'invalid' || result.status === 'stale' || !result.id) {
+      setErrors([result.message]);
+      setMessage(undefined);
+      return;
+    }
     setSelectedRecordId(result.id);
-    setMessage(result.duplicate
-      ? 'Este mesmo conteúdo já estava guardado. A cópia existente foi aberta sem duplicação.'
-      : 'Cópia recebida guardada na biblioteca separada. Nenhuma jornada ou coleção própria foi alterada.');
+    setMessage(result.message);
     resetCandidate();
   };
 
+  const handleMutation = (result: MutateReceivedResult): boolean => {
+    if (result.status === 'updated' || result.status === 'unchanged') {
+      setErrors([]);
+      setMessage(result.message);
+      return true;
+    }
+    setMessage(undefined);
+    setErrors([result.message]);
+    return false;
+  };
+
+  const archive = (recordId: string) => {
+    handleMutation(archiveRecord(recordId));
+  };
+
+  const reactivate = (recordId: string) => {
+    handleMutation(reactivateRecord(recordId));
+  };
+
   const remove = (recordId: string) => {
-    removeRecord(recordId);
+    const result = removeRecord(recordId);
+    if (!handleMutation(result) || result.status !== 'updated') return;
     if (selectedRecordId === recordId || selectedRecord?.id === recordId) setSelectedRecordId(undefined);
-    setMessage('A cópia local foi removida. O arquivo externo e sua origem não foram alterados.');
   };
 
   return <div className="page page--continuous-receive">
@@ -151,6 +181,7 @@ export function ContinuousReceivePage() {
           <li>Campos extras: recusados · v{continuousStrictContractCatalog.version}</li>
           <li>Margens textuais: exatas · v{continuousExactTextCatalog.version}</li>
           <li>Tempo: {continuousExactTimeCatalog.format} · v{continuousExactTimeCatalog.version}</li>
+          <li>Fachada: decisões delegadas ao domínio · v{continuousReceivedStoreDelegationPolicy.version}</li>
           <li>Limite de arquivo: {continuousResourceCatalog.maxFileBytes / 1024} KiB</li>
         </ul>
         <div className="safety-summary"><ShieldCheck/><p>Selecionar ou descartar um arquivo não envia confirmação e não registra recusa.</p></div>
@@ -172,7 +203,8 @@ export function ContinuousReceivePage() {
     {candidate && <>
       <Card title="2. Prévia sanitizada" eyebrow={`${candidate.package.items.length} itens`}>
         <div className="continuous-receive-preview-heading"><Eye aria-hidden="true"/><div><strong>{candidate.package.collection.label}</strong><p>Modelo {candidate.package.collection.templateId} · estado {candidate.package.collection.status}</p></div></div>
-        {duplicateRecord && <p className="continuous-receive-warning">Uma cópia com o mesmo conteúdo já existe na biblioteca. Guardar novamente apenas abrirá o registro existente.</p>}
+        {equivalentRecord && <p className="continuous-receive-warning">Uma cópia canonicamente equivalente já existe. Guardar novamente abrirá o registro existente sem duplicação.</p>}
+        {fingerprintCollision && <p className="continuous-receive-warning">A impressão curta coincide com outra cópia, mas o conteúdo é diferente. O domínio preservará ambas separadamente.</p>}
         {candidate.package.items.length === 0 ? <p>A coleção recebida está vazia. Isso não representa ausência de valor ou conteúdo incompleto.</p> : <ol className="continuous-receive-items">
           {candidate.package.items.map((item) => <li key={`${item.position}-${item.kind}-${item.variantId}`}>
             <span>{item.position}</span>
@@ -219,8 +251,8 @@ export function ContinuousReceivePage() {
           <div className="continuous-receive-actions">
             <Button variant="secondary" onClick={() => navigate(`/temple/continuous-received/${selectedRecord.id}/respond`)}><MessageCircleReply size={17}/> Preparar resposta opcional</Button>
             {selectedRecord.status === 'active'
-              ? <Button variant="ghost" onClick={() => archiveRecord(selectedRecord.id)}><Archive size={17}/> Arquivar cópia</Button>
-              : <Button variant="secondary" onClick={() => reactivateRecord(selectedRecord.id)}><RotateCcw size={17}/> Reativar cópia</Button>}
+              ? <Button variant="ghost" onClick={() => archive(selectedRecord.id)}><Archive size={17}/> Arquivar cópia</Button>
+              : <Button variant="secondary" onClick={() => reactivate(selectedRecord.id)}><RotateCcw size={17}/> Reativar cópia</Button>}
             <Button variant="danger" onClick={() => remove(selectedRecord.id)}><Trash2 size={17}/> Remover cópia local</Button>
           </div>
         </article>}
