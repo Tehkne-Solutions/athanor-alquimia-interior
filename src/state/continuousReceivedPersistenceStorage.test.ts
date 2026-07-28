@@ -25,7 +25,7 @@ describe('storage explícito da biblioteca recebida', () => {
   });
 
   it('grava somente na chave oficial', async () => {
-    const setItem = vi.fn(async () => undefined);
+    const setItem = vi.fn(async (_name: string, _value: string): Promise<void> => undefined);
     const storage: StateStorage = {
       getItem: async () => null,
       setItem,
@@ -34,8 +34,9 @@ describe('storage explícito da biblioteca recebida', () => {
     const registry = createContinuousReceivedRegistry('1.0.0', t0);
     await writeContinuousReceivedPersistedRegistry(registry, storage);
     expect(setItem).toHaveBeenCalledTimes(1);
-    expect(setItem.mock.calls[0][0]).toBe(CONTINUOUS_RECEIVED_STORAGE_KEY);
-    expect(JSON.parse(setItem.mock.calls[0][1])).toEqual({
+    const [name, serialized] = setItem.mock.calls[0];
+    expect(name).toBe(CONTINUOUS_RECEIVED_STORAGE_KEY);
+    expect(JSON.parse(serialized)).toEqual({
       state: { schemaVersion: 1, registry },
       version: 0
     });
