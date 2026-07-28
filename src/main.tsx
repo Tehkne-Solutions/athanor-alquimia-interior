@@ -21,6 +21,7 @@ import './content/validateContinuousReceivedCatalogVersion';
 import './content/validateContinuousReceivedChronology';
 import './content/validateContinuousReceivedFingerprintIntegrity';
 import './content/validateContinuousReceivedHydration';
+import './content/validateContinuousReceivedHydrationGate';
 import './content/validateContinuousReceivedIdentity';
 import './content/validateContinuousReceivedSnapshot';
 import './content/validateContinuousReceivedStoreDelegation';

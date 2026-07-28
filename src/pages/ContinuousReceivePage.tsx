@@ -15,6 +15,7 @@ import {
   continuousReceiveRestrictions
 } from '../content/continuousReceive';
 import { continuousReceivedHydrationPolicy } from '../content/continuousReceivedHydration';
+import { continuousReceivedHydrationGatePolicy } from '../content/continuousReceivedHydrationGate';
 import { continuousReceivedStoreDelegationPolicy } from '../content/continuousReceivedStoreDelegation';
 import { continuousResourceCatalog } from '../content/continuousResource';
 import { continuousStrictContractCatalog } from '../content/continuousStrictContract';
@@ -28,6 +29,7 @@ import {
 } from '../domain/continuousReceive';
 import { parseContinuousCollectionShareWithConsistency } from '../domain/continuousReceiveConsistency';
 import { readContinuousJsonFile } from '../domain/continuousResource';
+import { useContinuousReceivedHydrationRuntimeStore } from '../state/useContinuousReceivedHydrationRuntimeStore';
 import { useContinuousReceivedStore, type MutateReceivedResult } from '../state/useContinuousReceivedStore';
 
 interface ReceiveConsent {
@@ -62,9 +64,9 @@ function itemTitle(kind: 'trail' | 'theme-cycle', startPoint: string): string {
 export function ContinuousReceivePage() {
   const navigate = useNavigate();
   const registry = useContinuousReceivedStore((state) => state.registry);
-  const hydrationStatus = useContinuousReceivedStore((state) => state.hydrationStatus);
-  const hydrationMessage = useContinuousReceivedStore((state) => state.hydrationMessage);
-  const hydrationIssues = useContinuousReceivedStore((state) => state.hydrationIssues);
+  const hydrationStatus = useContinuousReceivedHydrationRuntimeStore((state) => state.status);
+  const hydrationMessage = useContinuousReceivedHydrationRuntimeStore((state) => state.message);
+  const hydrationIssues = useContinuousReceivedHydrationRuntimeStore((state) => state.issues);
   const keepPackage = useContinuousReceivedStore((state) => state.keepPackage);
   const archiveRecord = useContinuousReceivedStore((state) => state.archiveRecord);
   const reactivateRecord = useContinuousReceivedStore((state) => state.reactivateRecord);
@@ -86,6 +88,7 @@ export function ContinuousReceivePage() {
     ? findReceivedAllByFingerprint(registry, candidate.fingerprint)
     : [];
   const fingerprintCollision = Boolean(candidate && !equivalentRecord && fingerprintCandidates.length > 0);
+  const hydrationBlocked = hydrationStatus === 'initial' || hydrationStatus === 'unavailable';
   const ready = allConsentsChecked(consent);
 
   const resetCandidate = () => {
@@ -100,6 +103,10 @@ export function ContinuousReceivePage() {
     setMessage(undefined);
     resetCandidate();
     if (!file) return;
+    if (hydrationBlocked) {
+      setErrors([hydrationMessage ?? 'A biblioteca local ainda não está disponível para receber ações.']);
+      return;
+    }
 
     const readResult = await readContinuousJsonFile(file);
     if (!readResult.ok) {
@@ -187,11 +194,23 @@ export function ContinuousReceivePage() {
           <li>Tempo: {continuousExactTimeCatalog.format} · v{continuousExactTimeCatalog.version}</li>
           <li>Fachada: decisões delegadas ao domínio · v{continuousReceivedStoreDelegationPolicy.version}</li>
           <li>Hidratação: memória persistida revalidada · v{continuousReceivedHydrationPolicy.version}</li>
+          <li>Ações: bloqueadas até a hidratação terminar · v{continuousReceivedHydrationGatePolicy.version}</li>
           <li>Limite de arquivo: {continuousResourceCatalog.maxFileBytes / 1024} KiB</li>
         </ul>
         <div className="safety-summary"><ShieldCheck/><p>Selecionar ou descartar um arquivo não envia confirmação e não registra recusa.</p></div>
       </Card>
     </div>
+
+    {hydrationStatus === 'initial' && <Card title="Examinando a memória local" eyebrow={`Portão v${continuousReceivedHydrationGatePolicy.version}`}>
+      <p>{hydrationMessage}</p>
+      <p>As ações permanecem desabilitadas e não serão enfileiradas ou repetidas automaticamente.</p>
+    </Card>}
+
+    {hydrationStatus === 'unavailable' && <Card title="Memória local indisponível" eyebrow={`Portão v${continuousReceivedHydrationGatePolicy.version}`}>
+      <p>{hydrationMessage}</p>
+      <p>A biblioteca provisória não será gravada por cima de um estado persistido que não pôde ser lido.</p>
+      {hydrationIssues.length > 0 && <ul className="continuous-receive-errors">{hydrationIssues.map((issue) => <li key={issue}>{issue}</li>)}</ul>}
+    </Card>}
 
     {hydrationStatus === 'rejected' && <Card title="Memória persistida recusada" eyebrow={`Hidratação v${continuousReceivedHydrationPolicy.version}`}>
       <p>{hydrationMessage}</p>
@@ -204,7 +223,7 @@ export function ContinuousReceivePage() {
         <label>
           <Upload aria-hidden="true"/>
           <span>Selecionar pacote JSON da Fase 8.7</span>
-          <input type="file" accept="application/json,.json" onChange={handleFile}/>
+          <input type="file" accept="application/json,.json" onChange={handleFile} disabled={hydrationBlocked}/>
         </label>
         <p>Tamanho e texto bruto são limitados primeiro. Depois, chaves únicas, medida numérica, JSON.parse, forma inerte, orçamento, texto visível, selo, versão, contrato estrito, margens exatas, tempo UTC canônico, schema e conteúdo curado são validados nessa ordem.</p>
       </div>
@@ -231,13 +250,13 @@ export function ContinuousReceivePage() {
           {continuousReceiveConsentSteps.map((step) => {
             const field = consentFieldByStep[step.id];
             return <label key={step.id}>
-              <input type="checkbox" checked={consent[field]} onChange={() => toggleConsent(field)}/>
+              <input type="checkbox" checked={consent[field]} onChange={() => toggleConsent(field)} disabled={hydrationBlocked}/>
               <span><strong>{step.label}</strong><small>{step.description}</small></span>
             </label>;
           })}
         </div>
         <div className="continuous-receive-actions">
-          <Button disabled={!ready} onClick={keep}><Inbox size={18}/> Guardar cópia recebida</Button>
+          <Button disabled={!ready || hydrationBlocked} onClick={keep}><Inbox size={18}/> Guardar cópia recebida</Button>
           <Button variant="ghost" onClick={() => { resetCandidate(); setMessage('A prévia foi descartada sem criar registro.'); }}>Descartar prévia</Button>
         </div>
       </Card>
@@ -262,9 +281,9 @@ export function ContinuousReceivePage() {
           <div className="continuous-receive-actions">
             <Button variant="secondary" onClick={() => navigate(`/temple/continuous-received/${selectedRecord.id}/respond`)}><MessageCircleReply size={17}/> Preparar resposta opcional</Button>
             {selectedRecord.status === 'active'
-              ? <Button variant="ghost" onClick={() => archive(selectedRecord.id)}><Archive size={17}/> Arquivar cópia</Button>
-              : <Button variant="secondary" onClick={() => reactivate(selectedRecord.id)}><RotateCcw size={17}/> Reativar cópia</Button>}
-            <Button variant="danger" onClick={() => remove(selectedRecord.id)}><Trash2 size={17}/> Remover cópia local</Button>
+              ? <Button variant="ghost" disabled={hydrationBlocked} onClick={() => archive(selectedRecord.id)}><Archive size={17}/> Arquivar cópia</Button>
+              : <Button variant="secondary" disabled={hydrationBlocked} onClick={() => reactivate(selectedRecord.id)}><RotateCcw size={17}/> Reativar cópia</Button>}
+            <Button variant="danger" disabled={hydrationBlocked} onClick={() => remove(selectedRecord.id)}><Trash2 size={17}/> Remover cópia local</Button>
           </div>
         </article>}
       </>}
