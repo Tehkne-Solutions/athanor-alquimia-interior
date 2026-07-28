@@ -22,7 +22,7 @@ const t3 = '2026-07-28T18:03:00.000Z';
 const t4 = '2026-07-28T18:04:00.000Z';
 
 function notices(includeUnlinked = false): string[] {
-  const value = [
+  const value: string[] = [
     ...continuousShareMandatoryNotices,
     continuousShareConditionalNotices.datesOmitted,
     continuousShareConditionalNotices.emptyCollection
