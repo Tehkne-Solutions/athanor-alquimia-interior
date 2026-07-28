@@ -44,7 +44,11 @@ describe('storage explícito da biblioteca recebida', () => {
   });
 
   it('envia referência esperada e próximo envelope ao compare-and-set', async () => {
-    const compareAndSet = vi.fn(async () => ({ status: 'written' as const }));
+    const compareAndSet = vi.fn(async (
+      _name: string,
+      _expectedValue: string | null,
+      _nextValue: string
+    ) => ({ status: 'written' as const }));
     const registry = createContinuousReceivedRegistry('1.0.0', t0);
     const result = await writeContinuousReceivedPersistedRegistryIfUnchanged(
       registry,
@@ -64,7 +68,11 @@ describe('storage explícito da biblioteca recebida', () => {
   });
 
   it('aceita referência nula para a primeira escrita após memória vazia', async () => {
-    const compareAndSet = vi.fn(async () => ({ status: 'written' as const }));
+    const compareAndSet = vi.fn(async (
+      _name: string,
+      _expectedValue: string | null,
+      _nextValue: string
+    ) => ({ status: 'written' as const }));
     await writeContinuousReceivedPersistedRegistryIfUnchanged(
       createContinuousReceivedRegistry('1.0.0', t0),
       null,
@@ -74,7 +82,11 @@ describe('storage explícito da biblioteca recebida', () => {
   });
 
   it('propaga conflito sem produzir envelope confirmado', async () => {
-    const compareAndSet = vi.fn(async () => ({ status: 'conflict' as const }));
+    const compareAndSet = vi.fn(async (
+      _name: string,
+      _expectedValue: string | null,
+      _nextValue: string
+    ) => ({ status: 'conflict' as const }));
     const result = await writeContinuousReceivedPersistedRegistryIfUnchanged(
       createContinuousReceivedRegistry('1.0.0', t0),
       'estado-antigo',
