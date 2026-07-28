@@ -18,6 +18,7 @@ import './content/validateContinuousMap';
 import './content/validateContinuousNumericLexeme';
 import './content/validateContinuousReceive';
 import './content/validateContinuousReceivedChronology';
+import './content/validateContinuousReceivedFingerprintIntegrity';
 import './content/validateContinuousReceivedIdentity';
 import './content/validateContinuousReceivedSnapshot';
 import './content/validateContinuousResource';

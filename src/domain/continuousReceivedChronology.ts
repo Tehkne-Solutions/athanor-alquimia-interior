@@ -1,5 +1,6 @@
 import { continuousReceivedChronologyPolicy } from '../content/continuousReceivedChronology';
 import { isCanonicalContinuousUtcInstant } from './continuousExactTime';
+import { validateContinuousReceivedFingerprintIntegrity } from './continuousReceivedFingerprintIntegrity';
 import type { ContinuousReceivedCollection, ContinuousReceivedRegistry } from './continuousReceive';
 
 export interface ContinuousReceivedChronologySuccess {
@@ -89,9 +90,17 @@ export function validateContinuousReceivedRegistryChronology(
     validateRecord(registry, record, index, errors, createdValid, updatedValid);
   });
 
+  const fingerprints = validateContinuousReceivedFingerprintIntegrity(registry);
+  if (!fingerprints.ok) {
+    fingerprints.errors.forEach((error) => push(errors, error));
+  }
+
   return errors.length > 0
     ? { ok: false, errors }
-    : { ok: true, message: 'A cronologia local permanece UTC, canônica e monotônica.' };
+    : {
+      ok: true,
+      message: 'A cronologia local permanece UTC e monotônica, e cada impressão corresponde ao próprio pacote.'
+    };
 }
 
 export function validateContinuousReceivedActionTime(
@@ -103,7 +112,7 @@ export function validateContinuousReceivedActionTime(
   if (!registryResult.ok) {
     return {
       status: 'invalid',
-      message: `A biblioteca local possui cronologia incoerente: ${registryResult.errors[0]}`
+      message: `A biblioteca local possui integridade incoerente: ${registryResult.errors[0]}`
     };
   }
   if (!isCanonicalContinuousUtcInstant(actionAt)) {
