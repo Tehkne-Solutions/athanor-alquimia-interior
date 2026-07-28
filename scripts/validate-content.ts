@@ -26,6 +26,7 @@ try {
   await import('../src/content/validateContinuousFieldCompatibility');
   await import('../src/content/validateContinuousCatalogReference');
   await import('../src/content/validateContinuousCanonicalNotice');
+  await import('../src/content/validateContinuousFingerprintEquivalence');
   console.log('Conteúdo Athanor validado com sucesso.');
 } catch (error) {
   console.error('Falha na validação editorial:');

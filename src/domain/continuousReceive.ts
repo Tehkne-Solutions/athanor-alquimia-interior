@@ -1,10 +1,16 @@
 import type { ContinuousMapItemKind, ContinuousMapStatus } from './continuousMap';
 import type { NewWorkStartPoint } from './continuousJourney';
+import {
+  areContinuousSharePackagesEquivalent,
+  fingerprintContinuousSharePackage
+} from './continuousFingerprintEquivalence';
 import type {
   ContinuousCollectionShareExport,
   ContinuousShareItem,
   ContinuousShareOptions
 } from './continuousShare';
+
+export { fingerprintContinuousSharePackage } from './continuousFingerprintEquivalence';
 
 export type ContinuousReceivedStatus = 'active' | 'archived';
 
@@ -131,28 +137,6 @@ function parseShareItem(
   };
 }
 
-function fingerprintPayload(value: ContinuousCollectionShareExport): string {
-  return JSON.stringify({
-    schema: value.schema,
-    policy: value.policy,
-    catalogVersion: value.catalogVersion,
-    provenance: value.provenance,
-    collection: value.collection,
-    options: value.options,
-    items: value.items
-  });
-}
-
-export function fingerprintContinuousSharePackage(value: ContinuousCollectionShareExport): string {
-  const input = fingerprintPayload(value);
-  let hash = 2166136261;
-  for (let index = 0; index < input.length; index += 1) {
-    hash ^= input.charCodeAt(index);
-    hash = Math.imul(hash, 16777619);
-  }
-  return `received-${(hash >>> 0).toString(16).padStart(8, '0')}`;
-}
-
 export function parseContinuousCollectionShare(input: unknown): ContinuousReceiveResult {
   if (!isRecord(input)) return { ok: false, errors: ['Arquivo JSON inválido.'] };
   const errors: string[] = [];
@@ -258,11 +242,27 @@ export function findReceivedCollection(
   return registry.records.find((record) => record.id === recordId);
 }
 
+export function findReceivedAllByFingerprint(
+  registry: ContinuousReceivedRegistry,
+  fingerprint: string
+): ContinuousReceivedCollection[] {
+  return registry.records.filter((record) => record.fingerprint === fingerprint);
+}
+
 export function findReceivedByFingerprint(
   registry: ContinuousReceivedRegistry,
   fingerprint: string
 ): ContinuousReceivedCollection | undefined {
-  return registry.records.find((record) => record.fingerprint === fingerprint);
+  return findReceivedAllByFingerprint(registry, fingerprint)[0];
+}
+
+export function findEquivalentReceivedCollection(
+  registry: ContinuousReceivedRegistry,
+  packageValue: ContinuousCollectionShareExport
+): ContinuousReceivedCollection | undefined {
+  const fingerprint = fingerprintContinuousSharePackage(packageValue);
+  return findReceivedAllByFingerprint(registry, fingerprint)
+    .find((record) => areContinuousSharePackagesEquivalent(record.package, packageValue));
 }
 
 export function keepReceivedCollection(
@@ -272,7 +272,7 @@ export function keepReceivedCollection(
 ): ContinuousReceivedRegistry {
   if (!input.id || !receivedAt) return registry;
   const fingerprint = fingerprintContinuousSharePackage(input.package);
-  if (findReceivedByFingerprint(registry, fingerprint)) return registry;
+  if (findEquivalentReceivedCollection(registry, input.package)) return registry;
   const record: ContinuousReceivedCollection = {
     id: input.id,
     fingerprint,
