@@ -14,6 +14,7 @@ import {
   continuousReceiveConsentSteps,
   continuousReceiveRestrictions
 } from '../content/continuousReceive';
+import { continuousReceivedHydrationPolicy } from '../content/continuousReceivedHydration';
 import { continuousReceivedStoreDelegationPolicy } from '../content/continuousReceivedStoreDelegation';
 import { continuousResourceCatalog } from '../content/continuousResource';
 import { continuousStrictContractCatalog } from '../content/continuousStrictContract';
@@ -61,6 +62,9 @@ function itemTitle(kind: 'trail' | 'theme-cycle', startPoint: string): string {
 export function ContinuousReceivePage() {
   const navigate = useNavigate();
   const registry = useContinuousReceivedStore((state) => state.registry);
+  const hydrationStatus = useContinuousReceivedStore((state) => state.hydrationStatus);
+  const hydrationMessage = useContinuousReceivedStore((state) => state.hydrationMessage);
+  const hydrationIssues = useContinuousReceivedStore((state) => state.hydrationIssues);
   const keepPackage = useContinuousReceivedStore((state) => state.keepPackage);
   const archiveRecord = useContinuousReceivedStore((state) => state.archiveRecord);
   const reactivateRecord = useContinuousReceivedStore((state) => state.reactivateRecord);
@@ -182,11 +186,18 @@ export function ContinuousReceivePage() {
           <li>Margens textuais: exatas · v{continuousExactTextCatalog.version}</li>
           <li>Tempo: {continuousExactTimeCatalog.format} · v{continuousExactTimeCatalog.version}</li>
           <li>Fachada: decisões delegadas ao domínio · v{continuousReceivedStoreDelegationPolicy.version}</li>
+          <li>Hidratação: memória persistida revalidada · v{continuousReceivedHydrationPolicy.version}</li>
           <li>Limite de arquivo: {continuousResourceCatalog.maxFileBytes / 1024} KiB</li>
         </ul>
         <div className="safety-summary"><ShieldCheck/><p>Selecionar ou descartar um arquivo não envia confirmação e não registra recusa.</p></div>
       </Card>
     </div>
+
+    {hydrationStatus === 'rejected' && <Card title="Memória persistida recusada" eyebrow={`Hidratação v${continuousReceivedHydrationPolicy.version}`}>
+      <p>{hydrationMessage}</p>
+      <p>A biblioteca nova desta sessão foi preservada. Os bytes anteriores continuam na IndexedDB e não foram apagados, corrigidos ou migrados automaticamente.</p>
+      {hydrationIssues.length > 0 && <ul className="continuous-receive-errors">{hydrationIssues.map((issue) => <li key={issue}>{issue}</li>)}</ul>}
+    </Card>}
 
     <Card title="1. Selecionar arquivo recebido" eyebrow="Leitura exclusivamente local">
       <div className="continuous-receive-upload">
