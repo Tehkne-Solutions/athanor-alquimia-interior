@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import { continuousResponseGestures } from '../content/continuousResponse';
+import { canonicalResponseNotices, canonicalShareNotices } from './continuousCanonicalNotice.testFixtures';
 import type { ContinuousCollection } from './continuousCollection';
 import { attachContinuousConsistency } from './continuousConsistency';
 import { validateContinuousInertJson } from './continuousInertJson';
@@ -31,7 +32,7 @@ function sharePayload() {
     },
     options: { includeDates: false },
     items: [],
-    notices: ['Coleção vazia preservada.']
+    notices: canonicalShareNotices(false, 0)
   };
 }
 
@@ -64,7 +65,7 @@ function responsePayload() {
       deliveryTracked: false,
       recipientStored: false
     },
-    notices: ['Nenhuma resposta adicional é necessária.']
+    notices: canonicalResponseNotices(0)
   };
 }
 
