@@ -23,6 +23,7 @@ import './content/validateContinuousReceivedFingerprintIntegrity';
 import './content/validateContinuousReceivedHydration';
 import './content/validateContinuousReceivedHydrationGate';
 import './content/validateContinuousReceivedIdentity';
+import './content/validateContinuousReceivedPersistenceCommit';
 import './content/validateContinuousReceivedSnapshot';
 import './content/validateContinuousReceivedStoreDelegation';
 import './content/validateContinuousResource';
