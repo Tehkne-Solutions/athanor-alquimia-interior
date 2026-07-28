@@ -11,6 +11,10 @@ import {
   validateContinuousReceivedRegistryChronology
 } from './continuousReceivedChronology';
 import {
+  validateContinuousIncomingReceivedCatalogVersion,
+  validateContinuousReceivedCatalogVersion
+} from './continuousReceivedCatalogVersion';
+import {
   cloneContinuousReceivedPackage,
   cloneContinuousReceivedRecord
 } from './continuousReceivedSnapshot';
@@ -22,6 +26,7 @@ import type {
 
 export { fingerprintContinuousSharePackage } from './continuousFingerprintEquivalence';
 export { validateContinuousReceivedRegistryChronology } from './continuousReceivedChronology';
+export { validateContinuousReceivedCatalogVersion } from './continuousReceivedCatalogVersion';
 export {
   cloneContinuousReceivedPackage,
   cloneContinuousReceivedRecord,
@@ -281,13 +286,18 @@ export function createContinuousReceivedRegistry(
   if (!isCanonicalContinuousUtcInstant(createdAt)) {
     throw new RangeError('A criação da biblioteca exige instante UTC canônico YYYY-MM-DDTHH:mm:ss.sssZ.');
   }
-  return {
+  const registry: ContinuousReceivedRegistry = {
     id: 'continuous_received_registry_v1',
     catalogVersion,
     records: [],
     createdAt,
     updatedAt: createdAt
   };
+  const catalog = validateContinuousReceivedCatalogVersion(registry);
+  if (!catalog.ok) {
+    throw new RangeError(`A criação da biblioteca exige o catálogo atual reconhecido: ${catalog.errors[0]}`);
+  }
+  return registry;
 }
 
 function findStoredAllById(
@@ -401,6 +411,16 @@ export function keepReceivedCollectionWithIdentity(
 
   const invalidTime = invalidKeepTime(registry, input.id, receivedAt);
   if (invalidTime) return invalidTime;
+
+  const incomingCatalog = validateContinuousIncomingReceivedCatalogVersion(registry, input.package);
+  if (!incomingCatalog.ok) {
+    return {
+      registry,
+      status: 'invalid',
+      requestedId: input.id,
+      message: `O pacote recebido não pode entrar nesta biblioteca: ${incomingCatalog.errors[0]}`
+    };
+  }
 
   const detachedPackage = cloneContinuousReceivedPackage(input.package);
   const equivalent = findStoredEquivalentReceivedCollection(registry, detachedPackage);
