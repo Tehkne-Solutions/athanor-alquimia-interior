@@ -14,8 +14,8 @@ const generatedAt = '2026-07-27T15:00:00.000Z';
 
 function mapItem(overrides: Partial<ContinuousMapItem> = {}): ContinuousMapItem {
   return {
-    id: 'trail-private-id',
-    kind: 'trail',
+    id: 'cycle-private-id',
+    kind: 'theme-cycle',
     sourceTrailId: 'source-trail-private-id',
     sourceCycleInstanceId: 'source-cycle-private-id',
     startPoint: 'spirit',
@@ -87,7 +87,7 @@ describe('partilha consentida de coleções', () => {
     if (!result.ok) return;
     const serialized = JSON.stringify(result.export);
     expect(serialized).not.toContain('collection-private-id');
-    expect(serialized).not.toContain('trail-private-id');
+    expect(serialized).not.toContain('cycle-private-id');
     expect(serialized).not.toContain('source-trail-private-id');
     expect(serialized).not.toContain('source-cycle-private-id');
     expect(serialized).not.toMatch(/local-map|imported-map/);
@@ -109,7 +109,7 @@ describe('partilha consentida de coleções', () => {
   it('preserva ordem sem criar ranking ou pontuação', () => {
     const preview = buildContinuousSharePreview(collection([
       mapItem(),
-      mapItem({ id: 'cycle-2', kind: 'theme-cycle', variantId: 'spirit-v2' })
+      mapItem({ id: 'cycle-2', variantId: 'spirit-v2' })
     ]), { includeDates: false });
     expect(preview.items.map((item) => item.position)).toEqual([1, 2]);
     expect(JSON.stringify(preview)).not.toMatch(/score|rank|reward|streak|importance/i);
