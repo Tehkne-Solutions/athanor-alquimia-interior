@@ -29,6 +29,7 @@ try {
   await import('../src/content/validateContinuousFingerprintEquivalence');
   await import('../src/content/validateContinuousReceivedIdentity');
   await import('../src/content/validateContinuousReceivedChronology');
+  await import('../src/content/validateContinuousReceivedSnapshot');
   console.log('Conteúdo Athanor validado com sucesso.');
 } catch (error) {
   console.error('Falha na validação editorial:');

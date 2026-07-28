@@ -10,6 +10,10 @@ import {
   validateContinuousReceivedActionTime,
   validateContinuousReceivedRegistryChronology
 } from './continuousReceivedChronology';
+import {
+  cloneContinuousReceivedPackage,
+  cloneContinuousReceivedRecord
+} from './continuousReceivedSnapshot';
 import type {
   ContinuousCollectionShareExport,
   ContinuousShareItem,
@@ -18,6 +22,11 @@ import type {
 
 export { fingerprintContinuousSharePackage } from './continuousFingerprintEquivalence';
 export { validateContinuousReceivedRegistryChronology } from './continuousReceivedChronology';
+export {
+  cloneContinuousReceivedPackage,
+  cloneContinuousReceivedRecord,
+  cloneContinuousReceivedRegistry
+} from './continuousReceivedSnapshot';
 
 export type ContinuousReceivedStatus = 'active' | 'archived';
 
@@ -281,42 +290,65 @@ export function createContinuousReceivedRegistry(
   };
 }
 
-export function findReceivedAllById(
+function findStoredAllById(
   registry: ContinuousReceivedRegistry,
   recordId: string
 ): ContinuousReceivedCollection[] {
   return registry.records.filter((record) => record.id === recordId);
 }
 
-export function findReceivedCollection(
-  registry: ContinuousReceivedRegistry,
-  recordId: string
-): ContinuousReceivedCollection | undefined {
-  const matches = findReceivedAllById(registry, recordId);
-  return matches.length === 1 ? matches[0] : undefined;
-}
-
-export function findReceivedAllByFingerprint(
+function findStoredAllByFingerprint(
   registry: ContinuousReceivedRegistry,
   fingerprint: string
 ): ContinuousReceivedCollection[] {
   return registry.records.filter((record) => record.fingerprint === fingerprint);
 }
 
+function findStoredEquivalentReceivedCollection(
+  registry: ContinuousReceivedRegistry,
+  packageValue: ContinuousCollectionShareExport
+): ContinuousReceivedCollection | undefined {
+  const fingerprint = fingerprintContinuousSharePackage(packageValue);
+  return findStoredAllByFingerprint(registry, fingerprint)
+    .find((record) => areContinuousSharePackagesEquivalent(record.package, packageValue));
+}
+
+export function findReceivedAllById(
+  registry: ContinuousReceivedRegistry,
+  recordId: string
+): ContinuousReceivedCollection[] {
+  return findStoredAllById(registry, recordId).map(cloneContinuousReceivedRecord);
+}
+
+export function findReceivedCollection(
+  registry: ContinuousReceivedRegistry,
+  recordId: string
+): ContinuousReceivedCollection | undefined {
+  const matches = findStoredAllById(registry, recordId);
+  return matches.length === 1 ? cloneContinuousReceivedRecord(matches[0]) : undefined;
+}
+
+export function findReceivedAllByFingerprint(
+  registry: ContinuousReceivedRegistry,
+  fingerprint: string
+): ContinuousReceivedCollection[] {
+  return findStoredAllByFingerprint(registry, fingerprint).map(cloneContinuousReceivedRecord);
+}
+
 export function findReceivedByFingerprint(
   registry: ContinuousReceivedRegistry,
   fingerprint: string
 ): ContinuousReceivedCollection | undefined {
-  return findReceivedAllByFingerprint(registry, fingerprint)[0];
+  const match = findStoredAllByFingerprint(registry, fingerprint)[0];
+  return match ? cloneContinuousReceivedRecord(match) : undefined;
 }
 
 export function findEquivalentReceivedCollection(
   registry: ContinuousReceivedRegistry,
   packageValue: ContinuousCollectionShareExport
 ): ContinuousReceivedCollection | undefined {
-  const fingerprint = fingerprintContinuousSharePackage(packageValue);
-  return findReceivedAllByFingerprint(registry, fingerprint)
-    .find((record) => areContinuousSharePackagesEquivalent(record.package, packageValue));
+  const match = findStoredEquivalentReceivedCollection(registry, packageValue);
+  return match ? cloneContinuousReceivedRecord(match) : undefined;
 }
 
 export function allocateContinuousReceivedRecordId(
@@ -324,7 +356,7 @@ export function allocateContinuousReceivedRecordId(
   requestedId: string
 ): string | undefined {
   if (!requestedId) return undefined;
-  if (findReceivedAllById(registry, requestedId).length === 0) return requestedId;
+  if (findStoredAllById(registry, requestedId).length === 0) return requestedId;
 
   for (
     let suffix = continuousReceivedIdentityPolicy.firstSuffix;
@@ -332,24 +364,10 @@ export function allocateContinuousReceivedRecordId(
     suffix += 1
   ) {
     const candidate = `${requestedId}${continuousReceivedIdentityPolicy.separator}${suffix}`;
-    if (findReceivedAllById(registry, candidate).length === 0) return candidate;
+    if (findStoredAllById(registry, candidate).length === 0) return candidate;
   }
 
   return undefined;
-}
-
-function cloneReceivedPackage(packageValue: ContinuousCollectionShareExport): ContinuousCollectionShareExport {
-  return {
-    ...packageValue,
-    provenance: { ...packageValue.provenance },
-    collection: { ...packageValue.collection },
-    options: { ...packageValue.options },
-    items: packageValue.items.map((item) => ({
-      ...item,
-      passageSummary: { ...item.passageSummary }
-    })),
-    notices: [...packageValue.notices]
-  };
 }
 
 function invalidKeepTime(
@@ -384,14 +402,15 @@ export function keepReceivedCollectionWithIdentity(
   const invalidTime = invalidKeepTime(registry, input.id, receivedAt);
   if (invalidTime) return invalidTime;
 
-  const equivalent = findEquivalentReceivedCollection(registry, input.package);
+  const detachedPackage = cloneContinuousReceivedPackage(input.package);
+  const equivalent = findStoredEquivalentReceivedCollection(registry, detachedPackage);
   if (equivalent) {
     return {
       registry,
       status: 'equivalent',
       requestedId: input.id,
       storedId: equivalent.id,
-      record: equivalent,
+      record: cloneContinuousReceivedRecord(equivalent),
       message: 'A cópia equivalente já existe e foi preservada sem duplicação.'
     };
   }
@@ -406,19 +425,23 @@ export function keepReceivedCollectionWithIdentity(
     };
   }
 
-  const record: ContinuousReceivedCollection = {
+  const storedRecord: ContinuousReceivedCollection = {
     id: storedId,
-    fingerprint: fingerprintContinuousSharePackage(input.package),
+    fingerprint: fingerprintContinuousSharePackage(detachedPackage),
     status: 'active',
-    package: cloneReceivedPackage(input.package),
+    package: detachedPackage,
     receivedAt,
     updatedAt: receivedAt
   };
   const nextRegistry: ContinuousReceivedRegistry = {
     ...registry,
-    records: [...registry.records, record],
+    records: [
+      ...registry.records.map(cloneContinuousReceivedRecord),
+      storedRecord
+    ],
     updatedAt: receivedAt
   };
+  const returnedRecord = cloneContinuousReceivedRecord(storedRecord);
 
   if (storedId === input.id) {
     return {
@@ -426,7 +449,7 @@ export function keepReceivedCollectionWithIdentity(
       status: 'kept',
       requestedId: input.id,
       storedId,
-      record,
+      record: returnedRecord,
       message: 'A cópia foi guardada com o identificador local solicitado.'
     };
   }
@@ -436,7 +459,7 @@ export function keepReceivedCollectionWithIdentity(
     status: 'disambiguated',
     requestedId: input.id,
     storedId,
-    record,
+    record: returnedRecord,
     message: `O identificador local já existia; a cópia foi preservada como ${storedId}.`
   };
 }
@@ -486,7 +509,7 @@ function mutateReceivedCollectionWithIdentity(
   const registryTime = timeMutationFailure(registry, recordId, 0, updatedAt);
   if (registryTime?.status === 'invalid') return registryTime;
 
-  const matches = findReceivedAllById(registry, recordId);
+  const matches = findStoredAllById(registry, recordId);
   if (matches.length === 0) {
     return {
       registry,
@@ -524,7 +547,9 @@ function mutateReceivedCollectionWithIdentity(
   return {
     registry: {
       ...registry,
-      records: registry.records.map((record) => record === current ? updated : record),
+      records: registry.records.map((record) => record === current
+        ? cloneContinuousReceivedRecord(updated)
+        : cloneContinuousReceivedRecord(record)),
       updatedAt
     },
     status: 'updated',
@@ -605,7 +630,7 @@ export function removeReceivedCollectionWithIdentity(
     };
   }
 
-  const matches = findReceivedAllById(registry, recordId);
+  const matches = findStoredAllById(registry, recordId);
   if (matches.length === 0) {
     return {
       registry,
@@ -632,7 +657,9 @@ export function removeReceivedCollectionWithIdentity(
   return {
     registry: {
       ...registry,
-      records: registry.records.filter((record) => record !== target),
+      records: registry.records
+        .filter((record) => record !== target)
+        .map(cloneContinuousReceivedRecord),
       updatedAt
     },
     status: 'updated',
