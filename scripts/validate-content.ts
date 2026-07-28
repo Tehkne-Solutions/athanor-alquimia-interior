@@ -32,6 +32,7 @@ try {
   await import('../src/content/validateContinuousReceivedSnapshot');
   await import('../src/content/validateContinuousReceivedFingerprintIntegrity');
   await import('../src/content/validateContinuousReceivedCatalogVersion');
+  await import('../src/content/validateContinuousReceivedStoreDelegation');
   console.log('Conteúdo Athanor validado com sucesso.');
 } catch (error) {
   console.error('Falha na validação editorial:');
