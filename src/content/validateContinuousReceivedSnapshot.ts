@@ -44,7 +44,7 @@ z.array(z.string().min(1)).min(12).parse(continuousReceivedSnapshotRestrictions)
 if (!continuousReceivedSnapshotRestrictions.some((restriction) => /não compartilha/i.test(restriction))) {
   throw new Error('A Fase 8.28 precisa proibir referências compartilhadas entre entrada e biblioteca.');
 }
-if (!continuousReceivedSnapshotRestrictions.some((restriction) => /preserva exatamente/i.test(restriction))) {
+if (!continuousReceivedSnapshotRestrictions.some((restriction) => /preservam? exatamente/i.test(restriction))) {
   throw new Error('A Fase 8.28 precisa manter a mesma instância da biblioteca quando uma operação é recusada.');
 }
 if (!continuousReceivedSnapshotRestrictions.some((restriction) => /não comprova autoria/i.test(restriction))) {
