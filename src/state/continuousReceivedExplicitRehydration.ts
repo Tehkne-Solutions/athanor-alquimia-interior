@@ -95,7 +95,7 @@ export async function executeContinuousReceivedExplicitRehydration(
   persistenceStatus: ContinuousReceivedPersistenceRuntimeStatus,
   current: ContinuousReceivedRegistry,
   createEmpty: () => ContinuousReceivedRegistry,
-  readPersistedValue: () => Promise<string | null>,
+  readPersistedValue: () => string | null | Promise<string | null>,
   apply: (registry: ContinuousReceivedRegistry) => void,
   lifecycle: ContinuousReceivedExplicitRehydrationLifecycle
 ): Promise<ContinuousReceivedExplicitRehydrationResult> {
