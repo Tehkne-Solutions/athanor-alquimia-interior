@@ -10,6 +10,10 @@ import {
 import type { ContinuousCollectionShareExport } from '../domain/continuousShare';
 import { idbStateStorage } from '../storage/idbStorage';
 import {
+  hydrateContinuousReceivedPersistedState,
+  type ContinuousReceivedHydrationStatus
+} from './continuousReceivedHydration';
+import {
   archiveContinuousReceivedRecordFromStore,
   keepContinuousReceivedPackageFromStore,
   reactivateContinuousReceivedRecordFromStore,
@@ -36,6 +40,9 @@ export interface MutateReceivedResult {
 interface ContinuousReceivedStoreState {
   schemaVersion: number;
   registry: ContinuousReceivedRegistry;
+  hydrationStatus: ContinuousReceivedHydrationStatus | 'initial';
+  hydrationMessage?: string;
+  hydrationIssues: string[];
   keepPackage: (value: ContinuousCollectionShareExport) => KeepReceivedResult;
   archiveRecord: (recordId: string) => MutateReceivedResult;
   reactivateRecord: (recordId: string) => MutateReceivedResult;
@@ -50,6 +57,9 @@ export const useContinuousReceivedStore = create<ContinuousReceivedStoreState>()
     (set, get) => ({
       schemaVersion: 1,
       registry: initialRegistry(),
+      hydrationStatus: 'initial',
+      hydrationMessage: undefined,
+      hydrationIssues: [],
       keepPackage: (value) => {
         const current = get().registry;
         const result = keepContinuousReceivedPackageFromStore(
@@ -100,12 +110,31 @@ export const useContinuousReceivedStore = create<ContinuousReceivedStoreState>()
           message: result.message
         };
       },
-      reset: () => set({ registry: initialRegistry() })
+      reset: () => set({
+        registry: initialRegistry(),
+        hydrationStatus: 'empty',
+        hydrationMessage: 'A biblioteca recebida foi reiniciada localmente.',
+        hydrationIssues: []
+      })
     }),
     {
       name: 'athanor-continuous-received-state',
       storage: createJSONStorage(() => idbStateStorage),
-      partialize: (state) => ({ schemaVersion: state.schemaVersion, registry: state.registry })
+      partialize: (state) => ({ schemaVersion: state.schemaVersion, registry: state.registry }),
+      merge: (persistedState, currentState) => {
+        const hydration = hydrateContinuousReceivedPersistedState(
+          persistedState,
+          currentState.registry
+        );
+        return {
+          ...currentState,
+          schemaVersion: hydration.schemaVersion,
+          registry: hydration.registry,
+          hydrationStatus: hydration.status,
+          hydrationMessage: hydration.message,
+          hydrationIssues: hydration.issues
+        };
+      }
     }
   )
 );
