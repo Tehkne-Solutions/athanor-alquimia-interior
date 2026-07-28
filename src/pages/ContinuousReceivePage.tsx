@@ -17,6 +17,7 @@ import {
 import { continuousReceivedHydrationPolicy } from '../content/continuousReceivedHydration';
 import { continuousReceivedHydrationGatePolicy } from '../content/continuousReceivedHydrationGate';
 import { continuousReceivedPersistenceCommitPolicy } from '../content/continuousReceivedPersistenceCommit';
+import { continuousReceivedPersistenceConflictPolicy } from '../content/continuousReceivedPersistenceConflict';
 import { continuousReceivedStoreDelegationPolicy } from '../content/continuousReceivedStoreDelegation';
 import { continuousResourceCatalog } from '../content/continuousResource';
 import { continuousStrictContractCatalog } from '../content/continuousStrictContract';
@@ -94,7 +95,9 @@ export function ContinuousReceivePage() {
     : [];
   const fingerprintCollision = Boolean(candidate && !equivalentRecord && fingerprintCandidates.length > 0);
   const hydrationBlocked = hydrationStatus === 'initial' || hydrationStatus === 'unavailable';
-  const persistenceBlocked = persistenceStatus === 'writing';
+  const persistenceWriting = persistenceStatus === 'writing';
+  const persistenceConflict = persistenceStatus === 'conflict';
+  const persistenceBlocked = persistenceWriting || persistenceConflict;
   const actionsBlocked = hydrationBlocked || persistenceBlocked;
   const ready = allConsentsChecked(consent);
 
@@ -204,6 +207,7 @@ export function ContinuousReceivePage() {
           <li>Hidratação: memória persistida revalidada · v{continuousReceivedHydrationPolicy.version}</li>
           <li>Ações: bloqueadas até a hidratação terminar · v{continuousReceivedHydrationGatePolicy.version}</li>
           <li>Escrita: confirmação IndexedDB antes do runtime · v{continuousReceivedPersistenceCommitPolicy.version}</li>
+          <li>Concorrência: compare-and-set atômico · v{continuousReceivedPersistenceConflictPolicy.version}</li>
           <li>Limite de arquivo: {continuousResourceCatalog.maxFileBytes / 1024} KiB</li>
         </ul>
         <div className="safety-summary"><ShieldCheck/><p>Selecionar ou descartar um arquivo não envia confirmação e não registra recusa.</p></div>
@@ -227,7 +231,7 @@ export function ContinuousReceivePage() {
       {hydrationIssues.length > 0 && <ul className="continuous-receive-errors">{hydrationIssues.map((issue) => <li key={issue}>{issue}</li>)}</ul>}
     </Card>}
 
-    {persistenceStatus === 'writing' && <Card title="Gravando a alteração local" eyebrow={`Escrita v${continuousReceivedPersistenceCommitPolicy.version}`}>
+    {persistenceWriting && <Card title="Conferindo e gravando a alteração local" eyebrow={`Escrita v${continuousReceivedPersistenceCommitPolicy.version}`}>
       <p>{persistenceMessage}</p>
       <p>Outras mutações permanecem bloqueadas e não serão enfileiradas.</p>
     </Card>}
@@ -235,6 +239,12 @@ export function ContinuousReceivePage() {
     {persistenceStatus === 'failed' && <Card title="Gravação local não confirmada" eyebrow={`Escrita v${continuousReceivedPersistenceCommitPolicy.version}`}>
       <p>{persistenceMessage}</p>
       <p>A biblioteca ativa anterior permanece intacta. A ação pode ser decidida novamente de forma explícita.</p>
+      {persistenceIssues.length > 0 && <ul className="continuous-receive-errors">{persistenceIssues.map((issue) => <li key={issue}>{issue}</li>)}</ul>}
+    </Card>}
+
+    {persistenceConflict && <Card title="Memória alterada em outra aba" eyebrow={`Concorrência v${continuousReceivedPersistenceConflictPolicy.version}`}>
+      <p>{persistenceMessage}</p>
+      <p>Nenhuma versão foi escolhida, sobrescrita ou mesclada. Recarregue a página para examinar a memória mais recente antes de decidir novamente.</p>
       {persistenceIssues.length > 0 && <ul className="continuous-receive-errors">{persistenceIssues.map((issue) => <li key={issue}>{issue}</li>)}</ul>}
     </Card>}
 
@@ -276,8 +286,8 @@ export function ContinuousReceivePage() {
           })}
         </div>
         <div className="continuous-receive-actions">
-          <Button disabled={!ready || actionsBlocked} onClick={keep}><Inbox size={18}/> {persistenceBlocked ? 'Gravando…' : 'Guardar cópia recebida'}</Button>
-          <Button variant="ghost" disabled={persistenceBlocked} onClick={() => { resetCandidate(); setMessage('A prévia foi descartada sem criar registro.'); }}>Descartar prévia</Button>
+          <Button disabled={!ready || actionsBlocked} onClick={keep}><Inbox size={18}/> {persistenceWriting ? 'Gravando…' : 'Guardar cópia recebida'}</Button>
+          <Button variant="ghost" disabled={persistenceWriting} onClick={() => { resetCandidate(); setMessage('A prévia foi descartada sem criar registro.'); }}>Descartar prévia</Button>
         </div>
       </Card>
     </>}

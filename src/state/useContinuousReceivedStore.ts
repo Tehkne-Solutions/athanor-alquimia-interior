@@ -22,7 +22,7 @@ import {
 import {
   continuousReceivedHydrationOnlyStorage,
   CONTINUOUS_RECEIVED_STORAGE_KEY,
-  writeContinuousReceivedPersistedRegistry
+  writeContinuousReceivedPersistedRegistryIfUnchanged
 } from './continuousReceivedPersistenceStorage';
 import {
   archiveContinuousReceivedRecordFromStore,
@@ -91,6 +91,7 @@ function persistenceLifecycle() {
     begin: runtime.begin,
     confirm: runtime.confirm,
     fail: runtime.fail,
+    conflict: runtime.conflict,
     clear: runtime.clear
   };
 }
@@ -110,8 +111,10 @@ export const useContinuousReceivedStore = create<ContinuousReceivedStoreState>()
         );
         if (!hydrationGate.ready) return blockedKeep(hydrationGate.status, hydrationGate.message);
 
+        const persistenceRuntime = useContinuousReceivedPersistenceRuntimeStore.getState();
+        const expectedPersistedValue = persistenceRuntime.expectedPersistedValue;
         const execution = await executeContinuousReceivedConfirmedPersistence(
-          useContinuousReceivedPersistenceRuntimeStore.getState().status,
+          persistenceRuntime.status,
           'guardar cópia recebida',
           () => keepContinuousReceivedPackageFromStore(
             get().registry,
@@ -119,7 +122,10 @@ export const useContinuousReceivedStore = create<ContinuousReceivedStoreState>()
             crypto.randomUUID(),
             now()
           ),
-          writeContinuousReceivedPersistedRegistry,
+          (registry) => writeContinuousReceivedPersistedRegistryIfUnchanged(
+            registry,
+            expectedPersistedValue
+          ),
           (registry) => set({ registry }),
           persistenceLifecycle()
         );
@@ -140,11 +146,16 @@ export const useContinuousReceivedStore = create<ContinuousReceivedStoreState>()
         );
         if (!hydrationGate.ready) return blockedMutation(hydrationGate.status, hydrationGate.message);
 
+        const persistenceRuntime = useContinuousReceivedPersistenceRuntimeStore.getState();
+        const expectedPersistedValue = persistenceRuntime.expectedPersistedValue;
         const execution = await executeContinuousReceivedConfirmedPersistence(
-          useContinuousReceivedPersistenceRuntimeStore.getState().status,
+          persistenceRuntime.status,
           'arquivar cópia recebida',
           () => archiveContinuousReceivedRecordFromStore(get().registry, recordId, now()),
-          writeContinuousReceivedPersistedRegistry,
+          (registry) => writeContinuousReceivedPersistedRegistryIfUnchanged(
+            registry,
+            expectedPersistedValue
+          ),
           (registry) => set({ registry }),
           persistenceLifecycle()
         );
@@ -164,11 +175,16 @@ export const useContinuousReceivedStore = create<ContinuousReceivedStoreState>()
         );
         if (!hydrationGate.ready) return blockedMutation(hydrationGate.status, hydrationGate.message);
 
+        const persistenceRuntime = useContinuousReceivedPersistenceRuntimeStore.getState();
+        const expectedPersistedValue = persistenceRuntime.expectedPersistedValue;
         const execution = await executeContinuousReceivedConfirmedPersistence(
-          useContinuousReceivedPersistenceRuntimeStore.getState().status,
+          persistenceRuntime.status,
           'reativar cópia recebida',
           () => reactivateContinuousReceivedRecordFromStore(get().registry, recordId, now()),
-          writeContinuousReceivedPersistedRegistry,
+          (registry) => writeContinuousReceivedPersistedRegistryIfUnchanged(
+            registry,
+            expectedPersistedValue
+          ),
           (registry) => set({ registry }),
           persistenceLifecycle()
         );
@@ -188,11 +204,16 @@ export const useContinuousReceivedStore = create<ContinuousReceivedStoreState>()
         );
         if (!hydrationGate.ready) return blockedMutation(hydrationGate.status, hydrationGate.message);
 
+        const persistenceRuntime = useContinuousReceivedPersistenceRuntimeStore.getState();
+        const expectedPersistedValue = persistenceRuntime.expectedPersistedValue;
         const execution = await executeContinuousReceivedConfirmedPersistence(
-          useContinuousReceivedPersistenceRuntimeStore.getState().status,
+          persistenceRuntime.status,
           'remover cópia recebida',
           () => removeContinuousReceivedRecordFromStore(get().registry, recordId, now()),
-          writeContinuousReceivedPersistedRegistry,
+          (registry) => writeContinuousReceivedPersistedRegistryIfUnchanged(
+            registry,
+            expectedPersistedValue
+          ),
           (registry) => set({ registry }),
           persistenceLifecycle()
         );
@@ -212,15 +233,20 @@ export const useContinuousReceivedStore = create<ContinuousReceivedStoreState>()
         if (!hydrationGate.ready) return blockedMutation(hydrationGate.status, hydrationGate.message);
 
         const current = get().registry;
+        const persistenceRuntime = useContinuousReceivedPersistenceRuntimeStore.getState();
+        const expectedPersistedValue = persistenceRuntime.expectedPersistedValue;
         const execution = await executeContinuousReceivedConfirmedPersistence(
-          useContinuousReceivedPersistenceRuntimeStore.getState().status,
+          persistenceRuntime.status,
           'reiniciar biblioteca recebida',
           () => ({
             changed: true,
             registry: initialRegistry(),
             message: 'A biblioteca recebida foi reiniciada localmente por uma ação explícita.'
           }),
-          writeContinuousReceivedPersistedRegistry,
+          (registry) => writeContinuousReceivedPersistedRegistryIfUnchanged(
+            registry,
+            expectedPersistedValue
+          ),
           (registry) => set({ registry }),
           persistenceLifecycle()
         );
