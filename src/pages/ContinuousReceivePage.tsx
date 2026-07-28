@@ -1,5 +1,5 @@
 import { useState, type ChangeEvent } from 'react';
-import { Archive, BookOpenText, Eye, FileJson, Inbox, MessageCircleReply, RotateCcw, ShieldCheck, Trash2, Upload } from 'lucide-react';
+import { Archive, BookOpenText, Eye, FileJson, Inbox, MessageCircleReply, RefreshCcw, RotateCcw, ShieldCheck, Trash2, Upload } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/Button';
 import { Card } from '../components/Card';
@@ -14,6 +14,7 @@ import {
   continuousReceiveConsentSteps,
   continuousReceiveRestrictions
 } from '../content/continuousReceive';
+import { continuousReceivedExplicitRehydrationPolicy } from '../content/continuousReceivedExplicitRehydration';
 import { continuousReceivedHydrationPolicy } from '../content/continuousReceivedHydration';
 import { continuousReceivedHydrationGatePolicy } from '../content/continuousReceivedHydrationGate';
 import { continuousReceivedPersistenceCommitPolicy } from '../content/continuousReceivedPersistenceCommit';
@@ -77,6 +78,7 @@ export function ContinuousReceivePage() {
   const archiveRecord = useContinuousReceivedStore((state) => state.archiveRecord);
   const reactivateRecord = useContinuousReceivedStore((state) => state.reactivateRecord);
   const removeRecord = useContinuousReceivedStore((state) => state.removeRecord);
+  const refreshAfterConflict = useContinuousReceivedStore((state) => state.refreshAfterConflict);
   const [candidate, setCandidate] = useState<ContinuousReceiveSuccess>();
   const [consent, setConsent] = useState<ReceiveConsent>(emptyConsent);
   const [errors, setErrors] = useState<string[]>([]);
@@ -97,6 +99,7 @@ export function ContinuousReceivePage() {
   const hydrationBlocked = hydrationStatus === 'initial' || hydrationStatus === 'unavailable';
   const persistenceWriting = persistenceStatus === 'writing';
   const persistenceConflict = persistenceStatus === 'conflict';
+  const explicitRereading = hydrationStatus === 'initial' && persistenceConflict;
   const persistenceBlocked = persistenceWriting || persistenceConflict;
   const actionsBlocked = hydrationBlocked || persistenceBlocked;
   const ready = allConsentsChecked(consent);
@@ -180,6 +183,18 @@ export function ContinuousReceivePage() {
     if (selectedRecordId === recordId || selectedRecord?.id === recordId) setSelectedRecordId(undefined);
   };
 
+  const rereadAfterConflict = async () => {
+    setErrors([]);
+    setMessage(undefined);
+    const result = await refreshAfterConflict();
+    if (result.adopted) {
+      setSelectedRecordId(undefined);
+      setMessage(result.message);
+      return;
+    }
+    setErrors(result.issues.length > 0 ? result.issues : [result.message]);
+  };
+
   return <div className="page page--continuous-receive">
     <PageHeader
       eyebrow="A Recepção que Não se Apropria"
@@ -208,13 +223,14 @@ export function ContinuousReceivePage() {
           <li>Ações: bloqueadas até a hidratação terminar · v{continuousReceivedHydrationGatePolicy.version}</li>
           <li>Escrita: confirmação IndexedDB antes do runtime · v{continuousReceivedPersistenceCommitPolicy.version}</li>
           <li>Concorrência: compare-and-set atômico · v{continuousReceivedPersistenceConflictPolicy.version}</li>
+          <li>Releitura: explícita depois de conflito · v{continuousReceivedExplicitRehydrationPolicy.version}</li>
           <li>Limite de arquivo: {continuousResourceCatalog.maxFileBytes / 1024} KiB</li>
         </ul>
         <div className="safety-summary"><ShieldCheck/><p>Selecionar ou descartar um arquivo não envia confirmação e não registra recusa.</p></div>
       </Card>
     </div>
 
-    {hydrationStatus === 'initial' && <Card title="Examinando a memória local" eyebrow={`Portão v${continuousReceivedHydrationGatePolicy.version}`}>
+    {hydrationStatus === 'initial' && <Card title={explicitRereading ? 'Relendo a memória atual' : 'Examinando a memória local'} eyebrow={`Portão v${continuousReceivedHydrationGatePolicy.version}`}>
       <p>{hydrationMessage}</p>
       <p>As ações permanecem desabilitadas e não serão enfileiradas ou repetidas automaticamente.</p>
     </Card>}
@@ -242,10 +258,15 @@ export function ContinuousReceivePage() {
       {persistenceIssues.length > 0 && <ul className="continuous-receive-errors">{persistenceIssues.map((issue) => <li key={issue}>{issue}</li>)}</ul>}
     </Card>}
 
-    {persistenceConflict && <Card title="Memória alterada em outra aba" eyebrow={`Concorrência v${continuousReceivedPersistenceConflictPolicy.version}`}>
+    {persistenceConflict && <Card title="Memória alterada em outra aba" eyebrow={`Releitura v${continuousReceivedExplicitRehydrationPolicy.version}`}>
       <p>{persistenceMessage}</p>
-      <p>Nenhuma versão foi escolhida, sobrescrita ou mesclada. Recarregue a página para examinar a memória mais recente antes de decidir novamente.</p>
+      <p>Nenhuma versão foi escolhida, sobrescrita ou mesclada. Examine explicitamente a memória atual antes de decidir novamente. A ação interrompida não será repetida.</p>
       {persistenceIssues.length > 0 && <ul className="continuous-receive-errors">{persistenceIssues.map((issue) => <li key={issue}>{issue}</li>)}</ul>}
+      <div className="continuous-receive-actions">
+        <Button variant="secondary" disabled={explicitRereading || persistenceWriting} onClick={rereadAfterConflict}>
+          <RefreshCcw size={17}/> {explicitRereading ? 'Examinando…' : 'Examinar memória atual'}
+        </Button>
+      </div>
     </Card>}
 
     <Card title="1. Selecionar arquivo recebido" eyebrow="Leitura exclusivamente local">
