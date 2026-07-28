@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { continuousResponseGestures } from '../content/continuousResponse';
+import { canonicalShareNotices } from './continuousCanonicalNotice.testFixtures';
 import type { ContinuousCollection } from './continuousCollection';
 import { attachContinuousConsistency } from './continuousConsistency';
 import type { ContinuousReceivedCollection } from './continuousReceive';
@@ -40,7 +41,7 @@ function sharePayload(overrides: Record<string, unknown> = {}) {
       occurredAt: '2026-07-27T20:00:00.000Z',
       completedAt: '2026-07-27T21:00:00.000Z'
     }],
-    notices: ['Pacote de teste válido.'],
+    notices: canonicalShareNotices(true, 1),
     ...overrides
   };
 }
