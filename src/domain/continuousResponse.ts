@@ -10,6 +10,7 @@ import { validateContinuousResponseExactRelation } from './continuousExactRelati
 import { validateContinuousResponseExactTime } from './continuousExactTime';
 import { validateContinuousExactText } from './continuousExactText';
 import { validateContinuousResponseFieldCompatibility } from './continuousFieldCompatibility';
+import { validateContinuousResponseFingerprint } from './continuousFingerprintEquivalence';
 import { validateContinuousInertJson } from './continuousInertJson';
 import { inspectContinuousResourceBudget } from './continuousResource';
 import { validateContinuousTextVisibility } from './continuousTextVisibility';
@@ -190,6 +191,11 @@ export function createContinuousResponseExport(
   const catalogReferences = validateContinuousResponseCatalogReferences(payload);
   if (!catalogReferences.ok) {
     return { ok: false, errors: catalogReferences.errors.map((error) => `Não foi possível preservar a referência catalogada: ${error}`) };
+  }
+
+  const fingerprint = validateContinuousResponseFingerprint(payload);
+  if (!fingerprint.ok) {
+    return { ok: false, errors: fingerprint.errors.map((error) => `Não foi possível preservar a impressão descritiva: ${error}`) };
   }
 
   const canonicalNotices = validateContinuousResponseCanonicalNotices(payload);
