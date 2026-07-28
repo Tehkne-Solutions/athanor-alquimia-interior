@@ -5,7 +5,7 @@ import {
   validateContinuousShareCatalogReferences
 } from './continuousCatalogReference';
 
-function trail(overrides: Record<string, unknown> = {}) {
+function trail(overrides: Record<string, unknown> = {}): Record<string, unknown> {
   return {
     position: 1,
     kind: 'trail',
@@ -20,7 +20,7 @@ function trail(overrides: Record<string, unknown> = {}) {
   };
 }
 
-function cycle(overrides: Record<string, unknown> = {}) {
+function cycle(overrides: Record<string, unknown> = {}): Record<string, unknown> {
   return {
     position: 1,
     kind: 'theme-cycle',
@@ -38,7 +38,7 @@ function cycle(overrides: Record<string, unknown> = {}) {
   };
 }
 
-function share(item = trail(), templateId = 'collection-open') {
+function share(item: Record<string, unknown> = trail(), templateId = 'collection-open') {
   return {
     collection: { templateId, label: 'Coleção aberta', status: 'active', itemCount: 1 },
     items: [item]
