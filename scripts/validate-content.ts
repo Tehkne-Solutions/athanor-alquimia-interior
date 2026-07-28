@@ -34,6 +34,7 @@ try {
   await import('../src/content/validateContinuousReceivedCatalogVersion');
   await import('../src/content/validateContinuousReceivedStoreDelegation');
   await import('../src/content/validateContinuousReceivedHydration');
+  await import('../src/content/validateContinuousReceivedHydrationGate');
   console.log('Conteúdo Athanor validado com sucesso.');
 } catch (error) {
   console.error('Falha na validação editorial:');
