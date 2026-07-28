@@ -7,7 +7,8 @@ import {
   CONTINUOUS_RECEIVED_STORAGE_KEY,
   continuousReceivedHydrationOnlyStorage,
   serializeContinuousReceivedPersistedState,
-  writeContinuousReceivedPersistedRegistry
+  writeContinuousReceivedPersistedRegistry,
+  writeContinuousReceivedPersistedRegistryIfUnchanged
 } from './continuousReceivedPersistenceStorage';
 
 const t0 = '2026-07-28T20:00:00.000Z';
@@ -40,6 +41,46 @@ describe('storage explícito da biblioteca recebida', () => {
       state: { schemaVersion: 1, registry },
       version: 0
     });
+  });
+
+  it('envia referência esperada e próximo envelope ao compare-and-set', async () => {
+    const compareAndSet = vi.fn(async () => ({ status: 'written' as const }));
+    const registry = createContinuousReceivedRegistry('1.0.0', t0);
+    const result = await writeContinuousReceivedPersistedRegistryIfUnchanged(
+      registry,
+      'envelope-anterior',
+      compareAndSet
+    );
+    expect(result.status).toBe('confirmed');
+    expect(compareAndSet).toHaveBeenCalledTimes(1);
+    const [name, expectedValue, nextValue] = compareAndSet.mock.calls[0];
+    expect(name).toBe(CONTINUOUS_RECEIVED_STORAGE_KEY);
+    expect(expectedValue).toBe('envelope-anterior');
+    expect(JSON.parse(nextValue)).toEqual({
+      state: { schemaVersion: 1, registry },
+      version: 0
+    });
+    if (result.status === 'confirmed') expect(result.persistedValue).toBe(nextValue);
+  });
+
+  it('aceita referência nula para a primeira escrita após memória vazia', async () => {
+    const compareAndSet = vi.fn(async () => ({ status: 'written' as const }));
+    await writeContinuousReceivedPersistedRegistryIfUnchanged(
+      createContinuousReceivedRegistry('1.0.0', t0),
+      null,
+      compareAndSet
+    );
+    expect(compareAndSet.mock.calls[0][1]).toBeNull();
+  });
+
+  it('propaga conflito sem produzir envelope confirmado', async () => {
+    const compareAndSet = vi.fn(async () => ({ status: 'conflict' as const }));
+    const result = await writeContinuousReceivedPersistedRegistryIfUnchanged(
+      createContinuousReceivedRegistry('1.0.0', t0),
+      'estado-antigo',
+      compareAndSet
+    );
+    expect(result).toEqual({ status: 'conflict' });
   });
 
   it('propaga falha de escrita ao chamador', async () => {
