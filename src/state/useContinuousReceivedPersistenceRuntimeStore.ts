@@ -65,7 +65,7 @@ export const useContinuousReceivedPersistenceRuntimeStore = create<ContinuousRec
     status: 'conflict',
     operation: undefined,
     message: 'A memória persistida mudou em outra aba ou sessão. A alteração local não foi aplicada nem mesclada.',
-    issues: ['Recarregue a página para examinar novamente a versão mais recente antes de decidir outra ação.']
+    issues: ['Examine explicitamente a memória atual antes de decidir outra ação. A ação interrompida não será repetida.']
   }),
   clear: () => set((state) => ({
     status: 'idle',
