@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { AppShell } from '../components/AppShell';
+import { resolveFirstMissionStageRedirect, type FirstMissionStage } from '../domain/firstMissionFlow';
 import { AccessibilityPage } from '../pages/AccessibilityPage';
 import { BibleSetupPage } from '../pages/BibleSetupPage';
 import { ChainPage } from '../pages/ChainPage';
@@ -76,7 +77,6 @@ function RootRedirect() {
 }
 
 type OnboardingStage = 'character' | 'temple' | 'bible';
-type FirstMissionStage = 'classification' | 'chain' | 'crafting' | 'item' | 'review';
 
 function OnboardingGuard({ stage, children }: { stage: OnboardingStage; children: ReactNode }) {
   const initialized = useAthanorStore((state) => state.initialized);
@@ -98,25 +98,13 @@ function OnboardingGuard({ stage, children }: { stage: OnboardingStage; children
 function FirstMissionGuard({ stage, children }: { stage: FirstMissionStage; children: ReactNode }) {
   const mission = useAthanorStore((state) => state.activeMission);
   const lamp = useAthanorStore((state) => state.inventory.find((item) => item.id === 'item_clear_word_lamp_v1'));
-  const reviewReady = lamp && ['awaiting_review', 'adjusted', 'resting'].includes(lamp.lifecycle);
+  const redirect = resolveFirstMissionStageRedirect(stage, {
+    missionExists: Boolean(mission),
+    currentStep: mission?.currentStep,
+    itemLifecycle: lamp?.lifecycle
+  });
 
-  if (!mission) return <Navigate to="/mission/word-before-response" replace/>;
-
-  if (lamp) {
-    if (stage === 'review' && !reviewReady) return <Navigate to="/items/clear-word-lamp" replace/>;
-    if (stage === 'item' || stage === 'review') return children;
-    return <Navigate to={reviewReady ? '/review/clear-word-lamp' : '/items/clear-word-lamp'} replace/>;
-  }
-
-  if (stage === 'item' || stage === 'review') {
-    return <Navigate to={mission.currentStep >= 2 ? '/crafting/clear-word-lamp' : '/mission/word-before-response/classification'} replace/>;
-  }
-
-  if (stage !== 'classification' && mission.currentStep < 2) {
-    return <Navigate to="/mission/word-before-response/classification" replace/>;
-  }
-
-  return children;
+  return redirect ? <Navigate to={redirect} replace/> : children;
 }
 
 function ProtectedShell() {
