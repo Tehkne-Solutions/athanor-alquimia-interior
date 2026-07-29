@@ -8,12 +8,34 @@ import { useAthanorStore } from '../state/useAthanorStore';
 export function MissionPage() {
   const navigate = useNavigate();
   const mission = useAthanorStore((state) => state.activeMission);
+  const lamp = useAthanorStore((state) => state.inventory.find((item) => item.id === 'item_clear_word_lamp_v1'));
   const startMission = useAthanorStore((state) => state.startMission);
   const classificationCompleted = Boolean(mission && mission.currentStep >= 2);
+  const reviewReady = Boolean(lamp && ['awaiting_review', 'adjusted', 'resting'].includes(lamp.lifecycle));
+
+  const resumeRoute = lamp
+    ? reviewReady
+      ? '/review/clear-word-lamp'
+      : '/items/clear-word-lamp'
+    : classificationCompleted
+      ? '/mission/word-before-response/chain'
+      : '/mission/word-before-response/classification';
+
+  const resumeLabel = lamp
+    ? reviewReady
+      ? 'Retomar revisão da Lâmpada'
+      : 'Ver Lâmpada criada'
+    : classificationCompleted
+      ? 'Retomar na cadeia simbólica'
+      : mission
+        ? 'Continuar classificação'
+        : 'Começar classificação';
+
   const begin = () => {
     if (!mission) startMission();
-    navigate(classificationCompleted ? '/mission/word-before-response/chain' : '/mission/word-before-response/classification');
+    navigate(resumeRoute);
   };
+
   return (
     <div className="page">
       <PageHeader eyebrow="Missão 01 · Capítulo do Ar" title="A Palavra Antes da Resposta" description="Uma missão de prudência, escuta e organização da comunicação." />
@@ -26,7 +48,7 @@ export function MissionPage() {
         <Card eyebrow="Etapa 2" title="Escolha sua intenção"><p>Compreender, perguntar, esperar, informar, estabelecer limite ou preparar um próximo passo.</p></Card>
         <Card eyebrow="Etapa 3" title="Crie o item"><p>Transforme o princípio, a intenção e a ação em uma Lâmpada da Palavra Clara.</p></Card>
       </div>
-      <div className="mission-actions"><Button variant="ghost" onClick={() => navigate('/temple')}><PauseCircle size={18}/> Pausar e voltar ao Átrio</Button><Button onClick={begin}>{classificationCompleted ? 'Retomar na cadeia simbólica' : mission ? 'Continuar classificação' : 'Começar classificação'} <ArrowRight size={18}/></Button></div>
+      <div className="mission-actions"><Button variant="ghost" onClick={() => navigate('/temple')}><PauseCircle size={18}/> Pausar e voltar ao Átrio</Button><Button onClick={begin}>{resumeLabel} <ArrowRight size={18}/></Button></div>
     </div>
   );
 }
