@@ -83,7 +83,7 @@ export function TemplePage() {
   if (!character || !temple) return null;
 
   const lamp = inventory.find((item) => item.id === 'item_clear_word_lamp_v1');
-  const awaitingReview = lamp?.lifecycle === 'awaiting_review' || lamp?.lifecycle === 'adjusted';
+  const awaitingReview = lamp?.lifecycle === 'awaiting_review' || lamp?.lifecycle === 'adjusted' || lamp?.lifecycle === 'resting';
   const integrated = lamp?.lifecycle === 'integrated';
   const psalmsChamber = temple.rooms.find((room) => room.roomId === 'psalms-chamber');
   const forge = temple.rooms.find((room) => room.roomId === 'forge');
@@ -149,10 +149,12 @@ export function TemplePage() {
   };
 
   const missionAction = awaitingReview
-    ? { label: 'Revisar a Lâmpada', route: '/review/clear-word-lamp', icon: RefreshCw }
+    ? { label: lamp?.lifecycle === 'resting' ? 'Retomar revisão' : 'Revisar a Lâmpada', route: '/review/clear-word-lamp', icon: RefreshCw }
     : integrated
       ? { label: 'Visitar a Biblioteca', route: '/temple/proverbs-library', icon: CheckCircle2 }
-      : { label: mission ? 'Continuar jornada' : 'Iniciar jornada', route: '/mission/word-before-response', icon: ArrowRight };
+      : lamp
+        ? { label: 'Ver Lâmpada criada', route: '/items/clear-word-lamp', icon: LampDesk }
+        : { label: mission ? 'Continuar jornada' : 'Iniciar jornada', route: '/mission/word-before-response', icon: ArrowRight };
   const MissionActionIcon = missionAction.icon;
   const waterAction = waterCompleted ? 'Visitar a Câmara restaurada' : chaliceProgress?.positioned ? 'Concluir o capítulo da Água' : waterJourney?.status === 'named' ? 'Continuar a jornada da Água' : waterJourney ? 'Continuar missão da Água' : 'Entrar na Câmara dos Salmos';
   const fireAction = fireCompleted ? 'Visitar a Forja restaurada' : shieldProgress?.positioned ? 'Concluir o capítulo do Fogo' : shieldCreated ? 'Continuar o ciclo do Escudo' : shieldProgress ? 'Continuar a Forja do Escudo' : transformedMetalCreated ? 'Forjar o Escudo do Limite Justo' : transformationProgress ? 'Continuar O que Precisa Ser Transformado' : courageMarkCreated ? 'Iniciar O que Precisa Ser Transformado' : courageProgress ? 'Continuar A Coragem Proporcional' : boundaryPlateCreated ? 'Iniciar A Coragem Proporcional' : boundaryProgress ? 'Continuar O Limite que Protege' : intervalEmberCreated ? 'Iniciar O Limite que Protege' : intervalProgress ? 'Continuar O Instante Antes do Gesto' : namedFlameCreated ? 'Iniciar O Instante Antes do Gesto' : fireProgress ? 'Continuar O Nome da Chama' : 'Iniciar O Nome da Chama';
@@ -245,14 +247,29 @@ export function TemplePage() {
                       ? 'O ciclo da Água foi registrado e a Forja foi aberta.'
                       : integrated
                         ? 'A primeira Obra foi revisada.'
-                        : 'A Biblioteca aguarda sua primeira restauração.';
+                        : lamp?.lifecycle === 'resting'
+                          ? 'A primeira Obra está em repouso e pode ser retomada quando fizer sentido.'
+                          : awaitingReview
+                            ? 'A Biblioteca foi restaurada e a Lâmpada aguarda retorno.'
+                            : 'A Biblioteca aguarda sua primeira restauração.';
+
+  const missionEyebrow = integrated ? 'Ciclo integrado' : lamp?.lifecycle === 'resting' ? 'Ciclo em repouso' : awaitingReview ? 'Retorno pendente' : lamp ? 'Item criado' : 'Missão principal';
+  const missionDescription = integrated
+    ? 'A Lâmpada integra a Primeira Obra.'
+    : lamp?.lifecycle === 'resting'
+      ? 'O ciclo permanece preservado, sem prazo ou perda de progresso.'
+      : awaitingReview
+        ? 'O ciclo aguarda revisão.'
+        : lamp
+          ? 'A Lâmpada foi criada e precisa ser posicionada na Biblioteca.'
+          : 'Organize fato, interpretação, previsão e intenção.';
 
   return <div className="page page--temple">
     <PageHeader eyebrow="Átrio da Presença" title={`Bem-vindo ao Templo, ${character.name}.`} description="Seu Templo registra ciclos de gameplay, itens e revisões. Ele não mede sua condição espiritual." action={<span className="local-badge"><Database size={16}/> Dados locais</span>}/>
     <div className="temple-dashboard">
       <Card className="hero-card"><div className="hero-card__scene"><div className={`temple-backdrop temple-backdrop--${temple.theme}`} aria-hidden="true"/><CharacterAvatar character={character}/></div><div className="hero-card__content"><p className="eyebrow">Nível da Obra</p><h2>{workLevelLabels[character.workLevel]}</h2><p>{heroMessage}</p><div className="status-row"><span><strong>{activeRoomCount}</strong> salas acessíveis</span><span><strong>{componentCount}</strong> componentes e itens</span><span><strong>{cycleCount}</strong> ciclos e revisões</span><span><strong>{temple.restorationLevel}</strong> nível do Templo</span></div></div></Card>
-      <Card eyebrow="Princípio do ciclo" title={passage.title} className="principle-card"><blockquote>{passage.principle}</blockquote><p>{passage.application}</p><Button onClick={() => navigate('/temple/proverbs-library')}>Entrar na Biblioteca <ArrowRight size={18}/></Button></Card>
-      <Card eyebrow={integrated ? 'Ciclo integrado' : awaitingReview ? 'Retorno pendente' : 'Missão principal'} title="A Palavra Antes da Resposta" className="mission-card"><div className="mission-card__icon">{integrated ? <CheckCircle2/> : awaitingReview ? <Clock3/> : <BookOpenText/>}</div><p>{integrated ? 'A Lâmpada integra a Primeira Obra.' : awaitingReview ? 'O ciclo aguarda revisão.' : 'Organize fato, interpretação, previsão e intenção.'}</p><Button variant="secondary" onClick={() => navigate(missionAction.route)}>{missionAction.label} <MissionActionIcon size={18}/></Button></Card>
+      <Card eyebrow={missionEyebrow} title="A Palavra Antes da Resposta" className="mission-card"><div className="mission-card__icon">{integrated ? <CheckCircle2/> : awaitingReview ? <Clock3/> : lamp ? <LampDesk/> : <BookOpenText/>}</div><p>{missionDescription}</p><Button onClick={() => navigate(missionAction.route)}>{missionAction.label} <MissionActionIcon size={18}/></Button></Card>
+      <Card eyebrow="Princípio do ciclo" title={passage.title} className="principle-card"><blockquote>{passage.principle}</blockquote><p>{passage.application}</p><Button variant="ghost" onClick={() => navigate('/temple/proverbs-library')}>Conhecer o princípio <ArrowRight size={18}/></Button></Card>
       {waterAvailable && <Card eyebrow={waterCompleted ? 'Capítulo concluído' : 'Capítulo disponível'} title="A Câmara dos Salmos" className="mission-card mission-card--water"><div className="mission-card__icon">{waterCompleted ? <CupSoda/> : <Droplets/>}</div><p>{waterCompleted ? 'O ciclo da Água foi registrado.' : 'Reconheça emoção, lamento, memória e apoio sem diagnóstico.'}</p><Button variant="secondary" onClick={() => navigate(waterCompleted ? '/temple/psalms-chamber' : chaliceProgress?.positioned ? '/review/water-chapter' : '/temple/psalms-chamber')}>{waterAction} <ArrowRight size={18}/></Button></Card>}
       {forgeAvailable && <Card eyebrow={fireCompleted ? 'Capítulo concluído' : shieldProgress?.positioned ? 'Revisão geral disponível' : shieldCreated ? 'Escudo criado' : 'Capítulo disponível'} title="A Forja dos Elementos" className="mission-card mission-card--fire"><div className="mission-card__icon">{fireCompleted ? <CheckCircle2/> : shieldCreated ? <Shield/> : transformedMetalCreated ? <Hammer/> : <Flame/>}</div><p>{fireCompleted ? 'O primeiro ciclo do Fogo foi registrado.' : shieldProgress?.positioned ? 'O Escudo está pronto para o encerramento do capítulo.' : 'O Fogo avança por componentes separados e recusáveis.'}</p><Button variant="secondary" onClick={() => navigate(fireRoute)}>{fireAction} <ArrowRight size={18}/></Button></Card>}
       {gardenAvailable && <Card eyebrow={earthCompleted ? 'Capítulo concluído' : stoneProgress?.positioned ? 'Revisão geral disponível' : stoneCreated ? 'Item da Terra criado' : orderMapCreated ? 'Cinco componentes reunidos' : rhythmCompassCreated ? 'Quarto componente criado' : resourcesBasketCreated ? 'Terceiro componente criado' : firstStepSeedCreated ? 'Segundo componente criado' : bodyMarkCreated ? 'Primeiro componente criado' : earthBody ? 'Missão em andamento' : 'Novo capítulo disponível'} title="O Jardim Interior" className="mission-card mission-card--earth"><div className="mission-card__icon">{earthCompleted ? <CheckCircle2/> : stoneCreated ? <Gem/> : orderMapCreated ? <Map/> : rhythmCompassCreated ? <Clock3/> : resourcesBasketCreated ? <ListChecks/> : firstStepSeedCreated ? <Sprout/> : bodyMarkCreated ? <Footprints/> : <Sprout/>}</div><p>{earthCompleted ? 'O primeiro ciclo da Terra foi registrado.' : stoneProgress?.positioned ? 'A Pedra está pronta para o encerramento do capítulo.' : stoneCreated ? 'A Pedra registra uma fórmula local que ainda depende de revisão.' : orderMapCreated ? 'A receita da Pedra do Primeiro Passo está disponível.' : rhythmCompassCreated ? 'O Compasso registra uma cadência interrompível sem streak.' : resourcesBasketCreated ? 'O Cesto registra disponibilidade e limite sem prometer abundância.' : firstStepSeedCreated ? 'A Semente registra uma unidade pequena sem medir produtividade.' : bodyMarkCreated ? 'A Marca registra presença percebida sem avaliar saúde ou produtividade.' : 'A Terra começa por corpo percebido, descanso, estrutura e uma ação pequena.'}</p><Button variant="secondary" onClick={() => navigate(earthRoute)}>{earthAction} <ArrowRight size={18}/></Button></Card>}
