@@ -15,6 +15,7 @@ permissions:
 jobs:
   validate:
     runs-on: ubuntu-latest
+    timeout-minutes: 15
 
     steps:
       - name: Checkout
@@ -45,6 +46,25 @@ jobs:
         with:
           name: athanor-content-diagnostics
           path: content-validation.log
+          if-no-files-found: error
+          retention-days: 1
+
+      - name: Type check
+        id: typecheck
+        shell: bash
+        run: |
+          set +e
+          npm run lint > typecheck.log 2>&1
+          status=$?
+          tail -n 120 typecheck.log
+          exit $status
+
+      - name: Upload type-check diagnostics
+        if: failure() && steps.typecheck.outcome == 'failure'
+        uses: actions/upload-artifact@v4
+        with:
+          name: athanor-typecheck-diagnostics
+          path: typecheck.log
           if-no-files-found: error
           retention-days: 1
 
