@@ -77,6 +77,8 @@ function RootRedirect() {
 
 type OnboardingStage = 'character' | 'temple' | 'bible';
 
+type FirstMissionStage = 'classification' | 'chain' | 'crafting';
+
 function OnboardingGuard({ stage, children }: { stage: OnboardingStage; children: ReactNode }) {
   const initialized = useAthanorStore((state) => state.initialized);
   const onboardingCompleted = useAthanorStore((state) => state.onboardingCompleted);
@@ -91,6 +93,16 @@ function OnboardingGuard({ stage, children }: { stage: OnboardingStage; children
   if (!character) return <Navigate to="/character/create" replace/>;
   if (stage === 'temple') return children;
   if (!temple) return <Navigate to="/temple/foundation" replace/>;
+  return children;
+}
+
+function FirstMissionGuard({ stage, children }: { stage: FirstMissionStage; children: ReactNode }) {
+  const mission = useAthanorStore((state) => state.activeMission);
+
+  if (!mission) return <Navigate to="/mission/word-before-response" replace/>;
+  if (stage !== 'classification' && mission.currentStep < 2) {
+    return <Navigate to="/mission/word-before-response/classification" replace/>;
+  }
   return children;
 }
 
@@ -146,8 +158,8 @@ export function App() {
       <Route path="/crafting/first-step-stone" element={<EarthStonePage/>}/>
       <Route path="/review/earth-chapter" element={<EarthChapterReviewPage/>}/>
       <Route path="/mission/word-before-response" element={<MissionPage/>}/>
-      <Route path="/mission/word-before-response/classification" element={<ClassificationPage/>}/>
-      <Route path="/mission/word-before-response/chain" element={<ChainPage/>}/>
+      <Route path="/mission/word-before-response/classification" element={<FirstMissionGuard stage="classification"><ClassificationPage/></FirstMissionGuard>}/>
+      <Route path="/mission/word-before-response/chain" element={<FirstMissionGuard stage="chain"><ChainPage/></FirstMissionGuard>}/>
       <Route path="/mission/name-the-waters" element={<WaterMissionPage/>}/>
       <Route path="/mission/voice-of-lament" element={<WaterLamentPage/>}/>
       <Route path="/mission/mirror-of-memories" element={<WaterMemoryPage/>}/>
@@ -161,7 +173,7 @@ export function App() {
       <Route path="/review/fire-chapter" element={<FireChapterReviewPage/>}/>
       <Route path="/crafting/memory-serene-chalice" element={<WaterChalicePage/>}/>
       <Route path="/review/water-chapter" element={<WaterChapterReviewPage/>}/>
-      <Route path="/crafting/clear-word-lamp" element={<CraftingPage/>}/>
+      <Route path="/crafting/clear-word-lamp" element={<FirstMissionGuard stage="crafting"><CraftingPage/></FirstMissionGuard>}/>
       <Route path="/items/clear-word-lamp" element={<ItemPage/>}/>
       <Route path="/review/clear-word-lamp" element={<ReviewPage/>}/>
       <Route path="/inventory" element={<InventoryPage/>}/>
