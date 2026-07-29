@@ -55,7 +55,7 @@ z.array(z.string().min(1)).min(10).parse(continuousReceivedPersistedTextRestrict
 if (!continuousReceivedPersistedTextRestrictions.some((entry) => /antes do JSON\.parse/i.test(entry))) {
   throw new Error('A Fase 8.37 precisa inspecionar o texto persistido antes do JSON.parse.');
 }
-if (!continuousReceivedPersistedTextRestrictions.some((entry) => /primeiro ou último valor.*não.*escolhido/i.test(entry))) {
+if (!continuousReceivedPersistedTextRestrictions.some((entry) => /nenhum primeiro ou último valor repetido.*escolhido/i.test(entry))) {
   throw new Error('A Fase 8.37 precisa proibir escolha silenciosa entre chaves repetidas.');
 }
 if (!continuousReceivedPersistedTextRestrictions.some((entry) => /bytes existentes na IndexedDB/i.test(entry))) {
