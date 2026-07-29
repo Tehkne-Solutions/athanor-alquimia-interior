@@ -76,8 +76,7 @@ function RootRedirect() {
 }
 
 type OnboardingStage = 'character' | 'temple' | 'bible';
-
-type FirstMissionStage = 'classification' | 'chain' | 'crafting';
+type FirstMissionStage = 'classification' | 'chain' | 'crafting' | 'item' | 'review';
 
 function OnboardingGuard({ stage, children }: { stage: OnboardingStage; children: ReactNode }) {
   const initialized = useAthanorStore((state) => state.initialized);
@@ -98,11 +97,25 @@ function OnboardingGuard({ stage, children }: { stage: OnboardingStage; children
 
 function FirstMissionGuard({ stage, children }: { stage: FirstMissionStage; children: ReactNode }) {
   const mission = useAthanorStore((state) => state.activeMission);
+  const lamp = useAthanorStore((state) => state.inventory.find((item) => item.id === 'item_clear_word_lamp_v1'));
+  const reviewReady = lamp && ['awaiting_review', 'adjusted', 'resting'].includes(lamp.lifecycle);
 
   if (!mission) return <Navigate to="/mission/word-before-response" replace/>;
+
+  if (lamp) {
+    if (stage === 'review' && !reviewReady) return <Navigate to="/items/clear-word-lamp" replace/>;
+    if (stage === 'item' || stage === 'review') return children;
+    return <Navigate to={reviewReady ? '/review/clear-word-lamp' : '/items/clear-word-lamp'} replace/>;
+  }
+
+  if (stage === 'item' || stage === 'review') {
+    return <Navigate to={mission.currentStep >= 2 ? '/crafting/clear-word-lamp' : '/mission/word-before-response/classification'} replace/>;
+  }
+
   if (stage !== 'classification' && mission.currentStep < 2) {
     return <Navigate to="/mission/word-before-response/classification" replace/>;
   }
+
   return children;
 }
 
@@ -174,8 +187,8 @@ export function App() {
       <Route path="/crafting/memory-serene-chalice" element={<WaterChalicePage/>}/>
       <Route path="/review/water-chapter" element={<WaterChapterReviewPage/>}/>
       <Route path="/crafting/clear-word-lamp" element={<FirstMissionGuard stage="crafting"><CraftingPage/></FirstMissionGuard>}/>
-      <Route path="/items/clear-word-lamp" element={<ItemPage/>}/>
-      <Route path="/review/clear-word-lamp" element={<ReviewPage/>}/>
+      <Route path="/items/clear-word-lamp" element={<FirstMissionGuard stage="item"><ItemPage/></FirstMissionGuard>}/>
+      <Route path="/review/clear-word-lamp" element={<FirstMissionGuard stage="review"><ReviewPage/></FirstMissionGuard>}/>
       <Route path="/inventory" element={<InventoryPage/>}/>
       <Route path="/codex" element={<CodexPage/>}/>
       <Route path="/character" element={<CharacterPage/>}/>
