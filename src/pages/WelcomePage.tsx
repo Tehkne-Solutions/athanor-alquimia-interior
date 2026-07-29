@@ -14,7 +14,7 @@ export function WelcomePage() {
         <p className="landing-hero__lead">Uma jornada de sabedoria bíblica, reflexão, crafting simbólico e ações reais. Salmos e Provérbios formam o núcleo de um mundo pessoal que cresce com cada ciclo revisado.</p>
         <div className="landing-hero__actions">
           <Button onClick={() => navigate('/limits')}>Fundar meu Templo <ArrowRight size={18} /></Button>
-          <Button variant="ghost" onClick={() => navigate('/codex')}>Conhecer a proposta</Button>
+          <Button variant="ghost" onClick={() => navigate('/limits')}>Conhecer limites e proposta</Button>
         </div>
         <div className="feature-grid">
           <article><BookOpenText /><strong>Bíblia como núcleo</strong><span>Salmos para contemplação e Provérbios para sabedoria prática.</span></article>
