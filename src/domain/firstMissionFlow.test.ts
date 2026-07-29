@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   FIRST_MISSION_ROUTES,
   isFirstMissionReviewable,
+  resolveFirstMissionCardState,
   resolveFirstMissionResumeRoute,
   resolveFirstMissionStageRedirect
 } from './firstMissionFlow';
@@ -47,5 +48,51 @@ describe('first mission flow', () => {
     const state = { missionExists: true, currentStep: 1 };
     expect(resolveFirstMissionStageRedirect('chain', state)).toBe(FIRST_MISSION_ROUTES.classification);
     expect(resolveFirstMissionStageRedirect('crafting', state)).toBe(FIRST_MISSION_ROUTES.classification);
+  });
+
+  it('apresenta a missão inicial com CTA de início', () => {
+    expect(resolveFirstMissionCardState({ missionExists: false })).toEqual({
+      eyebrow: 'Missão principal',
+      description: 'Organize fato, interpretação, previsão e intenção.',
+      actionLabel: 'Iniciar jornada',
+      actionRoute: FIRST_MISSION_ROUTES.intro,
+      icon: 'mission'
+    });
+  });
+
+  it('apresenta item criado antes do posicionamento', () => {
+    expect(resolveFirstMissionCardState({ missionExists: true, itemLifecycle: 'active' })).toMatchObject({
+      eyebrow: 'Item criado',
+      actionLabel: 'Ver Lâmpada criada',
+      actionRoute: FIRST_MISSION_ROUTES.item,
+      icon: 'item'
+    });
+  });
+
+  it.each(['awaiting_review', 'adjusted'] as const)('apresenta revisão pendente para %s', (itemLifecycle) => {
+    expect(resolveFirstMissionCardState({ missionExists: true, itemLifecycle })).toMatchObject({
+      eyebrow: 'Retorno pendente',
+      actionLabel: 'Revisar a Lâmpada',
+      actionRoute: FIRST_MISSION_ROUTES.review,
+      icon: 'review'
+    });
+  });
+
+  it('diferencia o estado de repouso', () => {
+    expect(resolveFirstMissionCardState({ missionExists: true, itemLifecycle: 'resting' })).toMatchObject({
+      eyebrow: 'Ciclo em repouso',
+      actionLabel: 'Retomar revisão',
+      actionRoute: FIRST_MISSION_ROUTES.review,
+      icon: 'review'
+    });
+  });
+
+  it('leva o ciclo integrado para a Biblioteca', () => {
+    expect(resolveFirstMissionCardState({ missionExists: true, itemLifecycle: 'integrated' })).toMatchObject({
+      eyebrow: 'Ciclo integrado',
+      actionLabel: 'Visitar a Biblioteca',
+      actionRoute: FIRST_MISSION_ROUTES.library,
+      icon: 'integrated'
+    });
   });
 });
