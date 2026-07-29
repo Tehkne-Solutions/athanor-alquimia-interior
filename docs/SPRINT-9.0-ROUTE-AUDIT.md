@@ -32,7 +32,7 @@ limites aceitos
 → onboarding concluído
 ```
 
-A primeira jornada possui ainda um `FirstMissionGuard`, que preserva a ordem:
+A primeira jornada possui ainda um `FirstMissionGuard`, que preserva a ordem completa:
 
 ```text
 introdução da missão
@@ -41,6 +41,10 @@ introdução da missão
 → classificação concluída
 → cadeia simbólica
 → crafting
+→ item criado
+→ item posicionado
+→ revisão
+→ integração ou repouso
 ```
 
 ## Achado 9.0.1 — CTA público bloqueado
@@ -86,7 +90,30 @@ As rotas de classificação, cadeia simbólica e crafting podiam ser abertas dir
 
 O Átrio indicava `Continuar jornada`, mas a introdução sempre enviava o usuário à classificação. Depois de concluir essa etapa e pausar, a retomada voltava para uma tela já vencida.
 
-**Correção aplicada:** a página da missão agora consulta `currentStep` e retoma diretamente na cadeia simbólica quando a classificação já foi concluída. O texto do CTA também comunica se a ação inicia, continua ou retoma a jornada.
+**Correção aplicada:** a página da missão agora consulta a classificação e o ciclo de vida da Lâmpada. A retomada abre a classificação, a cadeia, o item ou a revisão conforme o estado persistido.
+
+## Achado 9.0.5 — Item e revisão acessíveis fora de ordem
+
+**Severidade:** P0
+
+As rotas `/items/clear-word-lamp` e `/review/clear-word-lamp` não faziam parte do guard da primeira missão. A revisão podia ser aberta antes do posicionamento, e a página do item podia ser acessada sem uma Lâmpada criada.
+
+**Correção aplicada:** o guard agora cobre item e revisão:
+
+- sem missão, retorna à introdução;
+- sem classificação, retorna à classificação;
+- sem item, retorna à forja;
+- com item ativo, impede revisão antecipada e abre a revelação do item;
+- com item em observação, ajustado ou repouso, abre a revisão;
+- com item integrado, mantém acesso ao registro do item.
+
+## Achado 9.0.6 — Estado de repouso interrompia a retomada
+
+**Severidade:** P0
+
+A revisão permite selecionar `resting`, mas o Átrio, a introdução e a página do item tratavam apenas `awaiting_review` e `adjusted` como estados revisáveis. Depois de escolher repouso, o ciclo deixava de apresentar um caminho claro de retomada.
+
+**Correção aplicada:** `resting` agora é reconhecido como ciclo em observação na página do item e no roteamento da missão. O usuário pode retornar à revisão sem perder progresso ou refazer etapas.
 
 ## Auditoria inicial do Átrio
 
@@ -99,7 +126,7 @@ O primeiro acesso ao Templo apresenta:
 - CTA explícito para iniciar ou continuar a jornada;
 - mapa e instrumentos ainda abaixo da ação principal.
 
-O card da missão principal já adapta seu estado para início, continuidade, revisão e integração. A próxima rodada deve avaliar visualmente hierarquia, dobra mobile e competição entre o CTA da Biblioteca e o CTA da missão.
+O card da missão principal adapta seu estado para início, continuidade, revisão e integração. A próxima rodada deve avaliar visualmente hierarquia, dobra mobile e competição entre o CTA da Biblioteca e o CTA da missão.
 
 ## Inventário macro de rotas
 
@@ -155,7 +182,7 @@ O card da missão principal já adapta seu estado para início, continuidade, re
 
 1. Auditar a hierarquia visual do Átrio em desktop e mobile.
 2. Verificar se o CTA de princípio compete com a missão principal na primeira dobra.
-3. Proteger item e revisão contra acesso sem Lâmpada criada.
+3. Ajustar o CTA do Átrio para reconhecer explicitamente o estado `resting`.
 4. Verificar rotas parametrizadas com IDs inexistentes.
 5. Validar fallback de rota desconhecida sem perda de contexto.
 6. Cobrir o ciclo `/welcome` até `/temple` com teste automatizado.
