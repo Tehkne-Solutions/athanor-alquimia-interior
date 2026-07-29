@@ -15,7 +15,7 @@ export function ItemPage() {
     return <div className="page"><PageHeader title="A receita ainda não foi concluída."/><Button onClick={() => navigate('/crafting/clear-word-lamp')}>Voltar à Forja</Button></div>;
   }
 
-  const awaitingReview = item.lifecycle === 'awaiting_review' || item.lifecycle === 'adjusted';
+  const awaitingReview = ['awaiting_review', 'adjusted', 'resting'].includes(item.lifecycle);
   const integrated = item.lifecycle === 'integrated';
   const place = () => {
     placeLamp();
@@ -50,7 +50,7 @@ export function ItemPage() {
         )}
 
         {awaitingReview && (
-          <Card title="Revisão pendente" eyebrow={item.lifecycle === 'adjusted' ? 'Ação ajustada' : 'Ciclo em observação'}>
+          <Card title="Revisão pendente" eyebrow={item.lifecycle === 'adjusted' ? 'Ação ajustada' : item.lifecycle === 'resting' ? 'Ciclo em repouso' : 'Ciclo em observação'}>
             <div className="review-status"><Clock3 aria-hidden="true"/><p>A Biblioteca já foi restaurada. Agora você pode registrar o resultado, ajustar o passo ou manter o ciclo em repouso.</p></div>
             <Button onClick={() => navigate('/review/clear-word-lamp')}><RefreshCw size={18}/> Revisar a Lâmpada</Button>
           </Card>
