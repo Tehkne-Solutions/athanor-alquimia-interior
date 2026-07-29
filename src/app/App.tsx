@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
 import { AppShell } from '../components/AppShell';
 import { AccessibilityPage } from '../pages/AccessibilityPage';
@@ -74,6 +75,25 @@ function RootRedirect() {
   return <Navigate to={onboardingCompleted ? '/temple' : '/welcome'} replace/>;
 }
 
+type OnboardingStage = 'character' | 'temple' | 'bible';
+
+function OnboardingGuard({ stage, children }: { stage: OnboardingStage; children: ReactNode }) {
+  const initialized = useAthanorStore((state) => state.initialized);
+  const onboardingCompleted = useAthanorStore((state) => state.onboardingCompleted);
+  const limitsAccepted = useAthanorStore((state) => state.limitsAccepted);
+  const character = useAthanorStore((state) => state.character);
+  const temple = useAthanorStore((state) => state.temple);
+
+  if (!initialized) return <BootScreen/>;
+  if (onboardingCompleted) return <Navigate to="/temple" replace/>;
+  if (!limitsAccepted) return <Navigate to="/limits" replace/>;
+  if (stage === 'character') return children;
+  if (!character) return <Navigate to="/character/create" replace/>;
+  if (stage === 'temple') return children;
+  if (!temple) return <Navigate to="/temple/foundation" replace/>;
+  return children;
+}
+
 function ProtectedShell() {
   const initialized = useAthanorStore((state) => state.initialized);
   const onboardingCompleted = useAthanorStore((state) => state.onboardingCompleted);
@@ -87,9 +107,9 @@ export function App() {
     <Route path="/" element={<RootRedirect/>}/>
     <Route path="/welcome" element={<WelcomePage/>}/>
     <Route path="/limits" element={<LimitsPage/>}/>
-    <Route path="/character/create" element={<CharacterCreatePage/>}/>
-    <Route path="/temple/foundation" element={<TempleFoundationPage/>}/>
-    <Route path="/setup/bible" element={<BibleSetupPage/>}/>
+    <Route path="/character/create" element={<OnboardingGuard stage="character"><CharacterCreatePage/></OnboardingGuard>}/>
+    <Route path="/temple/foundation" element={<OnboardingGuard stage="temple"><TempleFoundationPage/></OnboardingGuard>}/>
+    <Route path="/setup/bible" element={<OnboardingGuard stage="bible"><BibleSetupPage/></OnboardingGuard>}/>
     <Route path="/safety" element={<SafetyPage/>}/>
     <Route element={<ProtectedShell/>}>
       <Route path="/temple" element={<TemplePage/>}/>
