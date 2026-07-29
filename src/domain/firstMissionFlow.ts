@@ -8,13 +8,22 @@ export interface FirstMissionFlowState {
   itemLifecycle?: ItemLifecycle;
 }
 
+export interface FirstMissionCardState {
+  eyebrow: string;
+  description: string;
+  actionLabel: string;
+  actionRoute: string;
+  icon: 'mission' | 'item' | 'review' | 'integrated';
+}
+
 export const FIRST_MISSION_ROUTES = {
   intro: '/mission/word-before-response',
   classification: '/mission/word-before-response/classification',
   chain: '/mission/word-before-response/chain',
   crafting: '/crafting/clear-word-lamp',
   item: '/items/clear-word-lamp',
-  review: '/review/clear-word-lamp'
+  review: '/review/clear-word-lamp',
+  library: '/temple/proverbs-library'
 } as const;
 
 const reviewableLifecycles: ItemLifecycle[] = ['awaiting_review', 'adjusted', 'resting'];
@@ -34,6 +43,56 @@ export function resolveFirstMissionResumeRoute(state: FirstMissionFlowState): st
 
   if ((state.currentStep ?? 0) < 2) return FIRST_MISSION_ROUTES.classification;
   return FIRST_MISSION_ROUTES.chain;
+}
+
+export function resolveFirstMissionCardState(state: FirstMissionFlowState): FirstMissionCardState {
+  if (state.itemLifecycle === 'integrated') {
+    return {
+      eyebrow: 'Ciclo integrado',
+      description: 'A Lâmpada integra a Primeira Obra.',
+      actionLabel: 'Visitar a Biblioteca',
+      actionRoute: FIRST_MISSION_ROUTES.library,
+      icon: 'integrated'
+    };
+  }
+
+  if (state.itemLifecycle === 'resting') {
+    return {
+      eyebrow: 'Ciclo em repouso',
+      description: 'O ciclo permanece preservado, sem prazo ou perda de progresso.',
+      actionLabel: 'Retomar revisão',
+      actionRoute: FIRST_MISSION_ROUTES.review,
+      icon: 'review'
+    };
+  }
+
+  if (isFirstMissionReviewable(state.itemLifecycle)) {
+    return {
+      eyebrow: 'Retorno pendente',
+      description: 'O ciclo aguarda revisão.',
+      actionLabel: 'Revisar a Lâmpada',
+      actionRoute: FIRST_MISSION_ROUTES.review,
+      icon: 'review'
+    };
+  }
+
+  if (state.itemLifecycle) {
+    return {
+      eyebrow: 'Item criado',
+      description: 'A Lâmpada foi criada e precisa ser posicionada na Biblioteca.',
+      actionLabel: 'Ver Lâmpada criada',
+      actionRoute: FIRST_MISSION_ROUTES.item,
+      icon: 'item'
+    };
+  }
+
+  return {
+    eyebrow: 'Missão principal',
+    description: 'Organize fato, interpretação, previsão e intenção.',
+    actionLabel: state.missionExists ? 'Continuar jornada' : 'Iniciar jornada',
+    actionRoute: FIRST_MISSION_ROUTES.intro,
+    icon: 'mission'
+  };
 }
 
 export function resolveFirstMissionStageRedirect(
