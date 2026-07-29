@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { Button } from '../components/Button';
 import { Card } from '../components/Card';
 import { PageHeader } from '../components/PageHeader';
+import { isFirstMissionReviewable, resolveFirstMissionResumeRoute } from '../domain/firstMissionFlow';
 import { useAthanorStore } from '../state/useAthanorStore';
 
 export function MissionPage() {
@@ -11,15 +12,12 @@ export function MissionPage() {
   const lamp = useAthanorStore((state) => state.inventory.find((item) => item.id === 'item_clear_word_lamp_v1'));
   const startMission = useAthanorStore((state) => state.startMission);
   const classificationCompleted = Boolean(mission && mission.currentStep >= 2);
-  const reviewReady = Boolean(lamp && ['awaiting_review', 'adjusted', 'resting'].includes(lamp.lifecycle));
-
-  const resumeRoute = lamp
-    ? reviewReady
-      ? '/review/clear-word-lamp'
-      : '/items/clear-word-lamp'
-    : classificationCompleted
-      ? '/mission/word-before-response/chain'
-      : '/mission/word-before-response/classification';
+  const reviewReady = isFirstMissionReviewable(lamp?.lifecycle);
+  const resumeRoute = resolveFirstMissionResumeRoute({
+    missionExists: Boolean(mission),
+    currentStep: mission?.currentStep,
+    itemLifecycle: lamp?.lifecycle
+  });
 
   const resumeLabel = lamp
     ? reviewReady
@@ -33,7 +31,7 @@ export function MissionPage() {
 
   const begin = () => {
     if (!mission) startMission();
-    navigate(resumeRoute);
+    navigate(mission ? resumeRoute : '/mission/word-before-response/classification');
   };
 
   return (
