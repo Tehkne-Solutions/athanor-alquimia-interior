@@ -4,6 +4,7 @@ import {
   hydrateContinuousReceivedPersistedState,
   type ContinuousReceivedHydrationResult
 } from './continuousReceivedHydration';
+import { inspectContinuousReceivedPersistedText } from './continuousReceivedPersistedText';
 import {
   CONTINUOUS_RECEIVED_PERSIST_VERSION,
   CONTINUOUS_RECEIVED_SCHEMA_VERSION
@@ -39,14 +40,14 @@ interface PersistEnvelope {
 
 function rejected(
   current: ContinuousReceivedRegistry,
-  issue: string
+  issues: string[]
 ): ContinuousReceivedHydrationResult {
   return {
     schemaVersion: CONTINUOUS_RECEIVED_SCHEMA_VERSION,
     registry: current,
     status: 'rejected',
-    message: issue,
-    issues: [issue]
+    message: issues[0] ?? 'A memória atual foi recusada durante a releitura explícita.',
+    issues: issues.slice(0, 5)
   };
 }
 
@@ -54,24 +55,21 @@ function decodePersistEnvelope(
   raw: string,
   current: ContinuousReceivedRegistry
 ): ContinuousReceivedHydrationResult | PersistEnvelope {
-  let parsed: unknown;
-  try {
-    parsed = JSON.parse(raw);
-  } catch {
-    return rejected(current, 'A memória atual não contém um envelope JSON persistido interpretável.');
-  }
+  const inspected = inspectContinuousReceivedPersistedText(raw);
+  if (!inspected.ok) return rejected(current, inspected.errors);
 
+  const parsed = inspected.value;
   if (typeof parsed !== 'object' || parsed === null || Array.isArray(parsed)) {
-    return rejected(current, 'A memória atual não possui o envelope persistido esperado.');
+    return rejected(current, ['A memória atual não possui o envelope persistido esperado.']);
   }
 
   const record = parsed as Record<string, unknown>;
   const keys = Object.keys(record).sort();
   if (keys.length !== 2 || keys[0] !== 'state' || keys[1] !== 'version') {
-    return rejected(current, 'O envelope persistido atual possui campos ausentes ou desconhecidos.');
+    return rejected(current, ['O envelope persistido atual possui campos ausentes ou desconhecidos.']);
   }
   if (record.version !== CONTINUOUS_RECEIVED_PERSIST_VERSION) {
-    return rejected(current, 'A versão do envelope persistido atual não é reconhecida para releitura explícita.');
+    return rejected(current, ['A versão do envelope persistido atual não é reconhecida para releitura explícita.']);
   }
 
   return { state: record.state, version: record.version as number };
@@ -161,7 +159,7 @@ export async function executeContinuousReceivedExplicitRehydration(
     executed: true,
     adopted: false,
     status: 'rejected',
-    message: 'A memória mais recente foi relida, mas não passou pelas barreiras de hidratação. O snapshot anterior e o conflito permanecem.',
+    message: 'A memória mais recente foi relida, mas não passou pelas barreiras de texto bruto ou hidratação. O snapshot anterior e o conflito permanecem.',
     issues: [...hydration.issues]
   };
 }
