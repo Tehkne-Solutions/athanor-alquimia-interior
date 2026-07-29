@@ -5,6 +5,8 @@ import {
   idbStateStorage,
   type IdbCompareAndSetResult
 } from '../storage/idbStorage';
+import { inspectContinuousReceivedPersistedText } from './continuousReceivedPersistedText';
+import { useContinuousReceivedHydrationRuntimeStore } from './useContinuousReceivedHydrationRuntimeStore';
 import { useContinuousReceivedPersistenceRuntimeStore } from './useContinuousReceivedPersistenceRuntimeStore';
 
 export const CONTINUOUS_RECEIVED_STORAGE_KEY = 'athanor-continuous-received-state';
@@ -30,6 +32,13 @@ export const continuousReceivedHydrationOnlyStorage: StateStorage = {
   getItem: async (name) => {
     const value = await idbStateStorage.getItem(name);
     useContinuousReceivedPersistenceRuntimeStore.getState().hydrate(value);
+    if (value === null) return null;
+
+    const inspected = inspectContinuousReceivedPersistedText(value);
+    if (!inspected.ok) {
+      useContinuousReceivedHydrationRuntimeStore.getState().rejectPersistedText(inspected.errors);
+      return null;
+    }
     return value;
   },
   setItem: async () => {

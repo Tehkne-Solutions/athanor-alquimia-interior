@@ -7,6 +7,7 @@ interface ContinuousReceivedHydrationRuntimeState {
   message?: string;
   issues: string[];
   beginExplicitReread: () => void;
+  rejectPersistedText: (issues: string[]) => void;
   accept: (result: ContinuousReceivedHydrationResult) => void;
   fail: (error: unknown) => void;
   markEmpty: (message: string) => void;
@@ -26,6 +27,14 @@ export const useContinuousReceivedHydrationRuntimeStore = create<ContinuousRecei
     message: 'A memória local mais recente está sendo relida por uma escolha explícita.',
     issues: []
   }),
+  rejectPersistedText: (issues) => {
+    const limited = issues.slice(0, 5);
+    set({
+      status: 'rejected',
+      message: limited[0] ?? 'O texto bruto da memória persistida foi recusado antes do JSON.parse.',
+      issues: limited
+    });
+  },
   accept: (result) => set({
     status: result.status,
     message: result.message,

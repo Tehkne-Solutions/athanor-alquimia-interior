@@ -24,6 +24,7 @@ import './content/validateContinuousReceivedFingerprintIntegrity';
 import './content/validateContinuousReceivedHydration';
 import './content/validateContinuousReceivedHydrationGate';
 import './content/validateContinuousReceivedIdentity';
+import './content/validateContinuousReceivedPersistedText';
 import './content/validateContinuousReceivedPersistenceCommit';
 import './content/validateContinuousReceivedPersistenceConflict';
 import './content/validateContinuousReceivedSnapshot';
