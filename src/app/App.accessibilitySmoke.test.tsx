@@ -1,4 +1,4 @@
-import { cleanup, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { MemoryRouter } from 'react-router-dom';
 
@@ -60,6 +60,16 @@ describe('smoke de acessibilidade do shell protegido', () => {
     expect(screen.getAllByRole('link', { name: 'Jornada' })).toHaveLength(2);
   });
 
+  it('mantém links de navegação semanticamente operáveis por teclado', () => {
+    renderAt('/mission/word-before-response');
+
+    const journeyLinks = screen.getAllByRole('link', { name: 'Jornada' });
+    for (const link of journeyLinks) {
+      expect(link).toHaveAttribute('href', '/mission/word-before-response');
+      expect(link.tabIndex).toBeGreaterThanOrEqual(0);
+    }
+  });
+
   it('anuncia a rota atual em uma região live', () => {
     renderAt('/mission/word-before-response');
 
@@ -67,5 +77,17 @@ describe('smoke de acessibilidade do shell protegido', () => {
     expect(status).toHaveAttribute('aria-live', 'polite');
     expect(status).toHaveAttribute('aria-atomic', 'true');
     expect(status).toHaveTextContent('Página atual: Missão A Palavra Antes da Resposta');
+  });
+
+  it('move o foco para o conteúdo principal depois de uma navegação', async () => {
+    renderAt('/mission/word-before-response');
+
+    const main = screen.getByRole('main');
+    expect(main).not.toHaveFocus();
+
+    fireEvent.click(screen.getAllByRole('link', { name: 'Inventário' })[0]);
+
+    await waitFor(() => expect(main).toHaveFocus());
+    expect(screen.getByRole('status')).toHaveTextContent('Página atual: Inventário');
   });
 });
