@@ -37,11 +37,12 @@ export const itemLifecycleSchema = z.enum([
   'active',
   'awaiting_review',
   'adjusted',
+  'resting',
   'integrated',
   'memorial',
   'archived'
 ]);
-export type ItemLifecycle = 'recipe' | 'discovered' | 'incomplete' | 'created' | 'active' | 'awaiting_review' | 'adjusted' | 'integrated' | 'memorial' | 'archived';
+export type ItemLifecycle = 'recipe' | 'discovered' | 'incomplete' | 'created' | 'active' | 'awaiting_review' | 'adjusted' | 'resting' | 'integrated' | 'memorial' | 'archived';
 
 export type ReviewOutcome = 'integrated' | 'adjusted' | 'resting';
 
