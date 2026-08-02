@@ -92,23 +92,30 @@ Esta frente não deve bloquear o primeiro lançamento local-first.
 
 **Objetivo:** provar que uma pessoa nova consegue entrar, compreender, concluir uma jornada e retornar ao Templo sem orientação externa.
 
-Entregas:
+Entregas concluídas no código:
 
 - mapa atualizado das rotas e estados;
-- auditoria do fluxo de primeira sessão;
-- inventário de fricções P0/P1/P2;
 - correção dos bloqueios P0;
-- smoke test do ciclo principal;
-- relatório visual antes/depois;
-- atualização do README para refletir a Fase 8.37.
+- retomada centralizada da Primeira Obra;
+- guards determinísticos;
+- CTAs centralizados no domínio;
+- smoke tests de fluxo e acessibilidade;
+- gerenciamento de foco pós-navegação;
+- relatório final em `docs/SPRINT-9-BETA-READINESS-REPORT.md`;
+- README atualizado para a Fase 8.37;
+- CI com typecheck, diagnóstico por etapa, `workflow_dispatch`, concorrência e resumo final;
+- configuração do Vitest unificada em `vitest.config.ts`;
+- comando local `npm run verify` reproduzindo o gate completo.
 
-Critérios de aceite:
+Gate pendente para fechamento administrativo:
 
-- onboarding concluível em mobile e desktop;
-- nenhum beco sem saída;
-- progresso preservado após recarregar;
-- próxima ação clara em todas as etapas críticas;
-- fluxo principal coberto por teste automatizado.
+```text
+npm run verify
+```
+
+ou um run verde equivalente do workflow **Athanor CI** no GitHub Actions.
+
+Após o gate verde, executar homologação visual desktop/mobile e encerrar a issue #70.
 
 ### Sprint 9.1 — Sistema visual e shell do produto
 
@@ -188,51 +195,12 @@ Entregas:
 
 ## 4. Ordem de execução imediata
 
-1. Atualizar documentação da Fase 8.37.
-2. Mapear rotas, telas, stores e persistência.
-3. Executar e registrar testes atuais.
-4. Auditar visualmente o fluxo de primeira sessão.
-5. Corrigir todos os bloqueios P0.
-6. Criar smoke test automatizado do ciclo principal.
-7. Abrir a Sprint 9.1 somente após o fluxo principal estar estável.
+1. Executar `npm run verify` ou disparar manualmente **Athanor CI** em Actions.
+2. Corrigir qualquer falha observada no gate.
+3. Fazer homologação visual desktop/mobile do build aprovado.
+4. Encerrar a issue #70.
+5. Abrir a Sprint 9.1 somente após o fluxo principal estar estável e o gate verde.
 
 ## 5. Regra de foco
 
 Até o encerramento da Sprint 9.0, novas políticas defensivas da série 8.x só devem ser adicionadas quando corrigirem um risco real reproduzível. Melhorias abstratas de robustez não devem ultrapassar em prioridade problemas de navegação, compreensão, acessibilidade, conteúdo, qualidade visual ou entrega.
-
-## 6. Atualização de fechamento funcional — 2 de agosto de 2026
-
-A implementação da Sprint 9.0 consolidou o fluxo inicial e a Primeira Obra em uma única máquina de estados de domínio.
-
-Concluído no código:
-
-- onboarding sequencial e guards defensivos;
-- retomada determinística da Primeira Obra;
-- centralização de rotas, bloqueios, CTAs e apresentação em `firstMissionFlow.ts`;
-- `MissionPage`, `FirstMissionGuard` e `TemplePage` consumindo o mesmo contrato;
-- lifecycle `resting` formalizado no schema e no tipo;
-- testes de domínio e review;
-- testes integrados de roteamento;
-- testes dos CTAs reais do Átrio e da missão;
-- `jsdom` + Testing Library + matchers globais;
-- skip link, landmarks, região live e navegação semântica;
-- transferência de foco para o conteúdo principal após mudança de rota;
-- smoke de acessibilidade e foco;
-- workflow de CI com validação de conteúdo, typecheck, testes e build;
-- relatório de evidências em `docs/SPRINT-9-BETA-READINESS-REPORT.md`;
-- README já documentando a Fase 8.37.
-
-### Gate administrativo remanescente
-
-O conector do GitHub ainda retorna `statuses: []` para os commits recentes. Por isso, o roadmap não presume sucesso de execução remota.
-
-O fechamento administrativo definitivo da Sprint 9.0 depende de evidência verde para:
-
-```text
-npm run validate:content
-npm run lint
-npm test
-npm run build
-```
-
-Com esse gate aprovado, a execução pode avançar para a Sprint 9.1 e homologação visual sem reabrir a arquitetura do fluxo inicial.
