@@ -1,0 +1,71 @@
+:root {
+  --atrium-gap: clamp(.85rem,1.5vw,1.15rem);
+  --atrium-border: rgba(236,226,198,.12);
+  --atrium-bg: linear-gradient(155deg,rgba(25,35,32,.94),rgba(13,20,18,.92));
+  --atrium-soft: rgba(255,255,255,.025);
+}
+
+.page--temple { --content-max: 1360px; }
+.page--temple .page-header { margin-bottom:clamp(1.35rem,2.5vw,2.2rem); }
+.page--temple .page-header > div { max-width:760px; }
+.page--temple .page-header h1 { max-width:920px; margin-bottom:.75rem; text-wrap:balance; }
+.page--temple .temple-dashboard { gap:var(--atrium-gap); align-items:stretch; }
+.page--temple .temple-dashboard > .card { position:relative; overflow:clip; border-color:var(--atrium-border); background:var(--atrium-bg); box-shadow:0 18px 50px rgba(0,0,0,.14); }
+.page--temple .temple-dashboard > .card:not(.hero-card)::before { content:''; position:absolute; inset:0 auto 0 0; width:2px; background:linear-gradient(180deg,transparent,rgba(217,173,99,.65),transparent); opacity:.28; pointer-events:none; }
+
+.page--temple .hero-card { border-color:rgba(217,173,99,.2); box-shadow:0 24px 70px rgba(0,0,0,.22); }
+.page--temple .hero-card__scene { min-height:460px; }
+.page--temple .hero-card__scene::after { content:''; position:absolute; inset:auto 0 0; height:44%; background:linear-gradient(transparent,rgba(8,13,11,.62)); pointer-events:none; }
+.page--temple .hero-card__content { padding:clamp(1.35rem,2.5vw,2rem); }
+.page--temple .hero-card__content h2 { font-size:clamp(1.7rem,2.6vw,2.4rem); margin-bottom:.65rem; }
+.page--temple .hero-card__content > p:not(.eyebrow) { max-width:62ch; margin-bottom:1.3rem; }
+
+.page--temple .status-row { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:.55rem; }
+.page--temple .status-row span { min-height:56px; display:flex; align-items:center; gap:.45rem; padding:.7rem .8rem; border-radius:14px; background:var(--atrium-soft); }
+.page--temple .status-row strong { font-family:Georgia,'Times New Roman',serif; font-size:1.15rem; font-weight:500; }
+
+.page--temple .mission-card,.page--temple .principle-card { min-height:100%; display:flex; flex-direction:column; }
+.page--temple .mission-card .card__header,.page--temple .principle-card .card__header { margin-bottom:.75rem; }
+.page--temple .mission-card h2,.page--temple .principle-card h2 { font-size:clamp(1.35rem,1.8vw,1.7rem); }
+.page--temple .mission-card > p,.page--temple .principle-card > p { max-width:54ch; }
+.page--temple .mission-card .button,.page--temple .principle-card .button { margin-top:auto; align-self:flex-start; }
+.page--temple .mission-card__icon { width:46px; height:46px; margin-bottom:.8rem; border-radius:14px; border:1px solid rgba(127,158,174,.2); background:rgba(127,158,174,.08); }
+.page--temple .principle-card blockquote { margin:.35rem 0 1rem; padding-left:1.1rem; font-size:clamp(1.12rem,1.7vw,1.35rem); }
+
+.page--temple .mission-card--water .mission-card__icon { color:var(--blue); background:rgba(127,158,174,.09); }
+.page--temple .mission-card--fire .mission-card__icon { color:var(--red); background:rgba(191,117,106,.09); }
+.page--temple .mission-card--earth .mission-card__icon { color:var(--sage); background:rgba(127,157,143,.09); }
+.page--temple .mission-card--spirit .mission-card__icon { color:var(--violet); background:rgba(145,133,164,.09); }
+
+.page--temple .temple-map { gap:.55rem; }
+.page--temple .temple-node { min-height:108px; border-radius:15px; background:rgba(5,9,8,.22); transition:border-color 160ms ease,background 160ms ease,transform 160ms ease; }
+.page--temple .temple-node:hover:not(:disabled) { transform:translateY(-1px); border-color:rgba(236,226,198,.22); background:rgba(255,255,255,.03); }
+.page--temple .item-mini { padding:.75rem 0; border-bottom:1px solid var(--line); }
+.page--temple .item-mini:last-child { border-bottom:0; }
+.page--temple .item-mini p { margin-bottom:0; font-size:.84rem; }
+.page--temple .safety-summary { align-items:center; }
+.page--temple .safety-summary svg { color:var(--sage); flex:0 0 auto; }
+.page--temple .safety-summary p { margin-bottom:0; }
+
+[data-contrast='high'] .page--temple .temple-dashboard > .card,
+[data-contrast='high'] .page--temple .status-row span,
+[data-contrast='high'] .page--temple .temple-node { border-color:currentColor; }
+
+@media (max-width:1100px) {
+  .page--temple .hero-card__scene { min-height:380px; }
+  .page--temple .status-row { grid-template-columns:repeat(4,minmax(0,1fr)); }
+}
+
+@media (max-width:760px) {
+  .page--temple .page-header { margin-bottom:1.15rem; }
+  .page--temple .hero-card__scene { min-height:320px; }
+  .page--temple .hero-card__content { padding:1.15rem; }
+  .page--temple .status-row { grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .page--temple .status-row span { min-height:50px; font-size:.7rem; }
+  .page--temple .mission-card .button,.page--temple .principle-card .button { width:100%; }
+}
+
+@media (max-width:430px) {
+  .page--temple .status-row span { align-items:flex-start; flex-direction:column; gap:.1rem; }
+  .page--temple .temple-dashboard > .card { border-radius:18px; }
+}
