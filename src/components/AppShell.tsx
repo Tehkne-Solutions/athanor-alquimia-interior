@@ -1,6 +1,6 @@
 import { BookOpen, Boxes, ClipboardCheck, MailOpen, Map, ScrollText, Settings2, UserRound } from 'lucide-react';
-import { useEffect } from 'react';
-import { NavLink, Outlet } from 'react-router-dom';
+import { useEffect, useRef } from 'react';
+import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import { useAthanorStore } from '../state/useAthanorStore';
 import { RouteAnnouncer } from './RouteAnnouncer';
 
@@ -15,12 +15,21 @@ const navItems = [
 export function AppShell() {
   const highContrast = useAthanorStore((state) => state.preferences.highContrast);
   const reducedMotion = useAthanorStore((state) => state.preferences.reducedMotion);
+  const location = useLocation();
+  const mainRef = useRef<HTMLElement>(null);
+  const previousPathRef = useRef(location.pathname);
 
   useEffect(() => {
     const root = document.documentElement;
     root.dataset.contrast = highContrast ? 'high' : 'standard';
     root.dataset.motion = reducedMotion ? 'reduced' : 'full';
   }, [highContrast, reducedMotion]);
+
+  useEffect(() => {
+    if (previousPathRef.current === location.pathname) return;
+    previousPathRef.current = location.pathname;
+    mainRef.current?.focus({ preventScroll: true });
+  }, [location.pathname]);
 
   return (
     <div className="app-shell">
@@ -54,7 +63,7 @@ export function AppShell() {
         </div>
         <p className="side-nav__signature">Tehkné Solutions</p>
       </aside>
-      <main className="app-main" id="main-content" tabIndex={-1}><Outlet /></main>
+      <main ref={mainRef} className="app-main" id="main-content" tabIndex={-1}><Outlet /></main>
       <nav className="bottom-nav" aria-label="Navegação principal mobile">
         {navItems.map(({ to, label, icon: Icon }) => (
           <NavLink key={to} to={to} className={({ isActive }) => `bottom-nav__item ${isActive ? 'bottom-nav__item--active' : ''}`}>
