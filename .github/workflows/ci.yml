@@ -1,6 +1,7 @@
 name: Athanor CI
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
@@ -11,6 +12,10 @@ on:
 
 permissions:
   contents: read
+
+concurrency:
+  group: athanor-ci-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   validate:
@@ -105,3 +110,18 @@ jobs:
           path: build.log
           if-no-files-found: error
           retention-days: 1
+
+      - name: Validation summary
+        if: always()
+        shell: bash
+        run: |
+          {
+            echo '## Athanor CI'
+            echo ''
+            echo "- Commit: \`${GITHUB_SHA}\`"
+            echo "- Event: \`${GITHUB_EVENT_NAME}\`"
+            echo "- Content validation: \`${{ steps.content_validation.outcome }}\`"
+            echo "- Type check: \`${{ steps.typecheck.outcome }}\`"
+            echo "- Tests: \`${{ steps.tests.outcome }}\`"
+            echo "- Build: \`${{ steps.build.outcome }}\`"
+          } >> "$GITHUB_STEP_SUMMARY"
