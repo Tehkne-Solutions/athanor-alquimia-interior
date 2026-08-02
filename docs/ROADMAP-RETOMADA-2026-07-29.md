@@ -199,3 +199,40 @@ Entregas:
 ## 5. Regra de foco
 
 Até o encerramento da Sprint 9.0, novas políticas defensivas da série 8.x só devem ser adicionadas quando corrigirem um risco real reproduzível. Melhorias abstratas de robustez não devem ultrapassar em prioridade problemas de navegação, compreensão, acessibilidade, conteúdo, qualidade visual ou entrega.
+
+## 6. Atualização de fechamento funcional — 2 de agosto de 2026
+
+A implementação da Sprint 9.0 consolidou o fluxo inicial e a Primeira Obra em uma única máquina de estados de domínio.
+
+Concluído no código:
+
+- onboarding sequencial e guards defensivos;
+- retomada determinística da Primeira Obra;
+- centralização de rotas, bloqueios, CTAs e apresentação em `firstMissionFlow.ts`;
+- `MissionPage`, `FirstMissionGuard` e `TemplePage` consumindo o mesmo contrato;
+- lifecycle `resting` formalizado no schema e no tipo;
+- testes de domínio e review;
+- testes integrados de roteamento;
+- testes dos CTAs reais do Átrio e da missão;
+- `jsdom` + Testing Library + matchers globais;
+- skip link, landmarks, região live e navegação semântica;
+- transferência de foco para o conteúdo principal após mudança de rota;
+- smoke de acessibilidade e foco;
+- workflow de CI com validação de conteúdo, typecheck, testes e build;
+- relatório de evidências em `docs/SPRINT-9-BETA-READINESS-REPORT.md`;
+- README já documentando a Fase 8.37.
+
+### Gate administrativo remanescente
+
+O conector do GitHub ainda retorna `statuses: []` para os commits recentes. Por isso, o roadmap não presume sucesso de execução remota.
+
+O fechamento administrativo definitivo da Sprint 9.0 depende de evidência verde para:
+
+```text
+npm run validate:content
+npm run lint
+npm test
+npm run build
+```
+
+Com esse gate aprovado, a execução pode avançar para a Sprint 9.1 e homologação visual sem reabrir a arquitetura do fluxo inicial.
