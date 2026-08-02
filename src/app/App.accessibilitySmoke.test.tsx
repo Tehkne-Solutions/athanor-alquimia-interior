@@ -53,11 +53,11 @@ describe('smoke de acessibilidade do shell protegido', () => {
     expect(main).toHaveAttribute('tabindex', '-1');
   });
 
-  it('mantém navegação principal nomeada em desktop e mobile', () => {
+  it('mantém landmarks de navegação principal nomeados em desktop e mobile', () => {
     renderAt('/mission/word-before-response');
 
-    const navigations = screen.getAllByRole('navigation', { name: /Navegação principal/i });
-    expect(navigations).toHaveLength(2);
+    expect(screen.getByRole('complementary', { name: /Navegação principal/i })).toBeInTheDocument();
+    expect(screen.getByRole('navigation', { name: /Navegação principal mobile/i })).toBeInTheDocument();
     expect(screen.getAllByRole('link', { name: 'Jornada' })).toHaveLength(2);
   });
 
