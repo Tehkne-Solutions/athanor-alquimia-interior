@@ -115,12 +115,14 @@ Cobre skip link, landmarks, navegação nomeada, semântica para teclado, anúnc
 
 ## Infraestrutura de testes e CI
 
-Foi configurado ambiente de componentes com:
+O ambiente de componentes usa uma única configuração oficial em `vitest.config.ts`, com:
 
 - `jsdom`;
 - Testing Library;
 - `@testing-library/jest-dom/vitest`;
-- setup global em `src/test/setup.ts`.
+- setup global em `tests/setup.ts`.
+
+A configuração duplicada que também existia em `vite.config.ts` foi removida para evitar divergência entre desenvolvimento local e CI.
 
 O workflow `.github/workflows/ci.yml` executa:
 
@@ -132,11 +134,26 @@ npm ci
 → npm run build
 ```
 
-Falhas geram artefatos curtos de diagnóstico para conteúdo, typecheck, testes e build.
+O workflow também possui:
+
+- `workflow_dispatch` para disparo manual;
+- `concurrency` por ref para evitar runs obsoletos concorrentes;
+- resumo final no `GITHUB_STEP_SUMMARY` com o resultado de cada gate;
+- artefatos curtos de diagnóstico para conteúdo, typecheck, testes e build.
+
+Para reproduzir o mesmo gate localmente foi adicionado:
+
+```text
+npm run verify
+```
+
+que executa validação de conteúdo, typecheck, testes e build em sequência.
 
 ## Correções de contrato encontradas durante a sprint
 
 `resting` era reconhecido pelo fluxo e pela interface, porém não fazia parte de `ItemLifecycle`. O schema e o tipo foram alinhados ao comportamento já suportado.
+
+Também foi identificada e removida uma duplicação de configuração entre `vite.config.ts` e `vitest.config.ts`, que poderia fazer o Vitest usar setup diferente do esperado em CI.
 
 ## Evidências principais por commit
 
@@ -154,20 +171,22 @@ Falhas geram artefatos curtos de diagnóstico para conteúdo, typecheck, testes 
 - `b5667b1` — apresentação centralizada;
 - `66d3f60` — cobertura visual do domínio;
 - `86a6727` — TemplePage centralizado;
-- `17712e0` / `86ebd5e` — infraestrutura de testes de interface;
 - `a43df6b` — CI com typecheck e timeout;
 - `cbd0bfd` — contrato `resting` alinhado;
 - `db45c31` — testes integrados de guards;
 - `9ef71ae` — testes dos CTAs reais;
 - `2ee8e3d` — smoke inicial de acessibilidade;
 - `9b9add2` — gerenciamento de foco após navegação;
-- `fbd750b` — teste do foco e semântica de teclado.
+- `fbd750b` / `5cd39fe` — testes de foco e teclado;
+- `0723590` — CI com disparo manual, concorrência e resumo final;
+- `b201b2c` / `94fb3d0` — unificação da configuração do Vitest;
+- `f137278` — comando único `npm run verify`.
 
 ## Estado de aceite
 
 Funcionalmente, o escopo de código da Sprint 9 está implementado e coberto por testes automatizados adicionados ao repositório.
 
-O conector do GitHub utilizado durante esta sprint ainda retorna `statuses: []` para os commits recentes. Portanto, este relatório **não declara** `validate:content`, testes e build como aprovados em execução remota até existir evidência de um run concluído do GitHub Actions ou execução local equivalente.
+O conector do GitHub utilizado durante esta sprint continua retornando `statuses: []` para os commits recentes e o ambiente de execução disponível não possui `gh` instalado. Portanto, este relatório **não declara** `validate:content`, testes e build como aprovados em execução remota até existir evidência de um run concluído do GitHub Actions ou execução local equivalente de `npm run verify`.
 
 Esse é o único gate remanescente para o fechamento administrativo definitivo da Sprint 9.
 
