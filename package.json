@@ -10,7 +10,8 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "lint": "tsc --noEmit",
-    "validate:content": "tsx scripts/validate-content.ts"
+    "validate:content": "tsx scripts/validate-content.ts",
+    "verify": "npm run validate:content && npm run lint && npm test && npm run build"
   },
   "dependencies": {
     "lucide-react": "^0.468.0",
