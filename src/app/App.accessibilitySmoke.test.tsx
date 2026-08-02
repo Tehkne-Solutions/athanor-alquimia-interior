@@ -46,6 +46,7 @@ describe('smoke de acessibilidade do shell protegido', () => {
 
     const skipLink = screen.getByRole('link', { name: /Ir para o conteúdo principal/i });
     expect(skipLink).toHaveAttribute('href', '#main-content');
+    expect(skipLink.tabIndex).toBeGreaterThanOrEqual(0);
 
     const main = screen.getByRole('main');
     expect(main).toHaveAttribute('id', 'main-content');
