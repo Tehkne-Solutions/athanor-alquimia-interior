@@ -67,12 +67,12 @@ describe('Primeira Obra · Trabalho que Cabe Hoje', () => {
     fireEvent.click(screen.getByRole('button', { name: /Iniciar missão/i }));
 
     fireEvent.click(screen.getByRole('button', { name: /Concluir sem classificar/i }));
-    fireEvent.click(screen.getByRole('button', { name: /Mesa de trabalho/i }));
-    fireEvent.click(screen.getByRole('button', { name: /Disponível/i }));
-    fireEvent.click(screen.getByRole('button', { name: /Cinco minutos/i }));
-    fireEvent.click(screen.getByRole('button', { name: /Observar os materiais/i }));
-    fireEvent.click(screen.getByRole('button', { name: /Temporizador/i }));
-    fireEvent.click(screen.getByRole('button', { name: /Fazer somente o pequeno passo/i }));
+    fireEvent.click(screen.getByRole('button', { name: /Canto de mesa fictício/i }));
+    fireEvent.click(screen.getByRole('button', { name: /Alguma capacidade disponível/i }));
+    fireEvent.click(screen.getByRole('button', { name: /Até 5 minutos/i }));
+    fireEvent.click(screen.getByRole('button', { name: /Apenas observar/i }));
+    fireEvent.click(screen.getByRole('button', { name: /Temporizador opcional/i }));
+    fireEvent.click(screen.getByRole('button', { name: /Fazer o passo pequeno/i }));
 
     const complete = screen.getByRole('button', { name: /Criar Semente/i });
     expect(complete).toBeEnabled();
