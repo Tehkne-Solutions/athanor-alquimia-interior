@@ -22,9 +22,14 @@ describe('Primeira Obra · Trabalho que Cabe Hoje', () => {
     useEarthBodyStore.setState({
       progress: {
         id: 'mission_body_arrives_first_v1',
+        sourceFireCycleId: 'fire-cycle-test',
         status: 'completed',
-        currentStep: 4,
+        perceptions: {},
+        checkInSkipped: true,
         classifications: {},
+        classificationSkipped: true,
+        resources: ['none_available'],
+        action: 'no_action',
         bodyPresenceMarkCreated: true,
         startedAt: sourceBodyPresenceMarkId,
         updatedAt: sourceBodyPresenceMarkId,
