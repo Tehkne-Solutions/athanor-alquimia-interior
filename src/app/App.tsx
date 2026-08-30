@@ -43,6 +43,7 @@ import { LibraryPage } from '../pages/LibraryPage';
 import { LimitsPage } from '../pages/LimitsPage';
 import { MissionPage } from '../pages/MissionPage';
 import { NewWorkPage } from '../pages/NewWorkPage';
+import { PractitionerMemoryPage } from '../pages/PractitionerMemoryPage';
 import { PsalmsChamberPage } from '../pages/PsalmsChamberPage';
 import { ReviewPage } from '../pages/ReviewPage';
 import { SafetyPage } from '../pages/SafetyPage';
@@ -103,7 +104,6 @@ function FirstMissionGuard({ stage, children }: { stage: FirstMissionStage; chil
     currentStep: mission?.currentStep,
     itemLifecycle: lamp?.lifecycle
   });
-
   return redirect ? <Navigate to={redirect} replace/> : children;
 }
 
@@ -127,6 +127,7 @@ export function App() {
     <Route element={<ProtectedShell/>}>
       <Route path="/temple" element={<TemplePage/>}/>
       <Route path="/temple/map" element={<TemplePage/>}/>
+      <Route path="/temple/memory" element={<PractitionerMemoryPage/>}/>
       <Route path="/temple/proverbs-library" element={<LibraryPage/>}/>
       <Route path="/temple/psalms-chamber" element={<PsalmsChamberPage/>}/>
       <Route path="/temple/forge" element={<ForgePage/>}/>
@@ -182,7 +183,7 @@ export function App() {
       <Route path="/character" element={<CharacterPage/>}/>
       <Route path="/settings/accessibility" element={<AccessibilityPage/>}/>
       <Route path="/homologation" element={<HomologationPage/>}/>
-      {import.meta.env.DEV && <Route path="/dev" element={<DevPage/>}/>} 
+      {import.meta.env.DEV && <Route path="/dev" element={<DevPage/>}/>}
     </Route>
     <Route path="*" element={<Navigate to="/" replace/>}/>
   </Routes>;
